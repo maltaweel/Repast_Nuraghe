@@ -1024,7 +1024,7 @@ class AllianceModel:
                     "n_bad": np.zeros(N, np.int64), "n_good": np.zeros(N, np.int64),
                     "n_pc_refused": np.zeros(N, np.int64), "n_pc_refuse_given": np.zeros(N, np.int64),
                     "n_cheat": np.zeros(N, np.int64)}
-        self.soc["R"] = float(self.S.R)
+        self.soc["R"], self.soc["gentle"] = float(self.S.R), reputation_rule(sc) == "gentle"   # v13g (end of file)
 
     def _bad(self, k, i):
         """Reputation: does observer k see community i in bad standing? i's most recent act (as an asked community) that
@@ -1054,7 +1054,7 @@ class AllianceModel:
         if so["rep"]:
             if ok:
                 so["log"][j].append((i, True)); so["n_good"][j] += 1
-            elif not just:
+            elif not just and (not so["gentle"] or self.defector[j] or (j, i) in self.received_from):   # v13g
                 so["log"][j].append((i, False)); so["n_bad"][j] += 1
         if so["pc"]:
             if ok:
@@ -2002,7 +2002,7 @@ def signature(cfg, sc, haul):
     keys = ["hours_per_day", "builders", "stone", "transport"]
     al = {k: v for k, v in cfg["alliance"].items() if k not in ("list", "verify_scenarios", "sensitivity")}
     h = hashlib.sha1(json.dumps({**{k: cfg[k] for k in keys}, "alliance": al}, sort_keys=True, default=str).encode())
-    h.update(json.dumps(sc, sort_keys=True).encode())
+    h.update(json.dumps(_sig_sc(sc), sort_keys=True).encode())   # v13g: = sc unless reputation_rule "all" is explicit
     h.update(haul[["UID", "TWR_N", "haul_flatm", "haul_m"]].to_csv(index=False).encode())
     h.update(json.dumps(cfg["lit_scenarios"]["webster_md_per_tower"]).encode())
     h.update(json.dumps(cfg["lit_scenarios"]["lift_share_of_build"]).encode())          # B3: build/lift split
@@ -2038,7 +2038,7 @@ def signature(cfg, sc, haul):
         if sc.get("bichrome"):
             h.update(open(os.path.join(cfg["paths"]["cache_dir"], "census", "bichrome_dist.csv"), "rb").read())
     if any(sc.get(k) for k in SOCIAL_KEYS):              # v13 social mechanisms: their code version and cfg['scenarios']
-        h.update(SOCIAL_VERSION.encode())                # (split_cost_mh acts on every alliance run; was never hashed)
+        h.update((SOCIAL_VERSION + _rule_tag(sc)).encode())   # (split_cost_mh acts on every alliance run; was never hashed)
         h.update(json.dumps({k: v for k, v in cfg["scenarios"].items() if k != "list"}, sort_keys=True,
                             default=str).encode())
     h.update(CODE_VERSION.encode())                      # stale part files from older code are never reused
@@ -2141,3 +2141,38 @@ class _Light:
 
     def __init__(self, S):
         self.xy, self.T, self.H, self.W = S.xy.copy(), S.T.copy(), S.H, S.W
+
+
+# ------------------------------------------------------------------ v13g reputation rule (2 Nov 2026)
+# Appended at the end of the file so that every earlier line keeps its number (the ODD cites them); the three call
+# sites are one-line edits: _init_social (soc["gentle"]), _social_gate (which refusals are logged as bad) and
+# signature (_sig_sc, _rule_tag). reputation_rule: which refusals count as bad acts in the reputation log.
+#   "all" (default) = every unjustified refusal (the rule of the five v13 runs);
+#   "gentle" = only a refusal by a defector, or by a community that has received help from the requester
+#   (ingratitude: (j, i) in received_from, the same condition as the delta_down trust update and as cheating under
+#   partner choice). Other refusals (backlog, distance, capacity, by a community that owes the requester nothing) are
+#   not logged, so they cost no standing; helps and justified refusals are treated as before.
+# No numeric parameter and no random draws. The key acts only when a SOCIAL_KEYS key is set. The signature changes only
+# when the rule is not "all" (REPUTATION_RULE_VERSION and the rule are appended to SOCIAL_VERSION; an explicit "all"
+# is dropped from the hashed scenario), so every v13 run keeps its signature.
+REPUTATION_RULES = ("all", "gentle")
+REPUTATION_RULE_VERSION = "2026-11-02-v13g-gentle-1"
+
+
+def reputation_rule(sc):
+    """The scenario's reputation rule ("all" when the key is absent); any other value is an error."""
+    r = sc.get("reputation_rule", "all")
+    if r not in REPUTATION_RULES:
+        raise ValueError(f"reputation_rule {r!r} not in {REPUTATION_RULES}")
+    return r
+
+
+def _rule_tag(sc):
+    """Signature tag of the reputation rule: empty for "all", so the hash of every earlier v13 run is unchanged."""
+    r = reputation_rule(sc)
+    return "" if r == "all" else "|" + REPUTATION_RULE_VERSION + ":" + r
+
+
+def _sig_sc(sc):
+    """The scenario as hashed: sc itself, minus an explicit default reputation_rule ("all")."""
+    return {k: v for k, v in sc.items() if not (k == "reputation_rule" and v == "all")}

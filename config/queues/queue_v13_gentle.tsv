@@ -1,0 +1,4 @@
+prio	label	kind	est_s	ranks	config	args
+2	V13g_A5_full_freerider_V13repg	cmd	260	6	@RUN_DIR@/config_v13g_A5FR_repg.yaml	cd @RUN_DIR@/code_v13 && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_v13g_A5FR_repg.yaml --seeds 1-100 --no-shapefile --alliance A5_full_freerider_V13repg
+2	V13g_A5_full_freerider_V13repgpc	cmd	260	6	@RUN_DIR@/config_v13g_A5FR_repg_pc.yaml	cd @RUN_DIR@/code_v13 && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_v13g_A5FR_repg_pc.yaml --seeds 1-100 --no-shapefile --alliance A5_full_freerider_V13repgpc
+2	V13g_MOST_REALISTIC_AUDITED_LIT_V13allg_P10	cmd	410	6	@RUN_DIR@/config_v13g_MR_allg.yaml	cd @RUN_DIR@/code_v13 && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_v13g_MR_allg.yaml --seeds 1-100 --no-shapefile --alliance MOST_REALISTIC_AUDITED_LIT_V13allg_P10

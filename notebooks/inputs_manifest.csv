@@ -88,7 +88,7 @@ derived,derived/stones4/haul/sites_haul_mu0.1.csv,,,run,derived input (data/deri
 derived,derived/stones4/haul/sites_haul_mu0.38.csv,,,run,derived input (data/derived/README.md); presence only
 derived,derived/stones4/haul/sites_haul_mu0.5.csv,,,run,derived input (data/derived/README.md); presence only
 code,code/METHODS.md,112358,17030aa39d94b6cdb42e1530b0fd6745cbf588a41ce7dc8c18278c2dd53958ac,run;rebuild,repository code (CODE_PROVENANCE.md)
-code,code/alliance.py,130520,cd44493d3037a8ac6354aec7d23b17a4cf06348ff3c832233fa9f21fb89fd76d,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/alliance.py,132840,386c3f861bf80b624e265a58dc0590a53eb59225379f7b941ed2c016d91fb071,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/aud_chain.sh,4219,d11260027aa54ef572c9893056e6d28d2d61313f44be79176cd1ee63e23aa71b,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/census_v12.py,28830,15786fc46ad543dec130cac37f816cad3e6391d81ffc7b1d3a17fac75e0029f0,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/config.ship.yaml,12600,b785a1f64cd752869a608dd94b8ec211275e5471fdfc8e7c91b04369631a3759,run;rebuild,repository code (CODE_PROVENANCE.md)
@@ -122,6 +122,7 @@ code,code/sites302.txt,3321,d5dd7dbfc108f7190d27fbdb9548ca47a825ae29c4025d745c49
 code,code/v11_chain.sh,3832,67bd97e330d15b1f4dd14ee9714d38c339b2e571b35b199e4fbd61b2b6b92f58,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/v12_chain.sh,4207,606b4cf220a992591bd3b24281ddf4a25fe91c01074e6684bb9db9193bb48de2,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/v13_side_chain.sh,1313,fd8b8339bde53a75cac6c866b24532e2a17ea0fd4072b4ee66dacd4b92512ccb,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/v13g_side_chain.sh,1335,167091be52a33d4c5c25798bae3ac0ce5e04f3bcaa312bfbcf2aebc7a7272415,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/wl_chain.sh,2774,697e11730b903cf22273f3f179be9392af493df02f902cafd42ab6a1b8c68cc3,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/__init__.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/gaps_subset.sh,1507,988cee3c34b6b024f86dd9004cd610e070448dc08dbb6a0346a32c271e07087c,run;rebuild,repository code (CODE_PROVENANCE.md)
