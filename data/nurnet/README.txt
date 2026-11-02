@@ -1,0 +1,1 @@
+Nurnet's data. Site list: a Nurnet merge and deduplication of various sources. Site building stone: Nurnet's data. For the latest version and source information, contact Nurnet at nurnet.presidente@gmail.com.

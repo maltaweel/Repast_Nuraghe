@@ -1,0 +1,37 @@
+CODE,DESC_IT,DESC_EN,STONE,BUILDSTONE
+A1.1,"Leucograniti, Graniti s.l., Sienograniti","Leucogranites, granites, syenogranites",granite,1
+A1.2,"Monzograniti, Leucomonzograniti",Monzogranites,granite,1
+A1.3,Granodioriti,Granodiorites,granite,1
+A1.4,"Tonaliti, Quarzodioriti","Tonalites, quartz-diorites",granite,1
+A1.5,"Gabbri, Gabbrodioriti, Dioriti, Noriti","Gabbros, diorites",other intrusive,1
+A1.6,"Sieniti, Episieniti",Syenites,granite,1
+A2.1,Rioliti e Riodaciti,"Rhyolites, rhyodacites",acid volcanic,1
+A2.2,Daciti,Dacites,acid volcanic,1
+A2.3,"Basalti alcalini, Trachibasalti, Fonoliti, Tefriti","Alkali basalts, phonolites",basalt,1
+A2.4,"Andesiti, Andesiti basaltiche",Andesites,andesite,1
+A2.5,"Basalti, Basalti andesitici",Basalts,basalt,1
+A2.6,"Rocce ultrabasiche, Basaniti","Ultrabasic rocks, basanites",basalt,1
+A2.7,"Trachiti, Latiti","Trachytes, latites",trachyte,1
+A3.1,Filoni e ammassi acidi,"Acid dykes (quartz, aplite, pegmatite)",dyke,1
+A3.2,Filoni e ammassi basici/intermedi,Basic/intermediate dykes,dyke,1
+B1.1,"Metarioliti, Porfiroidi","Meta-rhyolites, acid metavolcanics",metamorphic,1
+B1.2,"Migmatiti acide, Ortogneiss","Acid migmatites, orthogneiss",metamorphic,1
+B1.3,"Migmatiti basiche, Eclogiti, Anfiboliti","Basic migmatites, amphibolites",metamorphic,1
+B1.4,"Metagabbri, Metadoleriti, Metavulcaniti basiche","Metagabbros, basic metavolcanics",metamorphic,1
+B2.1,"Filladi, Micascisti, Gneiss, Quarziti, Metarenarie","Phyllites, schists, quartzites",schist,1
+B2.2,"Marmi, Metacalcari, Metadolomie","Marbles, metacarbonates",limestone/marble,1
+C1.1,Depositi terrigeni antropici,Anthropogenic deposits,none,0
+C1.2,Conoide e piana alluvionale,Alluvial fan/plain deposits,none,0
+C1.3,"Detriti di versante, frane, colluvi","Slope deposits, landslides, colluvium",none,0
+C1.4,"Palustri, lacustri, lagunari","Marsh, lake, lagoon deposits",none,0
+C1.5,Litorali,Beach deposits,none,0
+C1.6,"Marini (siltiti, argilliti, peliti)",Marine fine clastics,none,0
+C1.7,Eolici,Wind-blown sands,none,0
+C1.8,Fluvio-deltizi,River-delta deposits,none,0
+C1.9,"Residuali (bauxiti, paleosuoli)","Bauxites, palaeosols",none,0
+C2.1,"Carbonatici lacustri/lagunari, travertini","Lake carbonates, travertine",limestone/marble,1
+C2.2,"Carbonatici marini (calcari, marne, calcareniti)","Marine limestones, marls, calcarenites",limestone/marble,1
+C3.1,"Vulcano-sedimentari (epiclastiti, tufi)","Volcano-sedimentary rocks, tuffs",tuff,1
+Cn,Canali,Canals,none,0
+D1.1,"Zone industriali, urbane, portuali, dighe","Built-up/industrial areas, dams",none,0
+Lg,Laghi,Lakes,none,0

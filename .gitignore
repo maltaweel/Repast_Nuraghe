@@ -1,0 +1,24 @@
+# Data and outputs are not committed (see data/README.md, data/derived/README.md), except Nurnet's data in data/nurnet/
+# and the audit files outputs/reference/, outputs/summary/ (notebooks/05_audit.ipynb)
+data/*
+!data/README.md
+!data/lithology_STONE_classes.csv
+!data/nurnet/
+!data/derived/
+data/derived/*
+!data/derived/README.md
+outputs/*
+!outputs/README.md
+!outputs/reference/
+outputs/reference/*
+!outputs/reference/README.md
+!outputs/reference/reference_audit_sha256.csv
+!outputs/summary/
+outputs/summary/*
+!outputs/summary/README.md
+!outputs/summary/per_seed_full_audited.csv
+!outputs/summary/summary_full_audited.csv
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

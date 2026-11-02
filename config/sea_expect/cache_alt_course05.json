@@ -1,0 +1,22 @@
+{
+ "params": {
+  "v_drag": 0.27,
+  "v_back": 1.39,
+  "lu_h": 0.25,
+  "min_haul": 100.0,
+  "pull": 100.0,
+  "crew": 10.0,
+  "payload_kg": 2000.0,
+  "transfer_h": 0.25,
+  "boat_factor": 0.5,
+  "hoist_ph_per_block_m": 0.412,
+  "mean_crew": 5.87483,
+  "mean_block_kg": 537.5758493910482
+ },
+ "speeds": [
+  4.0,
+  5.0,
+  6.0,
+  2.0
+ ]
+}

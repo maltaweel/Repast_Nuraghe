@@ -1,0 +1,197 @@
+group,path,bytes,sha256,needed_for,notes
+raw_input,data/sites/nurnet_nuraghi.shp,200776,c5128744f17f9434fae69c26067837d332ed85d699a5c5503ba8fbd2fc3eb540,run;rebuild,"Nurnet's data, included in the repository as data/nurnet/nurnet_nuraghi.shp; size + SHA-256 of the copy used for the 31 Oct 2026 package and the full audited run"
+raw_input,data/sites/nurnet_nuraghi.shx,57436,ebcaa3d99664f05ff3e275d9a52c36e9b192abbfa84feaa3b55a775929619b21,run;rebuild,"Nurnet's data, included in the repository as data/nurnet/nurnet_nuraghi.shx; size + SHA-256 of the copy used for the 31 Oct 2026 package and the full audited run"
+raw_input,data/sites/nurnet_nuraghi.dbf,6515381,e411c159feaa18570da06954e5454ae0d54184c9a9224b0a46712199dcb3a569,run;rebuild,"Nurnet's data, included in the repository as data/nurnet/nurnet_nuraghi.dbf; size + SHA-256 of the copy used for the 31 Oct 2026 package and the full audited run"
+raw_input,data/sites/nurnet_nuraghi.prj,403,2bfc323fa76efbd54e39e220c4d8f16ab79728c0eab137ab43fe7fee726e60dc,run;rebuild,"Nurnet's data, included in the repository as data/nurnet/nurnet_nuraghi.prj; size + SHA-256 of the copy used for the 31 Oct 2026 package and the full audited run"
+raw_input,data/sites/nurnet_nuraghi.cpg,5,3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824,run;rebuild,"Nurnet's data, included in the repository as data/nurnet/nurnet_nuraghi.cpg; size + SHA-256 of the copy used for the 31 Oct 2026 package and the full audited run"
+raw_input,data/costsurface/sardinia_drag_cost_8dir_mu03_25832_int.tif,119162544,69a9c1bb85ed6d857f2a7fdbc2f8eeef01746be48d7db944ebfc22923d8fd432,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/geology/sardinia_lithology_25832.shp,126217832,4203246d73d713b3d029c3bb912bd494339bb374991b993f3d94b177f11e79fd,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/geology/sardinia_lithology_25832.shx,382340,b2d73866acc04ab51c1cdd496b6518e5fc2f5b7d08a59d36417ea218aee47239,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/geology/sardinia_lithology_25832.dbf,18204438,27934a5ae8c72669576f6a6739bb5e06f50f061ea031ef6f83480964bfc01489,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/geology/sardinia_lithology_25832.prj,403,2bfc323fa76efbd54e39e220c4d8f16ab79728c0eab137ab43fe7fee726e60dc,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/geology/sardinia_lithology_25832.cpg,5,3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/dem/sardinia_dem_GLO30_25832.tif,94800062,1f01213b688333152621033095a453cb2498dbe0a94ccac02bcb4a36f2389e91,rebuild_mu;rebuild_sea;analysis_maps,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/costsurface/sardinia_slope_deg_25832.tif,87054967,70a42c4621f145b71efe09d16ead7610a1e2b55646ac1b0dacdac6702d0f22ba,rebuild_sea,size + SHA-256 of the copy used for the 31 Oct 2026 package
+raw_input,data/stone/nid_materiale_prod.csv,591434,08a1d36f7d57b95df58dd4e27d03d97435f3087d3cbcf97b86a91920fe198adb,rebuild,"Nurnet's data (site building stone), included in the repository as data/nurnet/nurnet_site_building_stone.csv; read only by preprocess.py (stone_rule hybrid); size + SHA-256 of the copy that built the hybrid haul tables of the full audited run"
+raw_input,data/water/sardinia_rivers_25832.shp,21160540,2d9371e8810330b49861aa463b63b65372745de54ff40b181a1039a085ffe2c1,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
+raw_input,data/water/sardinia_rivers_25832.shx,335116,70e4678d1b64e61b503e7fd936b75f830390215c4bdb39fceada7587ae43bb7d,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
+raw_input,data/water/sardinia_rivers_25832.dbf,1800809,557fd395b75a05cb766b084412b4930bdb879f19a5c26cfca2869fc46083d394,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
+raw_input,data/water/sardinia_rivers_25832.prj,403,2bfc323fa76efbd54e39e220c4d8f16ab79728c0eab137ab43fe7fee726e60dc,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
+raw_input,data/water/sardinia_rivers_25832.cpg,5,3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
+raw_input,data/soils/soils250k.geojson,24161306,c6093d55da4fe84f1dd9371a7973e7496b5fe74c8d72c58bc5bdd485a2d9d830,rebuild_food,"soil map 1:250,000 (Aru, Baldaccini & Vacca 1991); food catchments + v12 checks; size + SHA-256 of the copy used for the full audited run"
+derived,derived/materiale_use.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/outcrop_code.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/site_stone_sets.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sites_haul.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/alliance/kbest.npz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/alliance/kbest_mu038.npz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/alliance/kbest_wl.npz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/census/bichrome_dist.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/cost_mu/drag_cost_8dir_mu0.05_int.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/cost_mu/drag_cost_8dir_mu0.1_int.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/cost_mu/drag_cost_8dir_mu0.38_int.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/cost_mu/drag_cost_8dir_mu0.5_int.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/food/site_food_r1000.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/food/site_food_r1500.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/food/site_food_r2000.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/food/site_food_r3000.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/materiale_use_mu0.05.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/materiale_use_mu0.1.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/materiale_use_mu0.38.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/materiale_use_mu0.5.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_buildstone.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_buildstone_mu0.1.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_mu0.05.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_mu0.1.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_mu0.38.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_mu0.5.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/outcrop_code_stones7.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/site_stone_sets_mu0.05.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/site_stone_sets_mu0.1.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/site_stone_sets_mu0.38.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/site_stone_sets_mu0.5.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/site_stone_sets_stones7.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_buildstone.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_buildstone_mu0.1.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_complexfar.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_mu0.05.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_mu0.1.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_mu0.38.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_mu0.5.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/haul/sites_haul_stones7.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/landings.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/people_sea2kn.csv.gz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/people_sea4kn.csv.gz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/people_sea5kn.csv.gz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/people_sea6kn.csv.gz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/sea_meta.json,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/sites_haul_sea2kn.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/sites_haul_sea4kn.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/sites_haul_sea5kn.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/sea/sites_haul_sea6kn.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/kbest.npz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/outcrop_code.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/sites_haul.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_base_check.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_buildstone.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_buildstone_mu0.1.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_mu0.05.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_mu0.1.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_mu0.38.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/outcrop_code_mu0.5.tif,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_base_check.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_buildstone.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_buildstone_mu0.1.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_complexfar.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_mu0.05.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_mu0.1.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_mu0.38.csv,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/haul/sites_haul_mu0.5.csv,,,run,derived input (data/derived/README.md); presence only
+code,code/METHODS.md,112358,17030aa39d94b6cdb42e1530b0fd6745cbf588a41ce7dc8c18278c2dd53958ac,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/alliance.py,122119,4f757ae1b2ba2c8da5e94aaa5bce8d19e0548671c54821d868baf6bfabbd9e4b,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/aud_chain.sh,4219,d11260027aa54ef572c9893056e6d28d2d61313f44be79176cd1ee63e23aa71b,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/census_v12.py,28830,15786fc46ad543dec130cac37f816cad3e6391d81ffc7b1d3a17fac75e0029f0,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/config.ship.yaml,12600,b785a1f64cd752869a608dd94b8ec211275e5471fdfc8e7c91b04369631a3759,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/config.yaml,50248,2d90910bdc6d9f6fdaf05f4dc3f3d2d52ef96a076d7e1cf650a4528fa5ea1ac5,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/config_smallcrew_test.yaml,24590,601a1d0bc2ba98f58756d0e66e57b703bf6bdedee43f4c8da7385c104584c393,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/full_chain.sh,4650,26d29e51945a8a5060fc6c7c5a1636c23d6859314fbe56b904f8a0018bb6c304,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/gaps_chain.sh,2782,dba3c83dda16962c0b82c3f251c8367c4aa2fb0f0b26f1bc2612df3cd21c570d,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/lit.py,11065,7030474b57b15445611922236112ab395a7004789a1b24af195b8f5895e2af7f,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/memrun.py,1961,154a20ff8615a53031042e94cb5aab3fe060740fc12751b19be1ceca2ba66036,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/model.py,37801,dd936a1160015e2b82d069f6dd352f4d61064f7ddc4b360841fa1d6918a36b7b,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/nbcommon.py,5775,f3de59342afeb63c97be0ac3f336f75f6980b4a08384bb161664051fe65b2628,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/night_chain.sh,15411,24538b70c4969943923edf4da260f10a3230629d89f8d998db817a84d64c0b43,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/phasing.py,1704,92248f7dad7b91c5afacf3df956b3cbca1ae29a647987995d609ab21fd284587,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/pop_chain.sh,4219,99c17c1e3db3d3bd028aee82e5e43d31577eaef6df9a427b4f5037f4861d644a,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/pre_networks.py,9909,8284483d98324d496cd10ef0160207476c8758e099f36b5128feac8bc22a31f7,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/preprocess.py,18764,75a6fc4d62944682e5fc5be0ac858d23deb12880125d795b2413252f38c580a3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/report.py,17575,0d8175669c6472d503568f9b5edfbac4f000f6d71c91427691036566ce9a0eff,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/report_alliance.py,18295,a513ab018f25ad42eb8108579c3365e456670fa30552da5a1181a83fb69e8685,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/requirements.txt,234,c601c97a6782b453c35e78cebd20fefe1adf7e5b4858ae4f649a1cd9cdb0c00d,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/rerun1030.sh,8215,dc71febb89d50f66d655344ba8cfc33f317a0a00f48ee7e4ab287254d53f863a,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/rerun1030b.sh,11517,a67e42a0bc89e611b0e73c85e51949ec54b81867f0ada24ec04309c1649a402c,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/run_all.sh,4279,7f7e2dca4a5488e03c1b0535ed5db2600e8a544fd825d6f917549904288b51ab,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/run_subset_real.sh,937,aabf230d76237aa3f8b0e2efe0971b671fcaf16f90c1f60671457e4c1fa47415,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/run_subset_sea.sh,1990,49be299d50ecb2d9e9e006ea2a2e7af113ed7e2948d8e0e76e790a712bd91383,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/sea.py,3683,94b9a1bfc3beb67adfbfb506d1f2901ccb4807629fc9d2fbdbda13e90c4bd0d3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/season_alone_runs.sh,1259,4007a331de3f8fd60b326b2498fd6e65cb744d46d14571f060aeed802cb4f105,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/season_runs.sh,1010,5eafaa315aba906b2dfdbdc776a95bf8671ebf4d394846c62cdd535dc4b90497,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/sites300_real.txt,3299,798e15a90c3fef657213f17de733e34072d05719e4f72bdb5777e4115411ea1e,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/sites300_sea.txt,3299,fcc0008638e5b102656fff4aaf4f89329811ac6d4c54848d26b9ccd6f418b9d8,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/sites302.txt,3321,d5dd7dbfc108f7190d27fbdb9548ca47a825ae29c4025d745c49ed5583880790,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/v11_chain.sh,3832,67bd97e330d15b1f4dd14ee9714d38c339b2e571b35b199e4fbd61b2b6b92f58,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/v12_chain.sh,4207,606b4cf220a992591bd3b24281ddf4a25fe91c01074e6684bb9db9193bb48de2,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/wl_chain.sh,2774,697e11730b903cf22273f3f179be9392af493df02f902cafd42ab6a1b8c68cc3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/__init__.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/gaps_subset.sh,1507,988cee3c34b6b024f86dd9004cd610e070448dc08dbb6a0346a32c271e07087c,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/identity_merged.sh,5428,8c98e1dac828e6695c0945717ae86314503304cbcc20ca062f49c756c19dc4b5,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/identity_merged_nolock.sh,5400,bebb368fed5a5270358d1cb5a274291363b71ee246dbc858283d478a9fc05975,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/identity_phase_off.sh,2481,45efc26ac416d5dd0418b023f53a33467efabacb97a990ee4ba4d444860f10e2,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/most_realistic_subset.sh,1663,d9cfcea806ef8a58dc66d4c76152f5ded96aee5387932117024f91021884282c,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/mr_join_subset.sh,809,0d844fc377149639072217ab614d01ea5bfcd1855d5ba1e0bfbf0691cd02f65f,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/mr_join_subset_body.sh,2721,53efee07d072a2e41bef13a067119b41e2ff0af8501e3cc25ffe6f6f1c3eb22c,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/phase_subset.sh,1254,ffcebe31d5e92034d0bed26cf70a3af4b775e9bb2b228c7d428afe4a1db875dd,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/test_dijkstra.py,5273,c2be1a6bc0d4f51feab045e82066382167571ee882b850756d7482f155e2580e,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/test_reproducibility.py,3687,e8effb5ee71edae7a88231a69f211457171c5a86bbba5ee25fc697747824b1eb,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/v11_subset.sh,3136,30f869145f43ca987838e39d1d98ed75012d8966814ff23db9df8aedc2e69817,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/v12_item11.sh,2662,3e60c8971862fe2869b7f60a2a941a4fc8b8d3a9d75b3c7e7a7cd95c5654bc40,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/v12_subset.sh,1643,61fe5c3b5413bbc2f268b8e1c3f8ea625e75d92f7ef0a3bef9c1cacd277ecc30,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_alliance.py,8973,bd1a1caaa91851f733da5c0a539de0ecbeb77577269deb9819d003f714cfc966,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_alliance_identity.py,4785,61996f6792c21b45e63a3b157e68ccdbd929ab8a8bdbdd51c9c9d6410f19f010,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_hauls.py,4983,8e7f0fdd5b0e41a0d20fb1904625db49f65cffe125a0ad9bab79e3704329c76b,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_lit.py,6549,6425526a0bd570f6882959a85628cdb82fef47f1dbcd44902148af533b802285,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_pre.py,1135,19699515dc73e6536a8248c4b62e23d88b121795d9297760cc0c8d678002a3de,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_scenarios.py,8037,4f810b4bdfaf2bd846e16472e250575e71ee4857ae2d923de63dc291d16b4645,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_sea.py,5583,a3d3679f2fe2d24d9582ffd6a4d58e1e07a1450a2cd6f22b7e7a03e292202834,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/verify_webster.py,3048,2cb3220b4731ad57c656856ed7130604fc04a7bd1d642cf631eab9132966e643,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/wl_subset.sh,1705,e46367f9534347d7259f8114aee723546e5f65b93f4102ed33ef86645d0e9550,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/_scen.py,4540,2ea3d763a202fa7649293d097dbe67d8f6e15b731daa3a32015348ccea03c02b,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/all_scenarios.py,3990,e1d97ef7758881ae95dacdbac393c57ed2bd63f91ce7c80d4adb2bf4f8107b72,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/alliance_emergence.py,2776,ac4b1f46cf03d250aa1619a98f55aa37f0e7d26b244e983ebc7fad6d9fd75a6e,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/alliance_networks.py,24396,be6c5b785d372302e2231988ee994a0adc7dfbf318d52966ea9d4c6c97b0ea5e,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/alliance_savings.py,4791,20a41e00392c5455b655338a881732795eab6c9e20b586e1bf7794265ae37326,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/build_cost_mu.py,4110,e021ed1158b51ed6fc13f1cb849982cda83fb962c04290920b4ff2843bfd1779,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/census.py,5754,62f3a82ff91aef888d3870f4ea2a2ecd9220dbf979e6f013f9dfbad8f8e59b1c,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/census_bichrome.py,1193,177d1b3e2a36ffe9a083d0f452a8e8337a388c5318dac9ee209f97c2c0442fb8,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/centrality.py,16495,a9409366db335c61b051d7c99fc8d92dc5b052929d0e32e3235bb3511d35df54,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/check1030b.py,3434,fa22f95c9d548ef94482b009461b0df732ff62d487046fa2856fe7bd5d74e6d3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/check_independence.py,2196,8228054173367527861b07078e3ddcba689652424f961eff17dac830cc2210d5,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/compare_parts.py,1971,f22777511ffc8ba4149053d93022503b6b03caf8b1774bf9bd4e18dabcc89de3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/family_summary.py,7512,f527780a9700f099dc992dfc8e6fb6754dc5444834bf7c33a13b2442215e911a,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/fastest.py,7917,e553918b11a54f337b8b9b19ec710a1aedcfe050723149c0bbbdc06af7efa41e,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/fastest_params.py,10389,e606ddfab06e1c0ee468359771c2fb92792a48666b04bd66571349e6c80f3d74,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/food_capacity.py,4490,f80ae38f82fab6830a95441419c21ba08f201444dc5f0391b01ba7b342210915,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/formation.py,4753,3e18a66294a696c2b36db51699fad403f0181025448eac4f1315bb856857fe8a,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/formation_plot.py,2916,165715430aa82f1ec3ceded9781df182688be8232e4d4dc8ae6a2283f381c718,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/gaps_figures.py,10853,f82f394cfd7dc7ed74b155c763910b5e394a871ac437b33145bff418bdf343e3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/gaps_summary.py,7042,248106ec79bbeff7adfb2b6dd8f95b3a5ee697b18b69f4925b8d5d3fae334948,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/haul_far.py,6636,fadbb20556bc802eeb9cf95ff06f4799c89b3fa0fcdbfaed00af48e4ec707bcf,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/kbest_mu038.py,3227,71434b7319667607a1119d7ffaaa9c422aae0f3170d8d3c191dcee81f5be4192,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/kbest_quarries.py,9221,d216ac3ddfaaa3593f11afbdf0016a79322380ea9bd7459ecf74831159fe4085,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/master_table.py,12801,f80bae179bf57f9905e39a9ac6f21242df5411c701fac678e42a20daae5f2e9d,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/morris_mr.py,7235,1e59b99a9b502e0cd1fe5c59ae4732afbac4e172b6d8680a09163990e9b8a98f,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/mr_join_check.py,3011,d6aba446f17b54fb463c98af21591c247becf411fb2544325161e269455294e1,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/mr_subset_compare.py,5189,f9f9081c01d461af4ef183ebc92e68ee05bca53f765b607c423c67894ea2fcd0,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/network_need.py,4881,7057067fa7d5dfec528c78406ae0b1d9eba2a80ad5f23152f55124e554047d45,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/phased_posthoc.py,5116,657eb56cbf97c6585c05c231408bb1137a0161452700988fa5414a325eb3187d,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/phased_sim_summary.py,5651,32bd87eb989a48342b8656e16d5192af3305e8a4e7c3972275fde2ae152fd396,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/pre_analysis.py,8847,06c36a8862a6e530ea1301f07e14754c1654407c1a6b17ab9a41e3c328c142d3,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/scenario_guide.py,16143,8cab555678bbd81bd8679112b86e024fb18ea87499f698f6a28273d1534268b9,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/sea_report.py,9925,7ad806534fa15157ba1101be5d4c7631386b29f398fc651654e11d151c947b0d,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/sea_routes.py,27438,6c89a5edf6c7f130f19f553245427e4bb070006931602ab203cd99a0b3482b8f,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/sea_subset_compare.py,2430,0289fc76eedb8726876760917df96693d005eee7e7cf03b05eabd2a2e0321287,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/stone_rule.py,5919,2d7af10a9fd7306d30e8ee802460d6fd3051ecc153cd3ada1bbae1c344774daa,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/summary_figures.py,8336,c805b1c4ad05a9283c9601ab76575460f2b52a44b1c41ec0f6e1b5b9cb1a6588,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v11_figures.py,1840,4207484546724ef683acd27f0716060b0d8a6f3b8a917eff076557d403857776,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v11_master_table.py,3127,154999bce2e345895466500ab8da35c0c083ee940d79018d6cf26bc4d552d7a5,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v11_queue.py,4389,b86e979344214008d067578d0a919b8db5fbb3c5fb69c261b0209451771098d7,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v11_summary.py,10648,21ab5720ae8dae92b809622573c41f3462f887db51ac2e270bbcf4de2c6b14ba,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v12_checks.py,16044,557ec8f8f42c01ee4fafa72bf9a9f7745a6d5a4be61a60ab4ec6b9880a1dc25a,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v12_queue.py,2327,36821e90c0db398c40cb015e2c3e172d8aa6d29b6821f7e490d10f7b383f7f52,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v12_ranking.py,4563,6f042ea365497f7d6532af456a39979cdd5d2b65b38761a1045182e2276e1ed1,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/v12_summary.py,7089,aa0fecd621572134549f9fefbf95e66f5b96f50073d52073672c61903e04c8b1,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/wl_calibration.py,9722,492695e0d928f4ac1f60e7cb395621355380fddc609a0ea1ce0a6d3662c9dde8,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/wl_figures.py,7797,dd2839a056e0ab59d2516ab372e13933e3cb19e796d670e93dd73603adabf760,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/wl_inputs.py,6949,ef5f563251e022618c90fec9924c9e550577b016950e00e8f82a9c0f4a21ca7a,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/wl_summary.py,9008,c06b9ce0631747ce2025270e39652908b7c702e07ee6c492d53c61fcf660dbad,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tools/workforce_years.py,6330,d410bbec15d0d85d2a574014f7e5c5f778aa91bc181b9efbf50d46329565d2e4,run;rebuild,repository code (CODE_PROVENANCE.md)

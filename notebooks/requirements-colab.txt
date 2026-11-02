@@ -1,0 +1,38 @@
+# nuraghe-build-abm notebooks (code v8, stone rule stones7): exact package versions of the environment that produced
+# reference/ (Python 3.13.5; read with `uv pip freeze`). Install (needs OpenMPI + mpicc first, see 01_setup):
+#   CC=mpicc CXX=mpicxx pip install -r requirements-colab.txt
+# torch is NOT pinned: repast4py imports it but the model never uses it (all randomness is numpy PCG64,
+# default_rng([seed, site id, ...])). On Colab the preinstalled torch is kept; elsewhere pip installs one.
+affine==3.0.1
+attrs==26.1.0
+certifi==2026.7.22
+charset-normalizer==3.5.2
+click==8.5.0
+contourpy==1.4.0
+cycler==0.12.1
+cython==3.3.0
+dill==0.4.1
+fonttools==4.66.1
+geopandas==1.2.0
+kiwisolver==1.5.1
+llvmlite==0.50.0
+matplotlib==3.11.2
+mpi4py==4.1.2
+networkx==3.7
+numba==0.68.0
+numpy==2.5.4
+packaging==26.3
+pandas==3.0.6
+pillow==12.3.0
+pyogrio==0.13.0
+pyparsing==3.3.3
+pyproj==3.8.0
+python-dateutil==2.9.0.post0
+pyyaml==6.0.3
+rasterio==1.5.2
+repast4py==1.3.1
+reportlab==5.1.0
+scipy==1.18.1
+shapely==2.2.0
+six==1.17.0
+typing-extensions==4.16.0
