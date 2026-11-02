@@ -27,6 +27,7 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
   and island years (the time until the last tower is finished), over 100 seeds per scenario (ODD section 4.11).
+- **v13 social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), off by default and in the headline, used only by five v13 scenarios; with them off the outputs are identical to the frozen code (ODD section 7.15; `CODE_PROVENANCE.md`).
 - **Parameters.** No parameter is calibrated: every value has an audited source (author, year, page) or is
   declared an assumption (`param_audit/`).
 
@@ -87,13 +88,13 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
 ## Repository layout
 
 ```
-code/            the model and its tools: the frozen code of the full audited run (CODE_PROVENANCE.md)
+code/            the model and its tools: the code of the full audited run + the v13 social switches (CODE_PROVENANCE.md)
   model.py         entry point (baseline, cooperation, literature, alliance and pre-network scenarios)
   alliance.py      adaptive alliances / MOST_REALISTIC; lit.py, sea.py, phasing.py, pre_networks.py, census_v12.py
   preprocess.py    haul tables (least-cost quarry -> site); nbcommon.py config loader + Dijkstra
   tools/ tests/    derived-input builders, post hoc analyses, verification
   full_chain.sh    the serialized chain that ran the full audited queue
-config/          config_full_audited.yaml (+ 77 variants, tost_configs/), queues/, sea_expect/, check_sea_meta.py
+config/          config_full_audited.yaml (+ 84 variants, tost_configs/), queues/, sea_expect/, check_sea_meta.py
 data/            data/nurnet/ (Nurnet's data, included); the other inputs are fetched (data/README.md; data/derived/README.md)
 notebooks/       01-05: setup, inputs (fetch_data.py), scenarios, analysis, audit; HOW_TO_USE.md; Jupyter or Colab
 param_audit/     parameter audit and traceability (public-safe copies)

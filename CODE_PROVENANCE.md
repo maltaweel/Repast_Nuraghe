@@ -1,14 +1,47 @@
 # Code provenance
 
-## The run snapshot
+## The run snapshot (frozen v12 code) and the v13 code
 
 The full audited run (2-4 November 2026; configuration `config/config_full_audited.yaml`, queues
-`config/queues/`) used ONE frozen copy of the code. The SHA-256 checksums of that snapshot, written when it was
-frozen, are in `CODE_SHA256SUMS` (copied unchanged; 107 files: every `.py`, `.sh` and `.yaml` file of the
-snapshot except `full_chain.sh`). `code/` in this repository is that snapshot, scrubbed for publication.
+`config/queues/queue_full.tsv` and `queue_full_p23.tsv`) used ONE frozen copy of the code: every run started
+before 2 November 2026, 22:00, used it. The SHA-256 checksums of that snapshot, written when it was frozen, are in
+`CODE_SHA256SUMS` (copied unchanged; 107 files: every `.py`, `.sh` and `.yaml` file of the snapshot except
+`full_chain.sh`).
+
+**v13.** On 2 November the run's code folder was copied to a second folder, `code_v13/`, which adds three opt-in
+social switches to `alliance.py` (`reputation`, `partner_choice`, `tie_imitation`, plus the bookkeeping switch
+`social_log`; ODD section 7.15). They are off by default; with all of them off, the code path, the random draws and
+the run signatures are those of the frozen code. `alliance.py` is the only changed model file; `code_v13/` also has
+the side-chain script `v13_side_chain.sh` that runs the five v13 entries
+(`config/queues/queue_v13_social_STAGED.tsv`, configs `config/config_v13_*.yaml`). **Only these five runs use the
+v13 code**; the queue's commands run from `@RUN_DIR@/code_v13` (in a run folder laid out as in the README, link
+`code_v13` to this repository's `code/` as well). `CODE_V13_SHA256SUMS` holds the v13 checksums of the same 107 files as
+`CODE_SHA256SUMS` (only the `alliance.py` line differs). `v13_side_chain.sh` was written after the checksum file:
+SHA-256 `96882435718a6408b4b94f338081b439c57c9409f6d3b5a9ce614c3ccb15af67`.
+
+**Identity test (switches off).** The frozen code and the v13 code were run on `config_full_audited.yaml`, the
+300-site subset `code/sites300_real.txt`, seeds 1-2, one rank, and the decompressed content of every part file was
+hashed (gzip headers hold time stamps). All four scenarios are identical; combined hashes (frozen = v13):
+
+| Scenario | Signature | Part files | Combined hash |
+|---|---|---|---|
+| `MOST_REALISTIC_AUDITED_LIT_P10` (headline) | `923bb4fc1f6c` | 20 | `a99866a2c58f38d0` |
+| `A5_full_freerider` | `635bb6a0a447` | 18 | `1b390cc1e9749f5b` |
+| `P_D7_G20_kmesh4_trust` (pre-existing ties) | `44815b219875` | 18 | `75fb5d033e32a5ee` |
+| `MOST_REALISTIC_S20_lintels_3t0_P10` (census lintel path, which also calls `candidates` / `request`) | `803f9dd92a21` | 20 | `f962d1f48b491873` |
+
+`code/` in this repository is the v13 code (the superset), scrubbed for publication.
 
 Check: `cd code && sha256sum -c ../CODE_SHA256SUMS`. Result for this repository: **46 OK** (byte-identical to the
-run), **56 FAILED** (scrubbed, listed below), **5 missing** (excluded, listed below).
+run), **56 FAILED** (scrubbed, listed below; `alliance.py` also carries the v13 switches), **5 missing** (excluded,
+listed below). Against the v13 checksums (`sha256sum -c ../CODE_V13_SHA256SUMS`): **46 OK (v13)**,
+**56 FAILED (v13)**, **5 missing (v13)**.
+
+**Line numbers.** The ODD (`ODD/ODD.md`) cites the v13 `alliance.py`. The tables of `param_audit/` were written
+on the frozen code and cite its line numbers (the v13 rows A10-A12 are marked "(v13)"). A frozen line n of
+`alliance.py` is v13 line n + k: k = 0 for n <= 55, 9 for 56-492, 12 for 493-999, 90 for 1000-1069, 92 for
+1070-1112, 94 for 1113-1182, 99 for 1183-1214, 100 for 1216-1218 (frozen line 1215 = v13 lines 1314-1315),
+104 for 1219-1465, 107 for 1466-1778, 113 for 1779-1810, 116 for 1811-1923, 120 for 1924-2024.
 
 ## What the scrub changed
 
@@ -34,21 +67,22 @@ Only comments, docstrings, prose and paths; no model logic, parameter value or r
 **How this was confirmed.** For every changed `.py` file the token stream without comments and docstrings was
 compared with the snapshot (Python `tokenize`/`ast`); for `.sh` and `.yaml` files the lines without their comment
 part. The only non-comment differences are the edits listed in the last column below. Model core files that are
-byte-identical to the run: `model.py`, `nbcommon.py`, `sea.py`, `census_v12.py`, `pre_networks.py`, `report.py`,
+byte-identical to the run (frozen and v13 alike): `model.py`, `nbcommon.py`, `sea.py`, `census_v12.py`, `pre_networks.py`, `report.py`,
 `report_alliance.py`, `memrun.py`, `tools/kbest_quarries.py`, `tools/kbest_mu038.py`, `tools/sea_routes.py`,
 `tools/build_cost_mu.py`, `tools/wl_inputs.py`, `tools/food_capacity.py`, `tools/haul_far.py` and all
-`tests/*.py` except `tests/verify_alliance_identity.py`. `alliance.py`, `lit.py`, `preprocess.py` and
-`phasing.py` differ in comments/docstrings only. The configs in `config/` were checked the same way: YAML-parsed,
+`tests/*.py` except `tests/verify_alliance_identity.py`. `lit.py`, `preprocess.py` and `phasing.py` differ
+in comments/docstrings only; `alliance.py` differs from the v13 copy in comments/docstrings only (and from the frozen
+copy by the v13 switches as well). The configs in `config/` were checked the same way: YAML-parsed,
 each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`, `materiale.citation` and the
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (58; 206 lines in total)
+## Changed files (60; 217 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
 | `METHODS.md` | no | 39 | prose (names, message quotes/timestamps, stone-data citation) |
-| `alliance.py` | yes | 4 | comments/docstrings |
+| `alliance.py` | yes | 8 | comments/docstrings |
 | `aud_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `config.ship.yaml` | yes | 1 | comments/docstrings |
 | `config.yaml` | yes | 20 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
@@ -60,6 +94,7 @@ README).
 | `phasing.py` | yes | 1 | comments/docstrings |
 | `pop_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `preprocess.py` | yes | 1 | comments/docstrings |
+| `requirements.txt` | no | 4 | packages appended (imported by the code, missing from the run's list) |
 | `rerun1030.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `rerun1030b.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `run_all.sh` | yes | 1 | comments/docstrings |
@@ -104,6 +139,7 @@ README).
 | `tools/workforce_years.py` | yes | 2 | comments/docstrings |
 | `v11_chain.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `v12_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
+| `v13_side_chain.sh` | no | 3 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `wl_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 
 ## Excluded from the repository, and why
@@ -122,6 +158,16 @@ lines (step 8); those three calls fail in this repository. Nothing in `full_chai
 
 ## Not part of the snapshot
 
-`tools_extra/build_slope.py` (the slope raster, see `data/derived/README.md`), `config/check_sea_meta.py` (run-level
-check called by the queue; comments scrubbed) and `notebooks/repro.py` (adapted to the repository layout) are not
-in `CODE_SHA256SUMS`.
+Not in `CODE_SHA256SUMS` or `CODE_V13_SHA256SUMS`:
+- `tools_extra/build_slope.py` (the slope raster, see `data/derived/README.md`), `tools_extra/build_dem.py`,
+  `tools_extra/build_lithology.py` and `tools_extra/build_rivers.py` (builders of the public input layers from their
+  official downloads);
+- `notebooks/fetch_data.py` (downloads the public inputs and rebuilds the files the model reads; checks them against
+  `notebooks/inputs_manifest.csv`) and `notebooks/repro.py` (helpers of the notebooks, adapted to the repository
+  layout);
+- `config/check_sea_meta.py` (run-level check called by the queue; comments scrubbed);
+- `code/requirements.txt` is in the snapshot but not in the checksum files (only `.py`, `.sh`, `.yaml` are); the
+  repository copy appends `scipy`, `matplotlib` and `networkx`, which the code imports but the run's list omitted.
+
+`notebooks/inputs_manifest.csv` (group `code`) holds the size and SHA-256 of every file of this repository's `code/`
+(the copy that `notebooks/repro.py` expects).

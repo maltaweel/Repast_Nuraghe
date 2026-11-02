@@ -32,7 +32,8 @@ prio	label	kind	est_s	ranks	config	args
 2	SEA_TABLES_ALT_transfer2h	cmd	220	1	@RUN_DIR@/config_full_audited_alt_transfer2h.yaml	test -d @RUN_DIR@/outputs/cache_alt_transfer2h/sea && test ! -L @RUN_DIR@/outputs/cache_alt_transfer2h/sea && @PYTHON@ @RUN_DIR@/code/tools/sea_routes.py @RUN_DIR@/config_full_audited_alt_transfer2h.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/outputs/cache_alt_transfer2h
 2	MOST_REALISTIC_ALT_transfer2h_P10	alliance	410	6	@RUN_DIR@/config_full_audited_alt_transfer2h.yaml	--alliance MOST_REALISTIC_ALT_transfer2h_P10
 2	MOST_REALISTIC_ALT_pull21_P10	alliance	410	6	@RUN_DIR@/config_full_audited_alt_pull21.yaml	--alliance MOST_REALISTIC_ALT_pull21_P10
-2	MOST_REALISTIC_ALT_split0_P10	alliance	410	6	/mnt/nuraxi-projects/nuraghe-build-abm/runs/2026-11-02-v12-census/full_audited/config_full_audited_alt_split0.yaml	--alliance MOST_REALISTIC_ALT_split0_P10
+2	MOST_REALISTIC_ALT_split0_P10	alliance	410	6	@RUN_DIR@/config_full_audited_alt_split0.yaml	--alliance MOST_REALISTIC_ALT_split0_P10
+2	MOST_REALISTIC_ALT_nodistpen_P10	alliance	410	6	@RUN_DIR@/config_full_audited_alt_nodistpen.yaml	--alliance MOST_REALISTIC_ALT_nodistpen_P10
 2	MOST_REALISTIC_POP_lilliu30_scaled_P10	alliance	410	6	@RUN_DIR@/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_lilliu30_scaled_P10
 2	MOST_REALISTIC_POP_webster_household_flat_P10	alliance	410	6	@RUN_DIR@/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_household_flat_P10
 2	MOST_REALISTIC_POP_webster_density_scaled_P10	alliance	410	6	@RUN_DIR@/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_density_scaled_P10
