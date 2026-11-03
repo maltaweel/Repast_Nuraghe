@@ -1,5 +1,9 @@
 # Nuraghe construction: an agentic agent-based model
 
+**Background.** This model is an implementation of the agentic agent-based modelling framework proposed by Altaweel and Forte (2026).
+
+Reference: Altaweel, M. and Forte, M. (2026). Archeological theory and AI: the potential past through agentic systems. AI & Society. https://doi.org/10.1007/s00146-026-03287-0
+
 An agent-based model (ABM) built to test archaeological ideas about **how nuraghi were built**: who quarried,
 dressed, hauled and lifted the stone, how communities cooperated, formed alliances or relied on pre-existing
 networks, and what each idea implies for labour and time. Bronze Age Sardinia (7,167 nuraghe sites) is the test

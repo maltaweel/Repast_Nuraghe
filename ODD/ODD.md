@@ -53,7 +53,7 @@ This description follows the ODD protocol as updated by Grimm et al. (2020), wit
 
 ### 1.1 Overall purpose
 
-The model is a tool for testing archaeological ideas about how nuraghi were built: who quarried, dressed, hauled and lifted the stone, with how much labour and time, and with what cooperation between communities. Each idea becomes an explicit, seeded simulation rule, and its consequences are computed for every nuraghe of the island. Sardinia is the test case; the method is the subject. The paper draft frames the aim as using the link between agentic AI and ABM proposed by Anonymous (2026) to explore the literature on how nuraghi could have been built, and to show the benefit of that link for exploring the range of ways in which nuraghi may have been built and how long building took across Sardinia. In the purpose categories of Edmonds et al. (2019), the model serves **theoretical exposition**: it works out what stated, literature-based assumptions imply. It is not built for prediction. Its results bound what the assumptions allow; they do not forecast what happened.
+The model is a tool for testing archaeological ideas about how nuraghi were built: who quarried, dressed, hauled and lifted the stone, with how much labour and time, and with what cooperation between communities. Each idea becomes an explicit, seeded simulation rule, and its consequences are computed for every nuraghe of the island. Sardinia is the test case; the method is the subject. This model is an implementation of the agentic agent-based modelling framework proposed by Altaweel and Forte (2026). The paper draft frames the aim as using this link between agentic AI and ABM to explore the literature on how nuraghi could have been built, and to show the benefit of that link for exploring the range of ways in which nuraghi may have been built and how long building took across Sardinia. In the purpose categories of Edmonds et al. (2019), the model serves **theoretical exposition**: it works out what stated, literature-based assumptions imply. It is not built for prediction. Its results bound what the assumptions allow; they do not forecast what happened.
 
 ### 1.2 Specific questions
 
@@ -1080,7 +1080,7 @@ The code and configuration win in every case; this description follows them. "Do
 
 **Archaeological framing** (copied from the paper draft):
 
-- Anonymous (2026) [reference withheld for review]
+- Altaweel, M. and Forte, M. (2026). Archeological theory and AI: the potential past through agentic systems. AI & Society. https://doi.org/10.1007/s00146-026-03287-0
 - Araque González, R., 2021. Monuments of cooperating communities: Sardinian nuraghi and sanctuaries. In: Albertazzi, G., Muti, G., Saggio, A. (Eds.), Islands in Dialogue (ISLANDIA). Editoriale Artemide, Rome, pp. 193–200.
 - ARPAS (Agenzia Regionale per la Protezione dell'Ambiente della Sardegna), 2019. Carta litologica della Sardegna, 1:25.000. CC BY.
 - Boswinkel, Y., 2021. Labouring with Large Stones: A Study into the Investment and Impact of Construction Projects on Mycenaean Communities in Late Bronze Age Greece. Sidestone Press, Leiden.
