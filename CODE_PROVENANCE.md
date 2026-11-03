@@ -77,7 +77,7 @@ each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`,
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (61; 219 lines in total)
+## Changed files (62; 221 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
@@ -141,6 +141,7 @@ README).
 | `v12_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `v13_side_chain.sh` | no | 3 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `v13g_side_chain.sh` | no | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
+| `v13kd_side_chain.sh` | no | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `wl_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 
 ## Excluded from the repository, and why

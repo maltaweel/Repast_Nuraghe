@@ -61,7 +61,7 @@ CENSUS_KEYS = ("lift_graded", "lintel", "found", "fill", "vault_dress", "demog",
 # deliberately NOT bumped: with the keys off the outputs are identical to the frozen v12 code (tested), and a bump would move every
 # existing scenario's cache folder.
 SOCIAL_VERSION = "2026-11-02-v13-social-2"   # -2: partner order = exchange partners first (both directions)
-SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log")
+SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log", "trusted_nodist")   # v13kd: end of file
 
 STAGES = ["quarry", "dress", "track", "leg1", "transport", "build"]   # chain order (task rank)
 PAIR_STAGE = {"quarry": "quarry", "dress": "dress", "track": "track", "leg1": "transport", "transport": "transport",
@@ -1024,7 +1024,7 @@ class AllianceModel:
                     "n_bad": np.zeros(N, np.int64), "n_good": np.zeros(N, np.int64),
                     "n_pc_refused": np.zeros(N, np.int64), "n_pc_refuse_given": np.zeros(N, np.int64),
                     "n_cheat": np.zeros(N, np.int64)}
-        self.soc["R"], self.soc["gentle"] = float(self.S.R), reputation_rule(sc) == "gentle"   # v13g (end of file)
+        self.soc["R"], self.soc["gentle"] = float(self.S.R), reputation_rule(sc) == "gentle"; _init_kd(self, sc)   # v13g, v13kd (end of file)
 
     def _bad(self, k, i):
         """Reputation: does observer k see community i in bad standing? i's most recent act (as an asked community) that
@@ -1198,7 +1198,7 @@ class AllianceModel:
                 ok = self.rng[j].random() < float(fixed)
             else:
                 x = (A["beta0"] + A["beta1"] * self.T(j, i) - A["beta2"] * self.backlog_days(j)
-                     - A["beta3"] * dij / 1000.0)
+                     - (0.0 if self.soc is not None and self.soc["kd"] and _kd_pair(self, i, j) else A["beta3"] * dij / 1000.0))   # v13kd
                 if self.cz is not None and self.cz.feast is not None:   # v12 S12b: the host's surplus attracts help
                     x += self.cz.feast[i]
                 ok = self.rng[j].random() < sigmoid(x)
@@ -1888,7 +1888,7 @@ class AllianceModel:
                 rows["soc_" + k] = self.soc[k]
             rows["soc_bad_final"] = [int(self.soc["rep"] and bool(self.soc["log"][g]) and not self.soc["log"][g][-1][1])
                                      for g in range(self.N)]    # last logged act an unjustified refusal
-            rows["soc_help_ties"] = [len(a) for a in self.soc["adj"]]
+            rows["soc_help_ties"] = [len(a) for a in self.soc["adj"]]; _kd_cols(self, rows)   # v13kd: soc_n_kd if on
         pairs = []
         keys = set(self.help_mh) | set(self.trust)
         und = {}
@@ -2170,9 +2170,47 @@ def reputation_rule(sc):
 def _rule_tag(sc):
     """Signature tag of the reputation rule: empty for "all", so the hash of every earlier v13 run is unchanged."""
     r = reputation_rule(sc)
-    return "" if r == "all" else "|" + REPUTATION_RULE_VERSION + ":" + r
+    return ("" if r == "all" else "|" + REPUTATION_RULE_VERSION + ":" + r) + \
+        ("|" + TRUSTED_NODIST_VERSION + ":on" if sc.get("trusted_nodist") else "")   # v13kd: empty when off
 
 
 def _sig_sc(sc):
     """The scenario as hashed: sc itself, minus an explicit default reputation_rule ("all")."""
-    return {k: v for k, v in sc.items() if not (k == "reputation_rule" and v == "all")}
+    return {k: v for k, v in sc.items() if not (k == "reputation_rule" and v == "all")
+            and not (k == "trusted_nodist" and not v)}   # v13kd: an explicit false is not hashed
+
+
+# ------------------------------------------------------------------ v13kd trusted partners: no distance penalty (3 Nov 2026)
+# Appended at the end of the file (as v13g) so that every earlier line keeps its number; the call sites are one-line
+# edits: SOCIAL_KEYS (line 64), _init_social (line 1027), the acceptance logit in request (line 1201), results (line 1891).
+# trusted_nodist: in the asked community's acceptance logit the distance term beta3 * d_km is set to 0 when requester i
+# and asked community j form a RECIPROCAL dyad: help has flowed in both directions between them so far in the run
+# (help_mh > 0 for (j, i) and for (i, j); help_mh = man-hours charged, the same structure the pairs output and the
+# "reciprocated share" measure use). Every other pair keeps beta3 * d. The help radius R (who can be asked) is NOT changed,
+# only the acceptance penalty. No numeric parameter, no random draws (the acceptance draw is made as before).
+# Form: Kasper & Borgerhoff Mulder 2015, Curr. Anthropol. 56: 709-710 (Fig. 2) and 712: distance does not lower help in
+# contingent (reciprocal) dyads; the D x C interaction was not tested statistically (raw-data plot only).
+# The key is in SOCIAL_KEYS, so with it on the soc state exists (the other social rules stay off unless set) and the
+# signature changes: TRUSTED_NODIST_VERSION is appended to SOCIAL_VERSION via _rule_tag; an explicit false is not hashed.
+TRUSTED_NODIST_VERSION = "2026-11-03-v13kd-1"
+
+
+def _init_kd(m, sc):
+    """v13kd state: the switch, and per requester the number of asks in which the distance term was dropped."""
+    m.soc["kd"] = bool(sc.get("trusted_nodist"))
+    m.soc["n_kd"] = np.zeros(m.N, np.int64)
+
+
+def _kd_pair(m, i, j):
+    """Is (requester i, asked j) a reciprocal dyad (help with mh > 0 both ways so far)? Counts the ask if so."""
+    h = m.help_mh
+    if h.get((j, i), 0.0) > 0.0 and h.get((i, j), 0.0) > 0.0:
+        m.soc["n_kd"][i] += 1
+        return True
+    return False
+
+
+def _kd_cols(m, rows):
+    """sites column soc_n_kd (asks made by the community with the distance term dropped); only when the switch is on."""
+    if m.soc["kd"]:
+        rows["soc_n_kd"] = m.soc["n_kd"]

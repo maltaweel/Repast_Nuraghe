@@ -1,0 +1,3 @@
+prio	label	kind	est_s	ranks	config	args
+2	V13kd_MOST_REALISTIC_AUDITED_LIT_V13kd_P10	cmd	410	6	@RUN_DIR@/config_v13k_MR_kd.yaml	cd @RUN_DIR@/code_v13 && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_v13k_MR_kd.yaml --seeds 1-100 --no-shapefile --alliance MOST_REALISTIC_AUDITED_LIT_V13kd_P10
+2	V13kd_MOST_REALISTIC_AUDITED_LIT_V13allgkd_P10	cmd	410	6	@RUN_DIR@/config_v13k_MR_allgkd.yaml	cd @RUN_DIR@/code_v13 && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_v13k_MR_allgkd.yaml --seeds 1-100 --no-shapefile --alliance MOST_REALISTIC_AUDITED_LIT_V13allgkd_P10

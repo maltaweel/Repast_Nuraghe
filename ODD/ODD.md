@@ -1,16 +1,16 @@
 ---
 title: "ODD protocol: an agentic agent-based model of nuraghe construction (headline scenario MOST_REALISTIC_AUDITED_LIT_P10)"
 author: "Anonymous authors (model and scenarios); description drafted by the modelling agent"
-date: "2 November 2026"
+date: "3 November 2026"
 ---
 
 # ODD protocol: an agentic agent-based model of nuraghe construction
 
 **Model.** Nuraghe-construction agent-based model (ABM) by the authors, written in Python on repast4py (Collier and Ozik, 2022) with MPI, numba, numpy, pandas and scipy.
 
-**Version described.** The code and configuration of the full audited run of 2 November 2026, with the v13 social switches and the v13g reputation rule (7.15).
+**Version described.** The code and configuration of the full audited run of 2 November 2026, with the v13 social switches, the v13g reputation rule (7.15) and the v13kd switch `trusted_nodist` (7.16).
 
-- Code: `code/` (the v13 code: the frozen code of the run plus three opt-in social switches in `alliance.py`, off by default, and the v13g `reputation_rule` key, default `all`; with them off the outputs are identical to the frozen code, see 7.15 and `CODE_PROVENANCE.md`). Checksums: `CODE_SHA256SUMS` (frozen code, used by every run of the full audited queue) and `CODE_V13_SHA256SUMS` (v13). The repository copy differs from these only in comments and docstrings (`CODE_PROVENANCE.md`), so the line numbers below hold. Line numbers of `alliance.py` are those of the v13 file.
+- Code: `code/` (the v13 code: the frozen code of the run plus three opt-in social switches in `alliance.py`, off by default, the v13g `reputation_rule` key, default `all`, and the v13kd switch `trusted_nodist`, off by default (7.16); with them off the outputs are identical to the frozen code, see 7.15 and `CODE_PROVENANCE.md`). Checksums: `CODE_SHA256SUMS` (frozen code, used by every run of the full audited queue) and `CODE_V13_SHA256SUMS` (v13). The repository copy differs from these only in comments and docstrings (`CODE_PROVENANCE.md`), so the line numbers below hold. Line numbers of `alliance.py` are those of the v13 file.
 - Configuration: `config/config_full_audited.yaml`, cited as `cfg:<line>`.
 - Cached derived inputs: `cache_dir` of the configuration (`cache/` below; rebuild instructions in `data/derived/README.md`).
 
@@ -36,7 +36,7 @@ This description follows the ODD protocol as updated by Grimm et al. (2020), wit
    ODD+2D (Laatabi et al., 2018, in Grimm et al., 2027, Table 2) documents the data behind design and parameterisation. It was not adopted as a structure. Its content is covered by Section 6 and the parameter audit (Appendix A, Appendix C).
 8. **Rationale layer.** Each submodel ends with a short *Rationale*. The full justification of every value is the project's parameter audit and traceability record, mapped onto the elements of TRACE (Schmolke et al., 2010; Grimm et al., 2014; Ayllón et al., 2021) in Appendix C. Grimm et al. (2027, Sect. 5.2) recommend TRACE documents for recording the whole modelling process. Parameterisation and validation are not part of an ODD itself (Grimm et al., 2027, Sect. 7.4), so they are kept in the appendices.
 9. **Summaries and variants.** A text version of the visual-ODD panels (Szangolies et al., 2024) comes next. The scenario families are given as "delta" descriptions against the headline (Grimm et al., 2027, Sect. 6.2; Appendix B).
-10. **Edge cases and the use of AI.** The 2027 review warns that descriptions drafted with large language models can look complete while leaving out edge-case behaviour, and asks for a human-in-the-loop process (Sect. 7.2). This description was drafted by the modelling agent (an AI research agent) from the frozen code and configuration. Every statement is tagged to the code, and the edge cases and inactive branches are listed in 7.13. An independent AI agent then verified the description against the code and configuration (161 claims, 8 errors); the errors are corrected in this version. The v13 social mechanisms and the v13g reputation rule (7.15 and the lines that refer to it) were added later, checked sentence by sentence against the v13 code by the modelling agent, and were not part of that independent verification. Human review by the PI was still pending when this was written.
+10. **Edge cases and the use of AI.** The 2027 review warns that descriptions drafted with large language models can look complete while leaving out edge-case behaviour, and asks for a human-in-the-loop process (Sect. 7.2). This description was drafted by the modelling agent (an AI research agent) from the frozen code and configuration. Every statement is tagged to the code, and the edge cases and inactive branches are listed in 7.13. An independent AI agent then verified the description against the code and configuration (161 claims, 8 errors); the errors are corrected in this version. The v13 social mechanisms, the v13g reputation rule and the v13kd switch (7.15, 7.16 and the lines that refer to them) were added later, checked sentence by sentence against the v13 code by the modelling agent, and were not part of that independent verification. Human review by the PI was still pending when this was written.
 
 ## Summary panels (text version of a visual ODD)
 
@@ -130,7 +130,7 @@ There is one `Community` per nuraghe site (`code/alliance.py:229-234`), a repast
 | `trust[(a, b)]` | a's trust in b, in [0, 1]; default `trust0` (`T`, line 1110) |
 | `received_from` | set of (a, b): a has received help from b |
 | `allied_season[(a, b)]` | first season with mutual trust >= `alliance_threshold` (recorded only) |
-| `help_mh`, `help_stage`, `asks`, `asks_stage`, `help_log` | bookkeeping of help given and of asks and refusals, per pair, stage and season |
+| `help_mh`, `help_stage`, `asks`, `asks_stage`, `help_log` | bookkeeping of help given and of asks and refusals, per pair, stage and season. `help_mh[(a, b)]` (man-hours a has worked for b) also defines the reciprocal dyads of the v13kd switch `trusted_nodist` (7.16) |
 | `soc["log"][j]` | (v13 `reputation` only) j's decisions as an asked community, in time order: (requester, good). A help is good, an unjustified refusal bad; justified refusals are not logged. Under `reputation_rule: gentle` only a defector's refusal or a refusal after help received from the requester is logged as bad; other refusals are not logged (7.15) |
 | `soc["cheated"]` | (v13 `partner_choice` only) set of (a, b): b refused a, without justification, after having received help from a, and has not helped a since |
 | `soc["adj"][i]` | (v13; used by `tie_imitation`) communities linked to i by help given or received with mh > 0 |
@@ -656,6 +656,7 @@ At most `max_asks` = 3 (cfg:263) are asked, in turn.
 - the betas are 0, 2, 0.05 per day and 0.2 per km (cfg:268-cfg:271);
 - backlog_j = (remaining labour of j's active tasks) / (B_j x 8 h) (`backlog_days`, lines 1122-1127);
 - the draw comes from j's stream. Defectors would always refuse; there are none.
+- with the v13kd switch `trusted_nodist` on (off in the headline), the distance term is 0 for a reciprocal dyad (7.16).
 
 **Trust update** (`trust` true). On acceptance, T(i, j) <- min(1, T(i, j) + 0.1). On refusal, if j has received help from i before, T(i, j) <- max(0, T(i, j) - 0.2) (cfg:264-cfg:266). An acceptance records (i, j) in `received_from`. The first season of mutual trust >= 0.7 (cfg:267) is recorded. The first acceptance ends the asking; if all refuse, the owner works alone.
 
@@ -729,7 +730,7 @@ So a community spends its daily hours first on upstream stages, across its own a
 5. **Faces.** Two sites have only one face. The local-stone face (route -1) is never used: every site has at least one route.
 6. **Inactive preprocessing branches.** Snapping and the unreachable policy act on no site in the tables used (Appendix D).
 7. **Sea.** People never travel by sea at 2 kn (the people table is empty), so `wdist` is the straight-line distance. Sea faces exist at 46 sites; none uses a hoist landing.
-8. **Inactive switches.** Trackways (`tracks`), shared faces (`shared_quarry`), defectors, pre-existing ties, brokers and every v12, gaps and wider-literature switch are off. Their code paths are skipped by guards (`self.cz is None`, `hp is None`, `self.masons` false, `self.units is None`). The v13 social switches (`reputation`, `partner_choice`, `tie_imitation`, `social_log`) are off too, and the v13g `reputation_rule` (default `all`) acts only through them; their code is skipped by the guard `self.soc is None`, and with them off the outputs are identical to the frozen code (7.15).
+8. **Inactive switches.** Trackways (`tracks`), shared faces (`shared_quarry`), defectors, pre-existing ties, brokers and every v12, gaps and wider-literature switch are off. Their code paths are skipped by guards (`self.cz is None`, `hp is None`, `self.masons` false, `self.units is None`). The v13 social switches (`reputation`, `partner_choice`, `tie_imitation`, `social_log`) are off too, the v13g `reputation_rule` (default `all`) acts only through them, and the v13kd switch `trusted_nodist` (7.16) is off; their code is skipped by the guard `self.soc is None`, and with them off the outputs are identical to the frozen code (7.15).
 9. **Numerical guards.** `sigmoid` returns 0 for arguments below -700 (line 117). Run signatures include code-version strings, so part files from older code are never reused (lines 36-55, 2044). The signature does not cover every input (7.0).
 10. **Relay geometry.** The hand-off position and the 300 flat-m minimum use the mu 0.3 cost, while the legs are costed at the site's own friction. The route geometry is the mu 0.3 path for every friction (7.1, item 5).
 
@@ -745,7 +746,7 @@ So a community spends its daily hours first on upstream stages, across its own a
 
 Seeds 1-100 (`seeds`, cfg:98; `code/model.py:parse_seeds`, lines 496-503). Every random stream is keyed by seed and site or role, so results do not depend on the number of ranks.
 
-The v13 social switches and the v13g reputation rule (7.15) make no draws. A social refusal overrides the acceptance draw already taken from the asked community's stream, so every stream stays aligned with the switches-off run.
+The v13 social switches, the v13g reputation rule (7.15) and the v13kd switch (7.16) make no draws. A social refusal overrides the acceptance draw already taken from the asked community's stream, so every stream stays aligned with the switches-off run.
 
 ### 7.15 Social mechanisms (v13; off in the headline)
 
@@ -780,6 +781,21 @@ The v13 social switches and the v13g reputation rule (7.15) make no draws. A soc
 - Apicella et al. (2012: 500) and Kasper & Borgerhoff Mulder (2015: 708-711) show that cooperators assort and that help follows reciprocal partners.
 - Apicella et al. (2012: 500) show that behavioural similarity follows social ties more than geography.
 - All of these are forager or farmer studies and transfer as form only. The specific rules (observation within R, a binary image set by the last observed act, the three-group order, the exclusion of cheaters, cumulative undirected help ties, and the gentle rule's ingratitude condition) are the authors' idea. They have no numeric parameters (Appendix A; `param_audit/PARAM_AUDIT.md`, rows A10-A13).
+
+### 7.16 Trusted partners without distance penalty (v13kd; off in the headline)
+
+`TRUSTED_NODIST_VERSION`, `_init_kd`, `_kd_pair`, `_kd_cols` (lines 2183-2216, appended at the end of the file so that no earlier line moved); one-line calls in `SOCIAL_KEYS` (line 64), `_init_social` (line 1027), the acceptance logit of `request` (line 1201) and `results` (line 1891); signature through `_rule_tag` and `_sig_sc` (lines 2170-2180). One opt-in scenario switch, `trusted_nodist`, off unless set; it adds no numeric parameter and is used only by the two v13kd scenarios (Appendix B) and only with the v13 code.
+
+- **Rule.** In the acceptance logit of 7.7, the distance term beta3 d_ij / 1000 is set to 0 when requester i and asked community j form a **reciprocal dyad**: help has flowed in both directions between them so far in the run, `help_mh[(j, i)] > 0` and `help_mh[(i, j)] > 0` (`_kd_pair`). Every other pair keeps beta3 d_ij. `help_mh` counts man-hours actually charged, including walking, so a join-mode helper whose hands are capped to 0 (7.13) and a broker (reach > 1) count as having helped.
+- **Scope.** The rule acts only in the logistic branch of `request`. Tie-mode asks (`P_tie`), `accept_fixed` asks and defectors are as before. The help radius R and the candidate list (7.7) are unchanged: only the acceptance penalty changes, not who can be asked. The decision then passes through the social gate (7.15) as usual.
+- **Draws.** None. The acceptance draw is taken from j's stream as before, so every stream stays aligned with the switch-off run.
+- **Bookkeeping.** `trusted_nodist` is a `SOCIAL_KEYS` key. With it on, the `soc` state and the `soc_*` columns of 7.15 exist (the other social rules stay off unless set). `sites` also gets `soc_n_kd`: the asks made by the community in which the distance term was dropped.
+- **Signature and identity.** With the switch on, `TRUSTED_NODIST_VERSION` is appended to `SOCIAL_VERSION` (`_rule_tag`). An explicit `trusted_nodist: false` is dropped from the hashed scenario (`_sig_sc`), so every earlier signature is unchanged (7 comparators and the eight v13/v13g runs re-checked). The v13 code before and after the v13kd edit gives identical decompressed part files (`code/sites300_real.txt`, seeds 1-2) for `MOST_REALISTIC_AUDITED_LIT_P10`, `A5_full_freerider` and `MOST_REALISTIC_S20_lintels_3t0_P10` with every switch off, and for four test scenarios with v13 switches on under the rules `all` and `gentle`.
+
+*Rationale.*
+- Kasper & Borgerhoff Mulder (2015: 709-710, Fig. 2) find that distance does not lower help in contingent (reciprocal) dyads, while it lowers helping scope and the odds of a reciprocal dyad overall (ibid.: 708-711). Reciprocal relationships are robust to 5-10-minute walks (ibid.: 712).
+- The distance × contingency interaction was not tested statistically (no prediction, p. 709); the pattern rests on a raw-data plot only. The study area is one Tanzanian subvillage (hundreds of metres), so the result transfers as form only, and no value is taken from it.
+- The reciprocal-dyad condition (cumulative help in both directions, mh > 0) and the all-or-nothing removal of beta3 are the authors' idea (Appendix A; `param_audit/PARAM_AUDIT.md`, row A14).
 
 ## Appendix A. Parameters acting on the headline run
 
@@ -929,6 +945,7 @@ Each family changes the headline (or, for the earlier families, its own baseline
 | Alliance sensitivity | 27 `SENS_R*_b*_t*` cells | R, b, track cost on A5_full | Authors' idea |
 | Social mechanisms (v13) | `A5_full_freerider_V13rep`, `_V13pc`, `_V13reppc`; `MOST_REALISTIC_AUDITED_LIT_V13tie_P10`, `_V13all_P10` | `reputation`, `partner_choice`, `tie_imitation` (config copies `config/config_v13_*.yaml`, queue `config/queues/queue_v13_social_STAGED.tsv`; v13 code; 7.15) | Literature form (Boyd & Richerson 2022; Apicella et al. 2012; Kasper & Borgerhoff Mulder 2015; Nowak & Sigmund 2005; Panchanathan & Boyd 2004); rules: Authors' idea |
 | Social mechanisms, gentle reputation rule (v13g) | `A5_full_freerider_V13repg`, `_V13repgpc`; `MOST_REALISTIC_AUDITED_LIT_V13allg_P10` | as the v13 cells with `reputation_rule: gentle` (config copies `config/config_v13g_*.yaml`, queue `config/queues/queue_v13_gentle.tsv`; v13 code; 7.15) | Literature form (Fafchamps 1992; Boyd & Richerson 2022; Kasper & Borgerhoff Mulder 2015; Panchanathan & Boyd 2004); rule: Authors' idea |
+| Trusted partners without distance penalty (v13kd) | `MOST_REALISTIC_AUDITED_LIT_V13kd_P10`; `MOST_REALISTIC_AUDITED_LIT_V13allgkd_P10` | `trusted_nodist` on the headline, and on the v13g cell with all three switches (config copies `config/config_v13k_*.yaml`, queue `config/queues/queue_v13_kd.tsv`; v13 code; 7.16) | Literature form (Kasper & Borgerhoff Mulder 2015: 709-710, 712; interaction not tested statistically); rule: Authors' idea |
 | Pre-existing networks | `P_<size>_<shape>`, `P_none`, regional, stage-set, outcrop, D7 trust, D8 tie loss variants | `pre_networks` (`code/pre_networks.py`) | Authors' idea |
 | Sea access S9 | `S9_sea_*`, `<scenario>_sea`, sea grid with pre-networks | `sea_kn` / `_sea` suffix | Authors' idea |
 | Phasing twins | `<scenario>_P10`, `_P20` | name suffix | Authors' idea |
@@ -1046,12 +1063,12 @@ The code and configuration win in every case; this description follows them. "Do
 - Szangolies, L., Rohwäder, M.S., Ahmed, H., Jahanmiri, F., Wagner, A., Souto-Veiga, R., et al., 2024. Visual ODD: a standardised visualisation illustrating the narrative of agent-based models. J. Artif. Soc. Soc. Simulat. 27 (4).
 - Wright, T.P., 1936. Factors affecting the cost of airplanes. Journal of the Aeronautical Sciences 3, 122–128. https://doi.org/10.2514/8.155
 
-**Social mechanisms (v13, 7.15)**:
+**Social mechanisms (v13, 7.15; v13kd, 7.16)**:
 
 - Apicella, C.L., Marlowe, F.W., Fowler, J.H., Christakis, N.A., 2012. Social networks and cooperation in hunter-gatherers. Nature 481, 497–501. https://doi.org/10.1038/nature10736
 - Fafchamps, M., 1992. Solidarity networks in preindustrial societies: rational peasants with a moral economy. Economic Development and Cultural Change 41 (1), 147–174. (v13g gentle rule.)
 - Boyd, R., Richerson, P.J., 2022. Large-scale cooperation in small-scale foraging societies. Evolutionary Anthropology 31, 175–198. https://doi.org/10.1002/evan.21944
-- Kasper, C., Borgerhoff Mulder, M., 2015. Who helps and why? Cooperative networks in Mpimbwe. Current Anthropology 56 (5), 701–732. https://doi.org/10.1086/683024
+- Kasper, C., Borgerhoff Mulder, M., 2015. Who helps and why? Cooperative networks in Mpimbwe. Current Anthropology 56 (5), 701–732. https://doi.org/10.1086/683024 (also v13kd, 7.16: Fig. 2, pp. 709-710, and p. 712.)
 - Nowak, M.A., Sigmund, K., 2005. Evolution of indirect reciprocity. Nature 437. (Cited for the concept of image scoring; not read at a page in this project.)
 - Panchanathan, K., Boyd, R., 2004. Indirect reciprocity can stabilize cooperation without the second-order free rider problem. Nature 432. (Cited for the concept of standing; not read at a page in this project.)
 
