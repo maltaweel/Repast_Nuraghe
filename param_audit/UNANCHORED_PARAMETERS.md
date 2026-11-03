@@ -45,3 +45,4 @@ From PARAM_AUDIT.md (70 parameters): 31 carry the label "Authors' assumption". V
 ## C. Technical, no source expected: 2 + 6
 - X1 safety stop (20,000 seasons, never binding); X2 seeds 1-100
 - Addendum (PARAM_AUDIT_ADDENDUM.md): sea grid factor, sea attach radius, max people sea time, raster all-touched, nodata snap radius, unreachable policy (GIS and numerical choices)
+- 3 Nov 13:30 the authors on A1 (R_m 10 km): 'no its fine, keep it' — the headline stays 10 km and no walking-time anchor search was done. It stays an Authors' assumption; the paper must say territory size is set by it (TERRITORIES.md caveat). 3 Nov 13:32 the authors approved a sensitivity at 5 and 15 km on the audited headline (10 km kept as headline); results in outputs/summary_radius/SUMMARY_RADIUS.md, config_R5_audited.yaml / config_R15_audited.yaml, queue_radius.tsv.

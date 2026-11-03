@@ -163,7 +163,8 @@ A sea face (route -2) is added when the site's 2-knot sea table gives the sea ro
   - the 8-band directional drag cost raster (mu 0.3; cfg:15) and its mu 0.38 and mu 0.1 rebuilds (`cache/cost_mu/`);
   - the outcrop code raster and its regions;
   - per-move arrays along every face route: from-cell `mv_cell`; costs `mv_c03`, `mv_c01`, `mv_c038`; length `mv_len`.
-- **Neighbour lists.** Communities within `R_m` = 10 km, straight line, sorted by distance, then id (lines 186-196).
+- **Neighbour lists.** Communities within `R_m` = 10 km (the headline value; 5 and 15 km were run as a sensitivity on
+  the audited headline, Appendix B), straight line, sorted by distance, then id (lines 186-196).
 - **Globals:**
   - `open_faces` (region -> communities that opened it);
   - `track_owner` (empty: tracks are off);
@@ -183,7 +184,9 @@ A sea face (route -2) is added when the site's 2-knot sea table gives the sea ro
 - **Exogenous drivers.** None change during a run: there is no climatic, demographic, economic or chronological forcing. What drives a run is fixed at initialization: the site list and tower counts, the terrain (drag-cost rasters), the outcrops and recorded stone, the work-party rule and the cohort draw (Sections 5, 6). The population ceiling is a fixed constraint (7.3).
 - **How space is included.** Explicitly, on a 30 m raster (EPSG:25832) over Sardinia:
   - haul labour follows least-cost routes over a slope-dependent directional drag-cost surface, precomputed per site and face (7.1) and costed move by move (7.5);
-  - interaction is limited by straight-line distance: requests, relays and imitation within `R_m` = 10 km, acceptance falling by 0.2 logit per km, and helpers' walking charged by distance (7.7);
+  - interaction is limited by straight-line distance: requests, relays and imitation within `R_m` = 10 km (the
+    headline value; 5 and 15 km sensitivity, Appendix B), acceptance falling by 0.2 logit per km, and helpers'
+    walking charged by distance (7.7);
   - relay helpers must be nearer the quarry than the asker (7.7), and 46 coastal sites have a sea face with a boat route (7.1, item 6).
   - Communities do not move; only stone and work parties travel, and travel is charged as labour.
 - **Resolutions and extents** are given in 2.6.
@@ -644,7 +647,9 @@ The initial state differs between seeds only through the residents, the blocks, 
    - If one accepts, leg 1 (moves a..h) is a joint task and leg 2 (h..b) is done by the owner alone. Otherwise the owner hauls the whole route.
 4. **Build and lift** (`req_build`), at the site. This is the final task; its labour = (build + lift) per tower x discount.
 
-**Candidates** (`_candidates_R`). Neighbours within `R_m` = 10 km (cfg:260), sorted by:
+**Candidates** (`_candidates_R`). Neighbours within `R_m` = 10 km (cfg:260; the headline value, decided 3 November
+2026; 5 and 15 km were run as a sensitivity on the audited headline, `MOST_REALISTIC_AUDITED_LIT_R5_P10` /
+`_R15_P10`, Appendix B), sorted by:
 1. skill factor for the stage (ascending: most experienced first, because `specialisation` is on);
 2. the asker's trust in them (descending);
 3. distance;
@@ -943,6 +948,7 @@ Each family changes the headline (or, for the earlier families, its own baseline
 | REALISTIC | `REALISTIC`, `REALISTIC_oxen` | per-site mixed rules | Authors' idea |
 | Alliance A0-A5 | `A0_alone`, `A1_ask`, `A2_trust`, `A3_trust_learning`, `A4_trust_track`, `A5_full`, `A5_full_freerider`, `A0_verify` | `alliance.list` (cfg:282) | Authors' idea |
 | Alliance sensitivity | 27 `SENS_R*_b*_t*` cells | R, b, track cost on A5_full | Authors' idea |
+| Help radius sensitivity (audited headline) | `MOST_REALISTIC_AUDITED_LIT_R5_P10`, `_R15_P10` | `R_m` scenario key 5,000 / 15,000 m on the headline (`alliance.R_m` stays 10,000; config copies `config/config_R5_audited.yaml` / `config_R15_audited.yaml`, queue `config/queues/queue_radius.tsv`; frozen code). 10 km kept as the headline value | Authors' idea |
 | Social mechanisms (v13) | `A5_full_freerider_V13rep`, `_V13pc`, `_V13reppc`; `MOST_REALISTIC_AUDITED_LIT_V13tie_P10`, `_V13all_P10` | `reputation`, `partner_choice`, `tie_imitation` (config copies `config/config_v13_*.yaml`, queue `config/queues/queue_v13_social_STAGED.tsv`; v13 code; 7.15) | Literature form (Boyd & Richerson 2022; Apicella et al. 2012; Kasper & Borgerhoff Mulder 2015; Nowak & Sigmund 2005; Panchanathan & Boyd 2004); rules: Authors' idea |
 | Social mechanisms, gentle reputation rule (v13g) | `A5_full_freerider_V13repg`, `_V13repgpc`; `MOST_REALISTIC_AUDITED_LIT_V13allg_P10` | as the v13 cells with `reputation_rule: gentle` (config copies `config/config_v13g_*.yaml`, queue `config/queues/queue_v13_gentle.tsv`; v13 code; 7.15) | Literature form (Fafchamps 1992; Boyd & Richerson 2022; Kasper & Borgerhoff Mulder 2015; Panchanathan & Boyd 2004); rule: Authors' idea |
 | Trusted partners without distance penalty (v13kd) | `MOST_REALISTIC_AUDITED_LIT_V13kd_P10`; `MOST_REALISTIC_AUDITED_LIT_V13allgkd_P10` | `trusted_nodist` on the headline, and on the v13g cell with all three switches (config copies `config/config_v13k_*.yaml`, queue `config/queues/queue_v13_kd.tsv`; v13 code; 7.16) | Literature form (Kasper & Borgerhoff Mulder 2015: 709-710, 712; interaction not tested statistically); rule: Authors' idea |

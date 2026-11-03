@@ -1,0 +1,3 @@
+prio	label	kind	est	ranks	cfg	args
+9	RAD_MOST_REALISTIC_AUDITED_LIT_R5_P10	cmd	420	6	@RUN_DIR@/config_R5_audited.yaml	cd @RUN_DIR@/code && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_R5_audited.yaml --seeds 1-100 --no-shapefile --alliance MOST_REALISTIC_AUDITED_LIT_R5_P10
+9	RAD_MOST_REALISTIC_AUDITED_LIT_R15_P10	cmd	420	6	@RUN_DIR@/config_R15_audited.yaml	cd @RUN_DIR@/code && mpirun --allow-run-as-root --oversubscribe -n 6 @PYTHON@ model.py @RUN_DIR@/config_R15_audited.yaml --seeds 1-100 --no-shapefile --alliance MOST_REALISTIC_AUDITED_LIT_R15_P10

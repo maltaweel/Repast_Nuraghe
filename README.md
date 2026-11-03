@@ -22,7 +22,9 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   the chosen quarry face, and building (including lifting) (ODD sections 2-3).
 - **Cooperation.** Communities ask others within 10 km for help (up to 3 requests); a request is accepted according
   to trust, which reciprocity raises or lowers. Each community learns which choices worked for it, imitates
-  successful neighbours, and gains skill with experience (ODD sections 3-4).
+  successful neighbours, and gains skill with experience (ODD sections 3-4). The 10 km help radius is the headline
+  value; a sensitivity ran it at 5 and 15 km on the audited headline (`MOST_REALISTIC_AUDITED_LIT_R5_P10` /
+  `_R15_P10`, `config/config_R5_audited.yaml` / `config_R15_audited.yaml`, ODD Appendix B).
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
