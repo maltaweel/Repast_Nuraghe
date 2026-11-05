@@ -71,7 +71,7 @@
 | drag_speed_ms | 0.6 | same experiment |
 | return_walk_ms | 1.4 | normal walking speed |
 | load_unload_h | 0.25 | the modellers' assumption |
-| min_haul_flatm | 100 | quarry face to the site when the site sits on the outcrop; Webster's local hauls are ≤ 200 m |
+| min_haul_flatm | 15 (v15, 5 Nov 2026; 100 before) | quarry face to the site when the site sits on the outcrop, and the floor of every whole route; Webster's local hauls are ≤ 200 m |
 | other_mandays_per_tower | 2,500 | Webster Table 1: ~3,600 man-days per tower, minus ~1,100 for transport |
 | seeds | 1..100 | The authors' spec |
 
@@ -489,6 +489,7 @@ Code: `alliance.py` (model), `report_alliance.py` (outputs), `tools/kbest_quarri
   - The quarry-face values start from a model-based estimate (each community can see the cost of its own faces). The other values start at 0, so a community tries asking first.
   - **Social learning:** with probability p_imit = 0.3 per tower, the community copies the last strategy of the neighbour within R with the lowest cost per tonne, if that is lower than its own. Faces are copied only if the neighbour's face region is also among its own faces.
   - **Near-site rule (v14, 5 Nov 2026; `quarry.near_site_fixed_face_m`, 1,000 m in the v14 configs, absent / 0 = off).** A site whose dry-ground (μ 0.38) route to its cheapest face (face 0, haul table `haul/sites_haul_mu0.38.csv`, `haul_m`) is at most this length always quarries from face 0: for it the face is never explored (no ε draw), never chosen by its value table and never copied by imitation; the draws are skipped, not drawn and discarded. Its other dimensions, and the imitation draw itself, are unchanged. Sites over the threshold keep the choice among their k = 5 faces (and a sea face). The run signature includes the rule only when it is on (`CHANGES_V14_NEARFACE.md`).
+  - **Minimum haul (v15, 5 Nov 2026; `transport.min_haul_flatm`).** The minimum haul is 15 m (flat-equivalent metres; it was 100 m) for a site on its outcrop and as the floor of every whole route (drag and walk-back legs alike; relay legs have no minimum). It is a config value only: every floor in the code reads this key, and the sea tables, the only prepared tables that apply it, are rebuilt per config. Rows with their own value (the 200 / 210 / 300 m sensitivity configs) keep it. The results in the paper are being regenerated with the v15 configs (this value and the near-site rule) on the v15 code (`CHANGES_V15_HAUL15.md`).
 - **Scenarios** (100 seeds each, seeds 1..100):
 
 | Scenario | Settings |

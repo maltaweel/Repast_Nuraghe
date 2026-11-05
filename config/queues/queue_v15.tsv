@@ -1,0 +1,470 @@
+prio	label	kind	est_s	ranks	config	args
+0	PREP_ALT_stones7	cmd	194	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/alliance && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/alliance && test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/haul && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/haul && @PYTHON@ @RUN_DIR@/code_v15_haul15/preprocess.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml && @PYTHON@ @RUN_DIR@/code_v15_haul15/preprocess.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml --tag mu0.38 --cost-raster @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/cost_mu/drag_cost_8dir_mu0.38_int.tif && @PYTHON@ @RUN_DIR@/code_v15_haul15/preprocess.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml --tag mu0.1 --cost-raster @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/cost_mu/drag_cost_8dir_mu0.1_int.tif && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/kbest_quarries.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/kbest_mu038.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/wl_inputs.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/sites_haul.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/site_stone_sets.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/outcrop_code.tif && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/haul/sites_haul_mu0.38.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/haul/sites_haul_mu0.1.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/alliance/kbest.npz && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/alliance/kbest_mu038.npz && test -s @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/alliance/kbest_wl.npz
+0	SEA_TABLES	cmd	276	1	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited.yaml && test -s @RUN_DIR@/v15_haul15/outputs/cache/sea/sites_haul_sea2kn.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache/sea/people_sea2kn.csv.gz && test -s @RUN_DIR@/v15_haul15/outputs/cache/sea/sites_haul_sea5kn.csv
+0	SEA_TABLES_LOO_drag	cmd	267	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_drag.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_loo_drag/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_loo_drag/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_loo_drag.yaml && test -s @RUN_DIR@/v15_haul15/outputs/cache_loo_drag/sea/sites_haul_sea2kn.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_loo_drag/sea/people_sea2kn.csv.gz && test -s @RUN_DIR@/v15_haul15/outputs/cache_loo_drag/sea/sites_haul_sea5kn.csv && @PYTHON@ -c "import json; p=json.load(open('@RUN_DIR@/v15_haul15/outputs/cache_loo_drag/sea/sea_meta.json'))['params']; assert abs(p['v_drag']-0.6)<1e-9 and abs(p['v_back']-1.39)<1e-9, p"
+0	SEA_TABLES_LOO_walk	cmd	283	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_walk.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_loo_walk/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_loo_walk/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_loo_walk.yaml && test -s @RUN_DIR@/v15_haul15/outputs/cache_loo_walk/sea/sites_haul_sea2kn.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_loo_walk/sea/people_sea2kn.csv.gz && test -s @RUN_DIR@/v15_haul15/outputs/cache_loo_walk/sea/sites_haul_sea5kn.csv && @PYTHON@ -c "import json; p=json.load(open('@RUN_DIR@/v15_haul15/outputs/cache_loo_walk/sea/sea_meta.json'))['params']; assert abs(p['v_drag']-0.27)<1e-9 and abs(p['v_back']-1.4)<1e-9, p"
+0	SEA_TABLES_drag10	cmd	257	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_drag10_ownsea.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_drag10/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_drag10/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_drag10_ownsea.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_drag10
+0	SEA_TABLES_pull125	cmd	287	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_pull125_ownsea.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_pull125/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_pull125/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_pull125_ownsea.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_pull125
+0	SEA_TABLES_ALT_drag0355	cmd	286	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag0355.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_drag0355/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_drag0355/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag0355.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_drag0355
+0	SEA_TABLES_ALT_walk131	cmd	286	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk131.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_walk131/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_walk131/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk131.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_walk131
+0	SEA_TABLES_ALT_transfer1h	cmd	264	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_transfer1h.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_transfer1h/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_transfer1h/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_transfer1h.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_transfer1h
+0	SEA_TABLES_ALT_transfer2h	cmd	248	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_transfer2h.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_transfer2h/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_transfer2h/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_transfer2h.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_transfer2h
+0	SEA_TABLES_ALT_drag019	cmd	296	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag019.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_drag019/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_drag019/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag019.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_drag019
+0	SEA_TABLES_ALT_pull20kgf	cmd	294	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull20kgf.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_pull20kgf/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_pull20kgf/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull20kgf.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_pull20kgf
+0	SEA_TABLES_ALT_pull38kgf	cmd	279	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull38kgf.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_pull38kgf/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_pull38kgf/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull38kgf.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_pull38kgf
+0	SEA_TABLES_ALT_sigma041	cmd	291	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma041.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma041/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma041/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma041.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma041
+0	SEA_TABLES_ALT_sigma072	cmd	286	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma072.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma072/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma072/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma072.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma072
+0	SEA_TABLES_ALT_block549	cmd	294	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block549.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_block549/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_block549/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block549.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_block549
+0	SEA_TABLES_ALT_course05	cmd	293	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_course05.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_course05/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_course05/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_course05.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_course05
+0	SEA_TABLES_ALT_minhaul200	cmd	300	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul200.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul200/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul200/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul200.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul200
+0	SEA_TABLES_ALT_minhaul210	cmd	298	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul210.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul210/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul210/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul210.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul210
+0	SEA_TABLES_ALT_walk147	cmd	287	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk147.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_walk147/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_walk147/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk147.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_walk147
+0	SEA_TABLES_ALT_walk142	cmd	277	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk142.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_walk142/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_walk142/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk142.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_walk142
+0	SEA_TABLES_ALT_walk083	cmd	306	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk083.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_walk083/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_walk083/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk083.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_walk083
+0	SEA_TABLES_ALT_crew7	cmd	291	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_crew7.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_crew7/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_crew7/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_crew7.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_crew7
+0	SEA_TABLES_ALT_sea067	cmd	40	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sea067.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_sea067/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_sea067/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sea067.yaml --speeds 0.67 && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_sea067
+0	SEA_TABLES_ALT_stones7	cmd	220	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_stones7
+0	SEA_TABLES_ALT_drag083	cmd	267	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag083.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_drag083/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_drag083/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag083.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_drag083
+0	SEA_TABLES_ALT_drag09	cmd	264	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag09.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_drag09/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_drag09/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag09.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_drag09
+0	SEA_TABLES_ALT_load033	cmd	281	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_load033.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_load033/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_load033/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_load033.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_load033
+0	SEA_TABLES_ALT_load05	cmd	288	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_load05.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_load05/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_load05/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_load05.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_load05
+0	SEA_TABLES_ALT_minhaul300	cmd	283	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul300.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul300/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul300/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul300.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_minhaul300
+0	SEA_TABLES_ALT_blockmin143	cmd	271	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_blockmin143.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_blockmin143/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_blockmin143/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_blockmin143.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_blockmin143
+0	SEA_TABLES_ALT_pull181	cmd	292	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull181.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_pull181/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_pull181/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull181.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_pull181
+0	SEA_TABLES_ALT_block300	cmd	283	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block300.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_block300/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_block300/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block300.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_block300
+0	SEA_TABLES_ALT_block1000	cmd	279	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block1000.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_block1000/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_block1000/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block1000.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_block1000
+0	SEA_TABLES_ALT_sigma03	cmd	307	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma03.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma03/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma03/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma03.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma03
+0	SEA_TABLES_ALT_sigma09	cmd	290	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma09.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma09/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma09/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma09.yaml && @PYTHON@ @RUN_DIR@/check_sea_meta.py @RUN_DIR@/v15_haul15/outputs/cache_alt_sigma09
+0	SEA_TABLES_haul10	cmd	317	1	@RUN_DIR@/v15_haul15/configs/config_full_audited_haul10.yaml	test -d @RUN_DIR@/v15_haul15/outputs/cache_haul10/sea && test ! -L @RUN_DIR@/v15_haul15/outputs/cache_haul10/sea && @PYTHON@ @RUN_DIR@/code_v15_haul15/tools/sea_routes.py @RUN_DIR@/v15_haul15/configs/config_full_audited_haul10.yaml && test -s @RUN_DIR@/v15_haul15/outputs/cache_haul10/sea/sites_haul_sea2kn.csv && test -s @RUN_DIR@/v15_haul15/outputs/cache_haul10/sea/people_sea2kn.csv.gz && test -s @RUN_DIR@/v15_haul15/outputs/cache_haul10/sea/sites_haul_sea5kn.csv && @PYTHON@ -c "import json; p=json.load(open('@RUN_DIR@/v15_haul15/outputs/cache_haul10/sea/sea_meta.json'))['params']; assert p['min_haul']==10.0, p"
+0	MOST_REALISTIC_AUDITED_LIT_P10	alliance	526	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_P10
+0	MOST_REALISTIC_S22_demog_r035	alliance	383	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S22_demog_r035
+0	P_G20_system_kmesh4	pre	197	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4
+0	MOST_REALISTIC_S14_central_P10	alliance	523	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S14_central_P10
+0	A5_full	alliance	315	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A5_full
+0	MOST_REALISTIC_S20_lintels_3t0_P10	alliance	940	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S20_lintels_3t0_P10
+0	MOST_REALISTIC_S10_s70_P10	alliance	538	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S10_s70_P10
+0	S3c_dry_ground	lit	250	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S3c_dry_ground
+0	MOST_REALISTIC_AUDITED_LIT_P10_haul10	alliance	526	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_haul10.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_P10
+1	MOST_REALISTIC_AUDITED_LIT_POPFROZEN_P10	alliance	485	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_POPFROZEN_P10
+1	MOST_REALISTIC_P10	alliance	521	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_P10
+1	MOST_REALISTIC_C3_all_P10	alliance	517	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C3_all_P10
+1	MOST_REALISTIC_S4_graded_rate_P10	alliance	525	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S4_graded_rate_P10
+1	MOST_REALISTIC_S15_found_d1_P10	alliance	511	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S15_found_d1_P10
+1	MOST_REALISTIC_S13_walls_P10	alliance	527	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S13_walls_P10
+1	MOST_REALISTIC_S2c_vault_v10_P10	alliance	539	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S2c_vault_v10_P10
+1	MOST_REALISTIC_S17_fill_f40_P10	alliance	524	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S17_fill_f40_P10
+1	MOST_REALISTIC_C1_rails_P10	alliance	521	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C1_rails_P10
+1	P_D7_G20_kmesh4_trust	pre	235	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_D7_G20_kmesh4_trust
+1	A2_trust	alliance	227	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A2_trust
+1	A3_trust_learning	alliance	269	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A3_trust_learning
+1	MOST_REALISTIC_M1_s1_R5_P10	alliance	506	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M1_s1_R5_P10
+1	MOST_REALISTIC_S16_mud_m05_P10	alliance	507	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S16_mud_m05_P10
+1	MOST_REALISTIC_M2_regional_tribes_P10	alliance	608	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M2_regional_tribes_P10
+1	MOST_REALISTIC_S23_bichrome_b05_P10	alliance	536	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S23_bichrome_b05_P10
+1	MOST_REALISTIC_S13_rifascio_p80_s20_P10	alliance	521	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S13_rifascio_p80_s20_P10
+1	MOST_REALISTIC_S4e_laner_h3_P10	alliance	516	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_P10
+1	MOST_REALISTIC_handover_P10	alliance	460	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_handover_P10
+1	MOST_REALISTIC_S12b_feast_b05_P10	alliance	494	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12b_feast_b05_P10
+1	A1_ask	alliance	223	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A1_ask
+1	P_wide_stone_local_build	pre	50	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_wide_stone_local_build
+1	P_G20_kmesh4_on_outcrop	pre	199	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_on_outcrop
+1	P_D8_G20_kmesh4_tieloss	pre	202	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_D8_G20_kmesh4_tieloss
+1	A4_trust_track	alliance	266	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A4_trust_track
+1	MOST_REALISTIC_S21_levy_R1.7_D40_P10	alliance	468	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S21_levy_R1.7_D40_P10
+1	MOST_REALISTIC_S11_mid_P10	alliance	514	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S11_mid_P10
+1	MOST_REALISTIC_C2_wall_P10	alliance	519	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C2_wall_P10
+1	MOST_REALISTIC_S4d_spiral_7m5_P10	alliance	522	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S4d_spiral_7m5_P10
+1	A5_full_freerider	alliance	324	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A5_full_freerider
+1	MOST_REALISTIC_S10_unitary_P10	alliance	518	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S10_unitary_P10
+1	MOST_REALISTIC_M3_sand26_P10	alliance	522	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M3_sand26_P10
+1	MOST_REALISTIC_M2_central_P10	alliance	605	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M2_central_P10
+1	A0_alone	alliance	151	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A0_alone
+1	P_none	pre	150	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_none
+1	P_G20_kmesh4_north	pre	170	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_north
+1	MOST_REALISTIC_S21_levy_masters_P10	alliance	548	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S21_levy_masters_P10
+1	A0_verify	alliance	145	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A0_verify
+1	MOST_REALISTIC_S24_carts_P10	alliance	521	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S24_carts_P10
+1	MOST_REALISTIC_alone_P10	alliance	226	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_alone_P10
+1	MOST_REALISTIC_S19_mudbrick_h2_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S19_mudbrick_h2_P10
+1	MOST_REALISTIC_S25_size_P10	alliance	499	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S25_size_P10
+1	MOST_REALISTIC_S12_central_P10	alliance	539	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12_central_P10
+1	MOST_REALISTIC_S18_clearance_y50_P10	alliance	544	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S18_clearance_y50_P10
+1	S1b_joints_low	lit	230	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S1b_joints_low
+1	REALISTIC	lit	230	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit REALISTIC
+1	baseline	baseline	220	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--out @RUN_DIR@/v15_haul15/outputs/scenarios/baseline
+1	webster	lit	223	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit webster
+1	S1a_scree	lit	221	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S1a_scree
+1	S6_density	lit	240	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S6_density
+1	S5b_any_buildstone	lit	211	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S5b_any_buildstone
+1	S5a_onsite	lit	205	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S5a_onsite
+1	S2a_unworked	lit	199	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S2a_unworked
+1	S7_webster_classes	lit	214	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S7_webster_classes
+1	high	coop	782	2	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario high
+1	mixed	coop	219	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario mixed
+1	patchwork	coop	211	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario patchwork
+1	S8_learning	lit	213	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S8_learning
+1	S4c_internal_stair	lit	213	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S4c_internal_stair
+1	S4a_lever	lit	221	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S4a_lever
+1	S3a_rails_tallow	lit	184	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S3a_rails_tallow
+1	S2b_fine	lit	214	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S2b_fine
+1	S9_sea_5kn	coop	205	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario S9_sea_5kn
+1	S5c_complex_far	lit	220	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S5c_complex_far
+1	S3e_oxen	lit	217	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S3e_oxen
+1	MOST_REALISTIC_M4_1t_P10	alliance	557	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M4_1t_P10
+1	S4b_ramp	lit	232	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S4b_ramp
+1	LOW	lit	167	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit LOW
+1	HIGH	lit	283	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit HIGH
+2	MOST_REALISTIC_LOO_drag_P10	alliance	492	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_drag.yaml	--alliance MOST_REALISTIC_LOO_drag_P10
+2	MOST_REALISTIC_LOO_adult_share_P10	alliance	488	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_adult_share.yaml	--alliance MOST_REALISTIC_LOO_adult_share_P10
+2	MOST_REALISTIC_LOO_density_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_density.yaml	--alliance MOST_REALISTIC_LOO_density_P10
+2	MOST_REALISTIC_LOO_geometry_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_geometry.yaml	--alliance MOST_REALISTIC_LOO_geometry_P10
+2	MOST_REALISTIC_LOO_joints_low_P10	alliance	506	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_joints_low.yaml	--alliance MOST_REALISTIC_LOO_joints_low_P10
+2	MOST_REALISTIC_LOO_facade_P10	alliance	516	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_facade.yaml	--alliance MOST_REALISTIC_LOO_facade_P10
+2	MOST_REALISTIC_LOO_walk_P10	alliance	507	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_loo_walk.yaml	--alliance MOST_REALISTIC_LOO_walk_P10
+2	MOST_REALISTIC_POP_lilliu30_flat_P10	alliance	446	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_lilliu30_flat_P10
+2	MOST_REALISTIC_POP_webster_household_scaled_P10	alliance	613	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_household_scaled_P10
+2	MOST_REALISTIC_POP_webster_density_a04_P10	alliance	451	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_density_a04_P10
+2	MOST_REALISTIC_POP_calo_6km2_scaled_P10	alliance	560	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_calo_6km2_scaled_P10
+2	MOST_REALISTIC_POP_ugas_high_scaled_P10	alliance	453	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_ugas_high_scaled_P10
+2	MOST_REALISTIC_POP_ugas400_scaled_P10	alliance	469	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_ugas400_scaled_P10
+2	MOST_REALISTIC_POP_ugas700_scaled_P10	alliance	441	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_ugas700_scaled_P10
+2	MOST_REALISTIC_POP_anchored_scaled_P10	alliance	518	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_anchored_scaled_P10
+2	MR_P10_v12_drag10	alliance	491	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_drag10_ownsea.yaml	--alliance MOST_REALISTIC_P10 --parts-dir @RUN_DIR@/v15_haul15/outputs/drag10/parts
+2	MR_P10_v11_pull125	alliance	549	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_pull125_ownsea.yaml	--alliance MOST_REALISTIC_P10 --parts-dir @RUN_DIR@/v15_haul15/outputs/pull125/parts
+2	MOST_REALISTIC_ALT_drag0355_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag0355.yaml	--alliance MOST_REALISTIC_ALT_drag0355_P10
+2	MOST_REALISTIC_ALT_walk131_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk131.yaml	--alliance MOST_REALISTIC_ALT_walk131_P10
+2	MOST_REALISTIC_ALT_base1075_P10	alliance	533	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_base1075.yaml	--alliance MOST_REALISTIC_ALT_base1075_P10
+2	MOST_REALISTIC_ALT_season40_P10	alliance	533	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season40.yaml	--alliance MOST_REALISTIC_ALT_season40_P10
+2	MOST_REALISTIC_S2c_vault_v20_P10	alliance	557	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_S2c_vault_v20_P10
+2	MOST_REALISTIC_ALT_transfer1h_P10	alliance	496	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_transfer1h.yaml	--alliance MOST_REALISTIC_ALT_transfer1h_P10
+2	MOST_REALISTIC_ALT_transfer2h_P10	alliance	501	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_transfer2h.yaml	--alliance MOST_REALISTIC_ALT_transfer2h_P10
+2	MOST_REALISTIC_ALT_pull21_P10	alliance	601	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull21.yaml	--alliance MOST_REALISTIC_ALT_pull21_P10
+2	MOST_REALISTIC_ALT_split0_P10	alliance	510	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_split0.yaml	--alliance MOST_REALISTIC_ALT_split0_P10
+2	MOST_REALISTIC_ALT_nodistpen_P10	alliance	487	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_nodistpen.yaml	--alliance MOST_REALISTIC_ALT_nodistpen_P10
+2	MOST_REALISTIC_POP_lilliu30_scaled_P10	alliance	527	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_lilliu30_scaled_P10
+2	MOST_REALISTIC_POP_webster_household_flat_P10	alliance	453	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_household_flat_P10
+2	MOST_REALISTIC_POP_webster_density_scaled_P10	alliance	508	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_density_scaled_P10
+2	MOST_REALISTIC_POP_webster_density_flat_P10	alliance	441	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_webster_density_flat_P10
+2	MOST_REALISTIC_POP_calo_6km2_flat_P10	alliance	464	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_calo_6km2_flat_P10
+2	MOST_REALISTIC_POP_ugas_high_flat_P10	alliance	421	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_ugas_high_flat_P10
+2	MOST_REALISTIC_POP_ugas400_flat_P10	alliance	435	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_ugas400_flat_P10
+2	MOST_REALISTIC_POP_ugas700_flat_P10	alliance	407	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_ugas700_flat_P10
+2	MOST_REALISTIC_POP_anchored_flat_P10	alliance	438	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_POP_anchored_flat_P10
+2	MOST_REALISTIC_AUDITED_LIT_POPFLAT_P10	alliance	438	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_POPFLAT_P10
+2	MOST_REALISTIC_S20_lintels_1t5_P10	alliance	736	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S20_lintels_1t5_P10
+2	MOST_REALISTIC_S4_graded_order_P10	alliance	530	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S4_graded_order_P10
+2	MOST_REALISTIC_S20_lintels_4t2_P10	alliance	59	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S20_lintels_4t2_P10
+2	MOST_REALISTIC_C2_sled200_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C2_sled200_P10
+2	MOST_REALISTIC_S10_half_P10	alliance	528	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S10_half_P10
+2	MOST_REALISTIC_S22_demog_r042	alliance	403	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S22_demog_r042
+2	MOST_REALISTIC_C3_set_low_P10	alliance	559	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C3_set_low_P10
+2	MOST_REALISTIC_S15_found_d2_P10	alliance	526	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S15_found_d2_P10
+2	MOST_REALISTIC_C3_dress_P10	alliance	680	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C3_dress_P10
+2	MOST_REALISTIC_S17_fill_f30_P10	alliance	737	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S17_fill_f30_P10
+2	MOST_REALISTIC_C3_quarry_P10	alliance	531	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C3_quarry_P10
+2	MOST_REALISTIC_S17_fill_f50_P10	alliance	534	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S17_fill_f50_P10
+2	MOST_REALISTIC_S2c_vault_v30_P10	alliance	572	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S2c_vault_v30_P10
+2	MOST_REALISTIC_S14_low_P10	alliance	50	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S14_low_P10
+2	MOST_REALISTIC_M2_complex_P10	alliance	548	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M2_complex_P10
+2	MOST_REALISTIC_M1_s01_R5_P10	alliance	511	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M1_s01_R5_P10
+2	MOST_REALISTIC_M1_s1_R2500_P10	alliance	501	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M1_s1_R2500_P10
+2	MOST_REALISTIC_M1_s1_R10_P10	alliance	515	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M1_s1_R10_P10
+2	MOST_REALISTIC_M2_regional_regions_P10	alliance	604	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M2_regional_regions_P10
+2	MOST_REALISTIC_S11_order_P10	alliance	510	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S11_order_P10
+2	MOST_REALISTIC_S16_mud_m15_P10	alliance	512	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S16_mud_m15_P10
+2	MOST_REALISTIC_S21_levy_R1.1_D40_P10	alliance	486	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S21_levy_R1.1_D40_P10
+2	MOST_REALISTIC_S23_bichrome_b15_P10	alliance	525	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S23_bichrome_b15_P10
+2	MOST_REALISTIC_S21_levy_R1.7_D90_P10	alliance	468	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S21_levy_R1.7_D90_P10
+2	MOST_REALISTIC_S10_all_P10	alliance	555	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S10_all_P10
+2	MOST_REALISTIC_S21_levy_R11.9_D40_P10	alliance	466	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S21_levy_R11.9_D40_P10
+2	MOST_REALISTIC_S4e_laner_h4_P10	alliance	544	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S4e_laner_h4_P10
+2	MOST_REALISTIC_S12b_feast_b2_P10	alliance	475	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12b_feast_b2_P10
+2	MOST_REALISTIC_S13_rifascio_p120_s50_P10	alliance	534	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S13_rifascio_p120_s50_P10
+2	MOST_REALISTIC_C1_all_P10	alliance	511	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C1_all_P10
+2	MOST_REALISTIC_C3_set_high_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C3_set_high_P10
+2	MOST_REALISTIC_S13_walls_village_P10	alliance	591	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S13_walls_village_P10
+2	MOST_REALISTIC_C3_load_P10	alliance	515	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C3_load_P10
+2	MOST_REALISTIC_C1_all_slow_P10	alliance	520	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C1_all_slow_P10
+2	MOST_REALISTIC_S4d_spiral_full_P10	alliance	529	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S4d_spiral_full_P10
+2	MOST_REALISTIC_S14_high_P10	alliance	526	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S14_high_P10
+2	S9_alliance_sea_6	alliance	1540	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A1_ask_sea,A2_trust_sea,A3_trust_learning_sea,A4_trust_track_sea,A5_full_sea,A5_full_freerider_sea
+2	MOST_REALISTIC_M3_sand40_P10	alliance	517	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M3_sand40_P10
+2	MOST_REALISTIC_M1_s10_R5_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M1_s10_R5_P10
+2	MOST_REALISTIC_M2_large_P10	alliance	619	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M2_large_P10
+2	S9_pre_sea_5	pre	987	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_none_sea,P_G50_hub_sea,P_G20_system_hub_sea,P_G133_tribe_complete_sea,P_G20_kmesh4_track_sea
+2	MOST_REALISTIC_S11_low_P10	alliance	498	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S11_low_P10
+2	MOST_REALISTIC_S10_all_crew50_P10	alliance	578	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S10_all_crew50_P10
+2	MOST_REALISTIC_S12_high_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12_high_P10
+2	MOST_REALISTIC_C2_day5_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C2_day5_P10
+2	MOST_REALISTIC_S12_s30_P10	alliance	520	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12_s30_P10
+2	MOST_REALISTIC_S19_mudbrick_h4_P10	alliance	493	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S19_mudbrick_h4_P10
+2	MOST_REALISTIC_S18_clearance_y10_P10	alliance	509	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S18_clearance_y10_P10
+2	MOST_REALISTIC_S11_high_P10	alliance	515	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S11_high_P10
+2	MOST_REALISTIC_S18_clearance_y200_P10	alliance	531	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S18_clearance_y200_P10
+2	MOST_REALISTIC_C1_rails_relay_P10	alliance	528	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_C1_rails_relay_P10
+2	MOST_REALISTIC_S13_high_P10	alliance	602	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S13_high_P10
+2	mostly_TOST_block_sigma_min	tost	217	8	@RUN_DIR@/v15_haul15/configs/block_sigma_min.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_sigma_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_sigma_min/parts
+2	mostly_TOST_block_median_kg_min	tost	236	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_min.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_median_kg_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_median_kg_min/parts
+2	full_TOST_block_median_kg_min	tost	231	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_min.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/block_median_kg_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/block_median_kg_min/parts
+2	mostly_TOST_household_size_min	tost	216	8	@RUN_DIR@/v15_haul15/configs/household_size_min.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/household_size_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/household_size_min/parts
+2	mostly	coop	216	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario mostly
+2	mostly_TOST_hours_per_day_max	tost	207	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_max.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/hours_per_day_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/hours_per_day_max/parts
+2	mostly_TOST_hours_per_day_min	tost	230	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_min.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/hours_per_day_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/hours_per_day_min/parts
+2	full_TOST_block_sigma_min	tost	205	8	@RUN_DIR@/v15_haul15/configs/block_sigma_min.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/block_sigma_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/block_sigma_min/parts
+2	mostly_TOST_household_size_max	tost	209	8	@RUN_DIR@/v15_haul15/configs/household_size_max.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/household_size_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/household_size_max/parts
+2	mostly_TOST_block_sigma_max	tost	205	8	@RUN_DIR@/v15_haul15/configs/block_sigma_max.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_sigma_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_sigma_max/parts
+2	mostly_TOST_block_median_kg_max	tost	193	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_max.yaml	--scenario mostly --out @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_median_kg_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mostly/block_median_kg_max/parts
+2	full	coop	209	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario full
+2	full_TOST_hours_per_day_max	tost	199	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_max.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/hours_per_day_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/hours_per_day_max/parts
+2	full_TOST_hours_per_day_min	tost	226	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_min.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/hours_per_day_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/hours_per_day_min/parts
+2	full_TOST_household_size_max	tost	211	8	@RUN_DIR@/v15_haul15/configs/household_size_max.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/household_size_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/household_size_max/parts
+2	full_TOST_household_size_min	tost	211	8	@RUN_DIR@/v15_haul15/configs/household_size_min.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/household_size_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/household_size_min/parts
+2	full_TOST_block_sigma_max	tost	202	8	@RUN_DIR@/v15_haul15/configs/block_sigma_max.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/block_sigma_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/block_sigma_max/parts
+2	S9_sea_2kn	coop	206	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario S9_sea_2kn
+2	full_TOST_block_median_kg_max	tost	183	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_max.yaml	--scenario full --out @RUN_DIR@/v15_haul15/outputs/tost/full/block_median_kg_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/full/block_median_kg_max/parts
+2	mixed_TOST_block_median_kg_min	tost	234	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_min.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_median_kg_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_median_kg_min/parts
+2	mixed_TOST_household_size_max	tost	213	8	@RUN_DIR@/v15_haul15/configs/household_size_max.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/household_size_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/household_size_max/parts
+2	patchwork_TOST_block_median_kg_max	tost	187	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_max.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_median_kg_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_median_kg_max/parts
+2	mixed_TOST_block_sigma_min	tost	221	8	@RUN_DIR@/v15_haul15/configs/block_sigma_min.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_sigma_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_sigma_min/parts
+2	mixed_TOST_block_sigma_max	tost	218	8	@RUN_DIR@/v15_haul15/configs/block_sigma_max.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_sigma_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_sigma_max/parts
+2	patchwork_TOST_block_sigma_max	tost	217	8	@RUN_DIR@/v15_haul15/configs/block_sigma_max.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_sigma_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_sigma_max/parts
+2	patchwork_TOST_block_sigma_min	tost	215	8	@RUN_DIR@/v15_haul15/configs/block_sigma_min.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_sigma_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_sigma_min/parts
+2	patchwork_TOST_household_size_min	tost	218	8	@RUN_DIR@/v15_haul15/configs/household_size_min.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/household_size_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/household_size_min/parts
+2	mixed_TOST_household_size_min	tost	228	8	@RUN_DIR@/v15_haul15/configs/household_size_min.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/household_size_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/household_size_min/parts
+2	REALISTIC_oxen	lit	216	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit REALISTIC_oxen
+2	mixed_TOST_block_median_kg_max	tost	208	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_max.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_median_kg_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/block_median_kg_max/parts
+2	patchwork_TOST_household_size_max	tost	215	8	@RUN_DIR@/v15_haul15/configs/household_size_max.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/household_size_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/household_size_max/parts
+2	patchwork_TOST_block_median_kg_min	tost	241	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_min.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_median_kg_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/block_median_kg_min/parts
+2	patchwork_TOST_hours_per_day_min	tost	234	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_min.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/hours_per_day_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/hours_per_day_min/parts
+2	mixed_TOST_hours_per_day_min	tost	241	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_min.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/hours_per_day_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/hours_per_day_min/parts
+2	S1b_joints_high	lit	222	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S1b_joints_high
+2	S3d_rough	lit	239	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S3d_rough
+2	mixed_TOST_hours_per_day_max	tost	211	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_max.yaml	--scenario mixed --out @RUN_DIR@/v15_haul15/outputs/tost/mixed/hours_per_day_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/mixed/hours_per_day_max/parts
+2	patchwork_TOST_hours_per_day_max	tost	208	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_max.yaml	--scenario patchwork --out @RUN_DIR@/v15_haul15/outputs/tost/patchwork/hours_per_day_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/patchwork/hours_per_day_max/parts
+2	high_sea	coop	754	2	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario high_sea
+2	S9_sea_4kn	coop	212	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario S9_sea_4kn
+2	none_TOST_hours_per_day_min	tost	230	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_min.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/hours_per_day_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/hours_per_day_min/parts
+2	S9_sea_6kn	coop	214	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario S9_sea_6kn
+2	low_TOST_household_size_max	tost	235	8	@RUN_DIR@/v15_haul15/configs/household_size_max.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/household_size_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/household_size_max/parts
+2	none_TOST_block_median_kg_max	tost	227	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_max.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/block_median_kg_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/block_median_kg_max/parts
+2	low_TOST_block_median_kg_min	tost	261	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_min.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/block_median_kg_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/block_median_kg_min/parts
+2	none_TOST_block_sigma_min	tost	225	8	@RUN_DIR@/v15_haul15/configs/block_sigma_min.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/block_sigma_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/block_sigma_min/parts
+2	none_TOST_block_sigma_max	tost	217	8	@RUN_DIR@/v15_haul15/configs/block_sigma_max.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/block_sigma_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/block_sigma_max/parts
+2	none	coop	234	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario none
+2	none_TOST_household_size_min	tost	229	8	@RUN_DIR@/v15_haul15/configs/household_size_min.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/household_size_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/household_size_min/parts
+2	low_TOST_hours_per_day_min	tost	279	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_min.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/hours_per_day_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/hours_per_day_min/parts
+2	low_TOST_block_sigma_min	tost	237	8	@RUN_DIR@/v15_haul15/configs/block_sigma_min.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/block_sigma_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/block_sigma_min/parts
+2	none_TOST_household_size_max	tost	222	8	@RUN_DIR@/v15_haul15/configs/household_size_max.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/household_size_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/household_size_max/parts
+2	none_TOST_block_median_kg_min	tost	249	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_min.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/block_median_kg_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/block_median_kg_min/parts
+2	S3b_rails_grease	lit	179	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--lit S3b_rails_grease
+2	low	coop	245	8	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario low
+2	none_TOST_hours_per_day_max	tost	211	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_max.yaml	--scenario none --out @RUN_DIR@/v15_haul15/outputs/tost/none/hours_per_day_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/none/hours_per_day_max/parts
+2	low_TOST_block_sigma_max	tost	251	8	@RUN_DIR@/v15_haul15/configs/block_sigma_max.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/block_sigma_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/block_sigma_max/parts
+2	low_TOST_hours_per_day_max	tost	231	8	@RUN_DIR@/v15_haul15/configs/hours_per_day_max.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/hours_per_day_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/hours_per_day_max/parts
+2	low_TOST_household_size_min	tost	274	8	@RUN_DIR@/v15_haul15/configs/household_size_min.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/household_size_min --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/household_size_min/parts
+2	low_TOST_block_median_kg_max	tost	248	8	@RUN_DIR@/v15_haul15/configs/block_median_kg_max.yaml	--scenario low --out @RUN_DIR@/v15_haul15/outputs/tost/low/block_median_kg_max --parts-dir @RUN_DIR@/v15_haul15/outputs/tost/low/block_median_kg_max/parts
+2	MOST_REALISTIC_M4_any_P10	alliance	874	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M4_any_P10
+2	MOST_REALISTIC_M2_small_P10	alliance	599	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M2_small_P10
+2	MOST_REALISTIC_M3_stream40_P10	alliance	512	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M3_stream40_P10
+2	MOST_REALISTIC_M3_all_half_P10	alliance	494	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_M3_all_half_P10
+2	MOST_REALISTIC_S12_s10_P10	alliance	535	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12_s10_P10
+2	MOST_REALISTIC_S12_low_P10	alliance	538	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_S12_low_P10
+2	MOST_REALISTIC_POP_adult04_P10	alliance	511	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_adult04_P10
+2	MOST_REALISTIC_POP_men_only_P10	alliance	570	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_men_only_P10
+2	MOST_REALISTIC_POP_adult06_P10	alliance	496	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_adult06_P10
+2	X_nurtime	nurtime	34	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--sites NID0529600 --alliance MOST_REALISTIC_X_nurtime_stair_c10,MOST_REALISTIC_X_nurtime_lever_c10,MOST_REALISTIC_X_nurtime_ramp_c10,MOST_REALISTIC_X_nurtime_spiral7m5_c10,MOST_REALISTIC_X_nurtime_spiralfull_c10,MOST_REALISTIC_X_nurtime_laner3_c10,MOST_REALISTIC_X_nurtime_laner4_c10,MOST_REALISTIC_X_nurtime_stair_c20,MOST_REALISTIC_X_nurtime_lever_c20,MOST_REALISTIC_X_nurtime_ramp_c20,MOST_REALISTIC_X_nurtime_spiral7m5_c20,MOST_REALISTIC_X_nurtime_spiralfull_c20,MOST_REALISTIC_X_nurtime_laner3_c20,MOST_REALISTIC_X_nurtime_laner4_c20,MOST_REALISTIC_X_nurtime_stair_c40,MOST_REALISTIC_X_nurtime_lever_c40,MOST_REALISTIC_X_nurtime_ramp_c40,MOST_REALISTIC_X_nurtime_spiral7m5_c40,MOST_REALISTIC_X_nurtime_spiralfull_c40,MOST_REALISTIC_X_nurtime_laner3_c40,MOST_REALISTIC_X_nurtime_laner4_c40 --out @RUN_DIR@/v15_haul15/outputs/nurtime --parts-dir @RUN_DIR@/v15_haul15/outputs/nurtime/parts
+2	MOST_REALISTIC_ALT_drag019_P10	alliance	520	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag019.yaml	--alliance MOST_REALISTIC_ALT_drag019_P10
+2	MOST_REALISTIC_ALT_pull20kgf_P10	alliance	518	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull20kgf.yaml	--alliance MOST_REALISTIC_ALT_pull20kgf_P10
+2	MOST_REALISTIC_ALT_pull38kgf_P10	alliance	493	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull38kgf.yaml	--alliance MOST_REALISTIC_ALT_pull38kgf_P10
+2	MOST_REALISTIC_ALT_pull47_P10	alliance	547	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_pull47_P10
+2	MOST_REALISTIC_ALT_pull50_P10	alliance	547	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_pull50_P10
+2	MOST_REALISTIC_ALT_height10_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_height10.yaml	--alliance MOST_REALISTIC_ALT_height10_P10
+2	MOST_REALISTIC_ALT_height18_P10	alliance	519	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_height18.yaml	--alliance MOST_REALISTIC_ALT_height18_P10
+2	MOST_REALISTIC_ALT_sigma041_P10	alliance	513	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma041.yaml	--alliance MOST_REALISTIC_ALT_sigma041_P10
+2	MOST_REALISTIC_ALT_sigma072_P10	alliance	500	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma072.yaml	--alliance MOST_REALISTIC_ALT_sigma072_P10
+2	MOST_REALISTIC_ALT_tonnes1909_P10	alliance	536	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_tonnes1909.yaml	--alliance MOST_REALISTIC_ALT_tonnes1909_P10
+2	MOST_REALISTIC_ALT_block549_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block549.yaml	--alliance MOST_REALISTIC_ALT_block549_P10
+2	MOST_REALISTIC_ALT_height108_P10	alliance	500	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_height108.yaml	--alliance MOST_REALISTIC_ALT_height108_P10
+2	MOST_REALISTIC_ALT_top55_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_top55.yaml	--alliance MOST_REALISTIC_ALT_top55_P10
+2	MOST_REALISTIC_ALT_base1124_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_base1124.yaml	--alliance MOST_REALISTIC_ALT_base1124_P10
+2	MOST_REALISTIC_ALT_base125_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_base125.yaml	--alliance MOST_REALISTIC_ALT_base125_P10
+2	MOST_REALISTIC_ALT_base133_P10	alliance	519	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_base133.yaml	--alliance MOST_REALISTIC_ALT_base133_P10
+2	MOST_REALISTIC_ALT_base135_P10	alliance	525	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_base135.yaml	--alliance MOST_REALISTIC_ALT_base135_P10
+2	MOST_REALISTIC_ALT_course05_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_course05.yaml	--alliance MOST_REALISTIC_ALT_course05_P10
+2	MOST_REALISTIC_ALT_minhaul200_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul200.yaml	--alliance MOST_REALISTIC_ALT_minhaul200_P10
+2	MOST_REALISTIC_ALT_minhaul210_P10	alliance	507	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul210.yaml	--alliance MOST_REALISTIC_ALT_minhaul210_P10
+2	MOST_REALISTIC_ALT_walk147_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk147.yaml	--alliance MOST_REALISTIC_ALT_walk147_P10
+2	MOST_REALISTIC_ALT_walk142_P10	alliance	508	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk142.yaml	--alliance MOST_REALISTIC_ALT_walk142_P10
+2	MOST_REALISTIC_ALT_walk083_P10	alliance	514	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_walk083.yaml	--alliance MOST_REALISTIC_ALT_walk083_P10
+2	MOST_REALISTIC_ALT_b080_P10	alliance	509	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_b080_P10
+2	MOST_REALISTIC_ALT_quarry10_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_quarry10_P10
+2	MOST_REALISTIC_ALT_hands12_P10	alliance	506	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_hands12_P10
+2	MOST_REALISTIC_ALT_setup0_P10	alliance	516	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_setup0_P10
+2	MOST_REALISTIC_S4_graded_rate_ref2500_P10	alliance	517	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_ref2500.yaml	--alliance MOST_REALISTIC_S4_graded_rate_ref2500_P10
+2	MOST_REALISTIC_S4e_laner_h3_w2_P10	alliance	508	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_w2_P10
+2	MOST_REALISTIC_S4e_laner_h3_w4_P10	alliance	534	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_w4_P10
+2	MOST_REALISTIC_S4e_laner_h3_earth1500_P10	alliance	512	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_earth1500.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_earth1500_P10
+2	MOST_REALISTIC_S4e_laner_h3_earth1700_P10	alliance	512	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_earth1700.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_earth1700_P10
+2	MOST_REALISTIC_ALT_rho_granite2750_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_rho_granite2750.yaml	--alliance MOST_REALISTIC_ALT_rho_granite2750_P10
+2	MOST_REALISTIC_ALT_rho_lime2420_P10	alliance	499	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_rho_lime2420.yaml	--alliance MOST_REALISTIC_ALT_rho_lime2420_P10
+2	MOST_REALISTIC_ALT_rho_marble2711_P10	alliance	506	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_rho_marble2711.yaml	--alliance MOST_REALISTIC_ALT_rho_marble2711_P10
+2	MOST_REALISTIC_ALT_rho_meta2600_P10	alliance	500	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_rho_meta2600.yaml	--alliance MOST_REALISTIC_ALT_rho_meta2600_P10
+2	MOST_REALISTIC_ALT_rho_meta2800_P10	alliance	515	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_rho_meta2800.yaml	--alliance MOST_REALISTIC_ALT_rho_meta2800_P10
+2	MOST_REALISTIC_ALT_crew7_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_crew7.yaml	--alliance MOST_REALISTIC_ALT_crew7_P10
+2	MOST_REALISTIC_ALT_sea067_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sea067.yaml	--alliance MOST_REALISTIC_ALT_sea067_P10
+2	MOST_REALISTIC_ALT_hours5_P10	alliance	531	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_hours5.yaml	--alliance MOST_REALISTIC_ALT_hours5_P10
+2	MOST_REALISTIC_ALT_hours10_P10	alliance	493	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_hours10.yaml	--alliance MOST_REALISTIC_ALT_hours10_P10
+2	MOST_REALISTIC_ALT_season45_P10	alliance	521	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season45.yaml	--alliance MOST_REALISTIC_ALT_season45_P10
+2	MOST_REALISTIC_ALT_season75_P10	alliance	506	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season75.yaml	--alliance MOST_REALISTIC_ALT_season75_P10
+2	MOST_REALISTIC_ALT_season80_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season80.yaml	--alliance MOST_REALISTIC_ALT_season80_P10
+2	MOST_REALISTIC_ALT_season120_P10	alliance	510	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season120.yaml	--alliance MOST_REALISTIC_ALT_season120_P10
+2	MOST_REALISTIC_ramp_P10	alliance	525	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ramp_P10
+2	MOST_REALISTIC_ALT_stones7_P10	alliance	500	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_stones7.yaml	--alliance MOST_REALISTIC_ALT_stones7_P10
+3	P_G20_system_complete	pre	206	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_complete
+3	P_G20_system_kmesh8	pre	199	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh8
+3	P_G20_system_kmesh4_h3	pre	205	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_h3
+3	P_G20_system_smallworld	pre	196	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_smallworld
+3	P_G20_system_kmesh4_h2	pre	198	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_h2
+3	P_G20_system_kmesh2	pre	197	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh2
+3	P_G20_system_chain	pre	189	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_chain
+3	P_G20_system_hub	pre	190	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_hub
+3	P_G20_kmesh4_learning	pre	197	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_learning
+3	P_G133_tribe_hub	pre	190	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_hub
+3	P_G133_tribe_hub_h3	pre	226	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_hub_h3
+3	P_G133_tribe_hub_h2	pre	205	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_hub_h2
+3	P_G133_tribe_chain	pre	191	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_chain
+3	P_G133_tribe_kmesh2	pre	194	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_kmesh2
+3	P_G20_kmesh4_off_outcrop	pre	195	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_off_outcrop
+3	P_G133_tribe_kmesh4	pre	193	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_kmesh4
+3	P_G133_tribe_kmesh8	pre	200	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_kmesh8
+3	P_G133_tribe_smallworld	pre	199	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_smallworld
+3	P_G133_tribe_complete	pre	271	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G133_tribe_complete
+3	P_G20_kmesh4_track	pre	232	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_track
+3	P_G50_hub	pre	187	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_hub
+3	P_G3_canton_hub	pre	185	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_hub
+3	P_G20_kmesh4_central	pre	176	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_central
+3	P_local_stone_wide_build	pre	198	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_local_stone_wide_build
+3	P_G5_hub	pre	228	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_hub
+3	P_G20_kmesh4_south	pre	167	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_south
+3	P_G3_canton_chain	pre	189	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_chain
+3	P_G20_kmesh4_dense	pre	185	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_dense
+3	P_G3_canton_kmesh2	pre	191	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh2
+3	P_G3_canton_kmesh4	pre	192	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh4
+3	P_G3_canton_complete	pre	192	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_complete
+3	P_G3_canton_kmesh8	pre	194	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh8
+3	P_G3_canton_smallworld	pre	193	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_smallworld
+3	P_G5_chain	pre	229	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_chain
+3	P_G50_chain	pre	190	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_chain
+3	P_G5_kmesh2	pre	231	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_kmesh2
+3	P_G5_kmesh4	pre	235	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_kmesh4
+3	P_G5_kmesh8	pre	233	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_kmesh8
+3	P_G5_complete	pre	233	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_complete
+3	P_G5_smallworld	pre	231	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G5_smallworld
+3	P_partners2	pre	192	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_partners2
+3	P_G50_kmesh2	pre	195	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_kmesh2
+3	P_G50_smallworld	pre	197	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_smallworld
+3	P_G50_kmesh4	pre	195	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_kmesh4
+3	P_G50_kmesh8	pre	196	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_kmesh8
+3	P_G50_complete	pre	218	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G50_complete
+3	P_G9_verify_kmesh4	pre	206	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G9_verify_kmesh4
+3	P_partners5	pre	194	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_partners5
+3	P_partners10	pre	198	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_partners10
+3	P_D7_G20_kmesh4_trust_P10	pre	216	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_D7_G20_kmesh4_trust_P10
+3	P_G20_system_kmesh8_P10	pre	182	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh8_P10
+3	P_G20_system_complete_P10	pre	187	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_complete_P10
+3	P_G20_system_kmesh4_h3_P10	pre	192	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_h3_P10
+3	P_G20_system_kmesh4_P10	pre	180	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_P10
+3	P_G20_system_kmesh4_h2_P10	pre	186	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_h2_P10
+3	P_G20_system_smallworld_P10	pre	178	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_smallworld_P10
+3	P_G20_system_kmesh2_P10	pre	177	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh2_P10
+3	PHASE_alliance_P10	alliance	1952	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A1_ask_P10,A2_trust_P10,A3_trust_learning_P10,A4_trust_track_P10,A5_full_P10,A5_full_freerider_P10
+3	P_G20_system_chain_P10	pre	178	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_chain_P10
+3	P_G20_system_hub_P10	pre	175	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_hub_P10
+3	P_G20_kmesh4_learning_P10	pre	179	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_learning_P10
+3	MOST_REALISTIC_P20	alliance	755	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_P20
+3	P_G20_system_complete_P20	pre	186	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_complete_P20
+3	P_G20_system_kmesh8_P20	pre	180	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh8_P20
+3	P_D7_G20_kmesh4_trust_P20	pre	217	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_D7_G20_kmesh4_trust_P20
+3	P_G20_system_smallworld_P20	pre	181	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_smallworld_P20
+3	P_G20_system_kmesh4_P20	pre	175	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_P20
+3	P_G20_system_kmesh4_h3_P20	pre	190	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_h3_P20
+3	P_G20_system_kmesh4_h2_P20	pre	183	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh4_h2_P20
+3	P_G20_system_kmesh2_P20	pre	176	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_kmesh2_P20
+3	PHASE_alliance_P20	alliance	2758	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance A1_ask_P20,A2_trust_P20,A3_trust_learning_P20,A4_trust_track_P20,A5_full_P20,A5_full_freerider_P20
+3	P_G20_system_chain_P20	pre	173	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_chain_P20
+3	P_G20_system_hub_P20	pre	176	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_system_hub_P20
+3	P_G20_kmesh4_learning_P20	pre	175	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G20_kmesh4_learning_P20
+3	MOST_REALISTIC_handover_P20	alliance	601	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_handover_P20
+3	high_P20	coop	629	2	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario high_P20
+3	high_P10	coop	594	2	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--scenario high_P10
+3	MOST_REALISTIC_alone_P20	alliance	230	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_alone_P20
+3	MOST_REALISTIC_P100	alliance	1982	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_P100
+3	MOST_REALISTIC_handover_P100	alliance	1978	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_handover_P100
+3	MOST_REALISTIC_alone_P100	alliance	259	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_alone_P100
+3	MOST_REALISTIC_ALT_drag083_P10	alliance	498	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag083.yaml	--alliance MOST_REALISTIC_ALT_drag083_P10
+3	MOST_REALISTIC_ALT_drag09_P10	alliance	489	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_drag09.yaml	--alliance MOST_REALISTIC_ALT_drag09_P10
+3	MOST_REALISTIC_ALT_load033_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_load033.yaml	--alliance MOST_REALISTIC_ALT_load033_P10
+3	MOST_REALISTIC_ALT_load05_P10	alliance	510	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_load05.yaml	--alliance MOST_REALISTIC_ALT_load05_P10
+3	MOST_REALISTIC_ALT_minhaul300_P10	alliance	500	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_minhaul300.yaml	--alliance MOST_REALISTIC_ALT_minhaul300_P10
+3	MOST_REALISTIC_ALT_tonnes2481_P10	alliance	565	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_tonnes2481.yaml	--alliance MOST_REALISTIC_ALT_tonnes2481_P10
+3	MOST_REALISTIC_ALT_tonnes2009_P10	alliance	539	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_tonnes2009.yaml	--alliance MOST_REALISTIC_ALT_tonnes2009_P10
+3	MOST_REALISTIC_ALT_blockmin143_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_blockmin143.yaml	--alliance MOST_REALISTIC_ALT_blockmin143_P10
+3	MOST_REALISTIC_ALT_height186_P10	alliance	506	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_height186.yaml	--alliance MOST_REALISTIC_ALT_height186_P10
+3	MOST_REALISTIC_ALT_basalt2300_P10	alliance	496	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_basalt2300.yaml	--alliance MOST_REALISTIC_ALT_basalt2300_P10
+3	MOST_REALISTIC_ALT_basalt2750_P10	alliance	499	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_basalt2750.yaml	--alliance MOST_REALISTIC_ALT_basalt2750_P10
+3	MOST_REALISTIC_ALT_hard5_P10	alliance	515	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_hard5.yaml	--alliance MOST_REALISTIC_ALT_hard5_P10
+3	MOST_REALISTIC_ALT_day8_P10	alliance	498	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_day8.yaml	--alliance MOST_REALISTIC_ALT_day8_P10
+3	MOST_REALISTIC_ALT_season220_P10	alliance	495	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season220.yaml	--alliance MOST_REALISTIC_ALT_season220_P10
+3	MOST_REALISTIC_ALT_season290_P10	alliance	523	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season290.yaml	--alliance MOST_REALISTIC_ALT_season290_P10
+3	MOST_REALISTIC_ALT_season328_P10	alliance	498	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_season328.yaml	--alliance MOST_REALISTIC_ALT_season328_P10
+3	MOST_REALISTIC_ALT_pull181_P10	alliance	524	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_pull181.yaml	--alliance MOST_REALISTIC_ALT_pull181_P10
+3	MOST_REALISTIC_ALT_wall294_P10	alliance	520	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_wall294_P10
+3	MOST_REALISTIC_ALT_quarry88_P10	alliance	496	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_quarry88_P10
+3	MOST_REALISTIC_ALT_dress75_P10	alliance	517	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_dress75_P10
+3	MOST_REALISTIC_ALT_dress182_P10	alliance	512	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_dress182_P10
+3	MOST_REALISTIC_S4e_laner_h3_s03_P10	alliance	507	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_s03_P10
+3	MOST_REALISTIC_S4e_laner_h3_s01_P10	alliance	510	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_S4e_laner_h3_s01_P10
+3	MOST_REALISTIC_ALT_qhands6_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_qhands6_P10
+3	MOST_REALISTIC_ALT_seakn4_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_seakn4_P10
+3	MOST_REALISTIC_ALT_seakn5_P10	alliance	500	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_seakn5_P10
+3	MOST_REALISTIC_ALT_seakn6_P10	alliance	498	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_seakn6_P10
+3	MOST_REALISTIC_ALT_b095_P10	alliance	503	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_b095_P10
+3	MOST_REALISTIC_ALT_b100_P10	alliance	451	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_p23gaps.yaml	--alliance MOST_REALISTIC_ALT_b100_P10
+3	MOST_REALISTIC_ALT_block300_P10	alliance	516	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block300.yaml	--alliance MOST_REALISTIC_ALT_block300_P10
+3	MOST_REALISTIC_ALT_block1000_P10	alliance	541	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_block1000.yaml	--alliance MOST_REALISTIC_ALT_block1000_P10
+3	MOST_REALISTIC_ALT_sigma03_P10	alliance	502	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma03.yaml	--alliance MOST_REALISTIC_ALT_sigma03_P10
+3	MOST_REALISTIC_ALT_sigma09_P10	alliance	504	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_sigma09.yaml	--alliance MOST_REALISTIC_ALT_sigma09_P10
+3	MOST_REALISTIC_ALT_hours6_P10	alliance	525	6	@RUN_DIR@/v15_haul15/configs/config_full_audited_alt_hours6.yaml	--alliance MOST_REALISTIC_ALT_hours6_P10
+2	MOST_REALISTIC_POP_lilliu30_P10	alliance	445	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_lilliu30_P10
+2	MOST_REALISTIC_POP_webster_household_P10	alliance	570	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_webster_household_P10
+2	MOST_REALISTIC_POP_webster_density_P10	alliance	450	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_webster_density_P10
+2	MOST_REALISTIC_POP_calo_6km2_P10	alliance	486	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_calo_6km2_P10
+2	MOST_REALISTIC_POP_ugas_high_P10	alliance	454	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_ugas_high_P10
+2	MOST_REALISTIC_POP_anchored_P10	alliance	492	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_anchored_P10
+2	MOST_REALISTIC_POP_ugas400_P10	alliance	471	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_ugas400_P10
+2	MOST_REALISTIC_POP_ugas700_P10	alliance	435	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance MOST_REALISTIC_POP_ugas700_P10
+2	A5_SENSITIVITY_27cells	alliance	8797	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--alliance sensitivity
+3	GRID10_sea_b0	pre	2608	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_none_sea,P_G3_canton_kmesh8_sea,P_G5_chain_sea,P_G5_hub_sea,P_G20_system_kmesh2_sea,P_G20_system_smallworld_sea,P_G50_kmesh4_sea,P_G50_complete_sea,P_G133_tribe_kmesh8_sea,P_partners2_sea,P_G20_system_kmesh4_h3_sea,P_G20_kmesh4_on_outcrop_sea,P_G20_kmesh4_south_sea,P_D7_G20_kmesh4_trust_sea --out @RUN_DIR@/v15_haul15/outputs/scenarios_pre_grid10_sea
+3	GRID10_sea_b1	pre	2735	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_chain_sea,P_G3_canton_hub_sea,P_G5_kmesh2_sea,P_G5_smallworld_sea,P_G20_system_kmesh4_sea,P_G20_system_complete_sea,P_G50_kmesh8_sea,P_G133_tribe_chain_sea,P_G133_tribe_hub_sea,P_partners5_sea,P_G133_tribe_hub_h2_sea,P_G20_kmesh4_off_outcrop_sea,P_G20_kmesh4_dense_sea,P_D8_G20_kmesh4_tieloss_sea --out @RUN_DIR@/v15_haul15/outputs/scenarios_pre_grid10_sea
+3	GRID10_sea_b2	pre	2588	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh2_sea,P_G3_canton_smallworld_sea,P_G5_kmesh4_sea,P_G5_complete_sea,P_G20_system_kmesh8_sea,P_G50_chain_sea,P_G50_hub_sea,P_G133_tribe_kmesh2_sea,P_G133_tribe_smallworld_sea,P_partners10_sea,P_G133_tribe_hub_h3_sea,P_G20_kmesh4_north_sea,P_wide_stone_local_build_sea,P_G20_kmesh4_learning_sea --out @RUN_DIR@/v15_haul15/outputs/scenarios_pre_grid10_sea
+3	GRID10_sea_b3	pre	2270	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh4_sea,P_G3_canton_complete_sea,P_G5_kmesh8_sea,P_G20_system_chain_sea,P_G20_system_hub_sea,P_G50_kmesh2_sea,P_G50_smallworld_sea,P_G133_tribe_kmesh4_sea,P_G133_tribe_complete_sea,P_G20_system_kmesh4_h2_sea,P_G9_verify_kmesh4_sea,P_G20_kmesh4_central_sea,P_local_stone_wide_build_sea,P_G20_kmesh4_track_sea --out @RUN_DIR@/v15_haul15/outputs/scenarios_pre_grid10_sea
+3	GRID10_P10_b0	pre	1843	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_none_P10,P_G3_canton_kmesh8_P10,P_G5_chain_P10,P_G5_hub_P10,P_G20_system_kmesh2_P10,P_G20_system_smallworld_P10,P_G50_kmesh4_P10,P_G50_complete_P10,P_G133_tribe_kmesh8_P10,P_partners2_P10,P_G20_system_kmesh4_h3_P10,P_G20_kmesh4_on_outcrop_P10,P_G20_kmesh4_south_P10,P_D7_G20_kmesh4_trust_P10
+3	GRID10_P10_b1	pre	2146	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_chain_P10,P_G3_canton_hub_P10,P_G5_kmesh2_P10,P_G5_smallworld_P10,P_G20_system_kmesh4_P10,P_G20_system_complete_P10,P_G50_kmesh8_P10,P_G133_tribe_chain_P10,P_G133_tribe_hub_P10,P_partners5_P10,P_G133_tribe_hub_h2_P10,P_G20_kmesh4_off_outcrop_P10,P_G20_kmesh4_dense_P10,P_D8_G20_kmesh4_tieloss_P10
+3	GRID10_P10_b2	pre	2136	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh2_P10,P_G3_canton_smallworld_P10,P_G5_kmesh4_P10,P_G5_complete_P10,P_G20_system_kmesh8_P10,P_G50_chain_P10,P_G50_hub_P10,P_G133_tribe_kmesh2_P10,P_G133_tribe_smallworld_P10,P_partners10_P10,P_G133_tribe_hub_h3_P10,P_G20_kmesh4_north_P10,P_wide_stone_local_build_P10,P_G20_kmesh4_learning_P10
+3	GRID10_P10_b3	pre	2067	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh4_P10,P_G3_canton_complete_P10,P_G5_kmesh8_P10,P_G20_system_chain_P10,P_G20_system_hub_P10,P_G50_kmesh2_P10,P_G50_smallworld_P10,P_G133_tribe_kmesh4_P10,P_G133_tribe_complete_P10,P_G20_system_kmesh4_h2_P10,P_G9_verify_kmesh4_P10,P_G20_kmesh4_central_P10,P_local_stone_wide_build_P10,P_G20_kmesh4_track_P10
+3	GRID10_P20_b0	pre	1826	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_none_P20,P_G3_canton_kmesh8_P20,P_G5_chain_P20,P_G5_hub_P20,P_G20_system_kmesh2_P20,P_G20_system_smallworld_P20,P_G50_kmesh4_P20,P_G50_complete_P20,P_G133_tribe_kmesh8_P20,P_partners2_P20,P_G20_system_kmesh4_h3_P20,P_G20_kmesh4_on_outcrop_P20,P_G20_kmesh4_south_P20,P_D7_G20_kmesh4_trust_P20
+3	GRID10_P20_b1	pre	2130	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_chain_P20,P_G3_canton_hub_P20,P_G5_kmesh2_P20,P_G5_smallworld_P20,P_G20_system_kmesh4_P20,P_G20_system_complete_P20,P_G50_kmesh8_P20,P_G133_tribe_chain_P20,P_G133_tribe_hub_P20,P_partners5_P20,P_G133_tribe_hub_h2_P20,P_G20_kmesh4_off_outcrop_P20,P_G20_kmesh4_dense_P20,P_D8_G20_kmesh4_tieloss_P20
+3	GRID10_P20_b2	pre	2137	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh2_P20,P_G3_canton_smallworld_P20,P_G5_kmesh4_P20,P_G5_complete_P20,P_G20_system_kmesh8_P20,P_G50_chain_P20,P_G50_hub_P20,P_G133_tribe_kmesh2_P20,P_G133_tribe_smallworld_P20,P_partners10_P20,P_G133_tribe_hub_h3_P20,P_G20_kmesh4_north_P20,P_wide_stone_local_build_P20,P_G20_kmesh4_learning_P20
+3	GRID10_P20_b3	pre	2037	6	@RUN_DIR@/v15_haul15/configs/config_full_audited.yaml	--pre P_G3_canton_kmesh4_P20,P_G3_canton_complete_P20,P_G5_kmesh8_P20,P_G20_system_chain_P20,P_G20_system_hub_P20,P_G50_kmesh2_P20,P_G50_smallworld_P20,P_G133_tribe_kmesh4_P20,P_G133_tribe_complete_P20,P_G20_system_kmesh4_h2_P20,P_G9_verify_kmesh4_P20,P_G20_kmesh4_central_P20,P_local_stone_wide_build_P20,P_G20_kmesh4_track_P20
+2	V13_A5_full_freerider_V13rep	alliance	318	6	@RUN_DIR@/v15_haul15/configs/config_v13_A5FR_rep.yaml	--alliance A5_full_freerider_V13rep
+2	V13_A5_full_freerider_V13pc	alliance	320	6	@RUN_DIR@/v15_haul15/configs/config_v13_A5FR_pc.yaml	--alliance A5_full_freerider_V13pc
+2	V13_A5_full_freerider_V13reppc	alliance	324	6	@RUN_DIR@/v15_haul15/configs/config_v13_A5FR_rep_pc.yaml	--alliance A5_full_freerider_V13reppc
+2	V13_MOST_REALISTIC_AUDITED_LIT_V13tie_P10	alliance	495	6	@RUN_DIR@/v15_haul15/configs/config_v13_MR_tie.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_V13tie_P10
+2	V13_MOST_REALISTIC_AUDITED_LIT_V13all_P10	alliance	509	6	@RUN_DIR@/v15_haul15/configs/config_v13_MR_all.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_V13all_P10
+2	V13g_A5_full_freerider_V13repg	alliance	314	6	@RUN_DIR@/v15_haul15/configs/config_v13g_A5FR_repg.yaml	--alliance A5_full_freerider_V13repg
+2	V13g_A5_full_freerider_V13repgpc	alliance	326	6	@RUN_DIR@/v15_haul15/configs/config_v13g_A5FR_repg_pc.yaml	--alliance A5_full_freerider_V13repgpc
+2	V13g_MOST_REALISTIC_AUDITED_LIT_V13allg_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_v13g_MR_allg.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_V13allg_P10
+2	V13kd_MOST_REALISTIC_AUDITED_LIT_V13kd_P10	alliance	505	6	@RUN_DIR@/v15_haul15/configs/config_v13k_MR_kd.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_V13kd_P10
+2	V13kd_MOST_REALISTIC_AUDITED_LIT_V13allgkd_P10	alliance	510	6	@RUN_DIR@/v15_haul15/configs/config_v13k_MR_allgkd.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_V13allgkd_P10
+9	RAD_MOST_REALISTIC_AUDITED_LIT_R5_P10	alliance	446	6	@RUN_DIR@/v15_haul15/configs/config_R5_audited.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_R5_P10
+9	RAD_MOST_REALISTIC_AUDITED_LIT_R15_P10	alliance	562	6	@RUN_DIR@/v15_haul15/configs/config_R15_audited.yaml	--alliance MOST_REALISTIC_AUDITED_LIT_R15_P10

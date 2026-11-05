@@ -53,6 +53,15 @@ CENSUS_VERSION = "2026-11-02-census-1"
 CENSUS_KEYS = ("lift_graded", "lintel", "found", "fill", "vault_dress", "demog", "lift_ramp", "mortar", "rifascio",
                "bichrome", "levy", "mason_regions", "feast_attract", "mudbrick", "clearance", "carts", "size_draw",
                "lift_override")
+# 2 Nov 2026 (v13) social mechanisms (ODD 7.15, CODE_PROVENANCE.md): reputation (indirect reciprocity with
+# standing, third-party shunning), partner choice (assortment), imitation along help ties; social_log = bookkeeping only.
+# Each is OFF unless its key is set in the scenario. They make no random draws of their own. Hashed (with
+# cfg['scenarios'] minus its list, whose split_cost_mh acts on every alliance run) only when one of these keys is set, so
+# every earlier scenario keeps its signature and its code path (identity test: ODD 7.15, CODE_PROVENANCE.md). CODE_VERSION is
+# deliberately NOT bumped: with the keys off the outputs are identical to the frozen v12 code (tested), and a bump would move every
+# existing scenario's cache folder.
+SOCIAL_VERSION = "2026-11-02-v13-social-2"   # -2: partner order = exchange partners first (both directions)
+SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log", "trusted_nodist")   # v13kd: end of file
 # v14 (5 Nov 2026, specified by the authors; CHANGES_V14_NEARFACE.md): config
 # key quarry.near_site_fixed_face_m. A site whose dry-ground (mu 0.38) route (haul table mu0.38, haul_m) is <= this
 # many metres always quarries from face 0: no epsilon draw, no Q choice, no imitation of the face (the draws are
@@ -512,6 +521,9 @@ class AllianceModel:
         self.asks = {}                                        # (asker, asked) -> [asked, refused] (a Nurnet collaborator; bookkeeping only)
         self.asks_stage = {}                                  # (asker, asked, pair-stage) -> [asked, refused]
         self.help_log = {}                                    # (season, helper, owner) -> man-hours (a Nurnet collaborator; bookkeeping)
+        self.soc = None                                       # v13 social mechanisms: None when every SOCIAL_KEYS key is off
+        if any(sc.get(k) for k in SOCIAL_KEYS):
+            self._init_social(sc, N)
         # pre-existing ties (pre_networks.py): adjacency per stage set, copied so tie loss (D8) stays within a run
         tz = sc.get("_ties")
         if tz is None:
@@ -1019,6 +1031,84 @@ class AllianceModel:
             self.m_loc[self.m_n] = self.S.xy[i]          # apprenticeship: a new master trained at this site
             self.m_n += 1
 
+    # ------------------------------------------------------------------ v13 social mechanisms (ODD 7.15, CODE_PROVENANCE.md)
+    def _init_social(self, sc, N):
+        """State of the v13 switches. reputation: per community, the log of its acts as an ASKED community, (requester,
+        good) in time order; an observer k sees the act iff k is the requester or within R of it (R = the run's
+        interaction radius, S.R). partner_choice: `cheated` = {(a, b): b refused a after having received help from a,
+        and has not helped a since}. tie_imitation / social_log: help adjacency (help actually given or received,
+        mh > 0) and the imitated source per tower start."""
+        self.soc = {"rep": bool(sc.get("reputation")), "pc": bool(sc.get("partner_choice")),
+                    "tie": bool(sc.get("tie_imitation")),
+                    "log": [[] for _ in range(N)], "cheated": set(), "adj": [set() for _ in range(N)],
+                    "strat": [], "src": -1, "linked": 0,
+                    "n_shunned": np.zeros(N, np.int64), "n_shun_given": np.zeros(N, np.int64),
+                    "n_bad": np.zeros(N, np.int64), "n_good": np.zeros(N, np.int64),
+                    "n_pc_refused": np.zeros(N, np.int64), "n_pc_refuse_given": np.zeros(N, np.int64),
+                    "n_cheat": np.zeros(N, np.int64)}
+        self.soc["R"], self.soc["gentle"] = float(self.S.R), reputation_rule(sc) == "gentle"; _init_kd(self, sc)   # v13g, v13kd (end of file)
+
+    def _bad(self, k, i):
+        """Reputation: does observer k see community i in bad standing? i's most recent act (as an asked community) that
+        k observed decides: a help -> good, an unjustified refusal -> bad; none observed -> good (Nowak & Sigmund 2005;
+        Panchanathan & Boyd 2004: justified refusals are not logged, see _social_gate)."""
+        xy, R = self.S.xy, self.soc["R"]
+        for r, good in reversed(self.soc["log"][i]):
+            if r == k or math.hypot(xy[r, 0] - xy[k, 0], xy[r, 1] - xy[k, 1]) <= R:
+                return not good
+        return False
+
+    def _social_gate(self, i, j, ok):
+        """v13: j has been asked by i and its decision `ok` is drawn (the draw is always made, so the random streams stay
+        aligned with the switches off). Partner choice: j declines a requester that cheated it (refused j after receiving
+        j's help). Reputation: a non-defector j declines a requester it sees in bad standing (third-party shunning). Such
+        refusals are JUSTIFIED: they give j no bad standing and do not count as cheating. Returns the decision."""
+        so = self.soc
+        just = False
+        if so["pc"] and (j, i) in so["cheated"]:
+            if ok:
+                so["n_pc_refused"][i] += 1; so["n_pc_refuse_given"][j] += 1
+            ok, just = False, True
+        if so["rep"] and not self.defector[j] and self._bad(j, i):
+            if ok:
+                so["n_shunned"][i] += 1; so["n_shun_given"][j] += 1
+            ok, just = False, True
+        if so["rep"]:
+            if ok:
+                so["log"][j].append((i, True)); so["n_good"][j] += 1
+            elif not just and (not so["gentle"] or self.defector[j] or (j, i) in self.received_from):   # v13g
+                so["log"][j].append((i, False)); so["n_bad"][j] += 1
+        if so["pc"]:
+            if ok:
+                so["cheated"].discard((i, j))                 # j has now helped i: forgiven
+            elif not just and (j, i) in self.received_from:   # j refuses after having received help from i
+                so["cheated"].add((i, j)); so["n_cheat"][j] += 1
+        return ok
+
+    def _partner_order(self, i, cands):
+        """Partner choice: stable reordering of i's candidate list into 3 groups: exchange partners first (j has helped
+        i, or i has helped j and j has not cheated i: a partner that owes i a return), then the rest, then the
+        communities that cheated i; the existing order (skill, trust, distance, id / tie hops) is kept inside each group."""
+        rf, ch = self.received_from, self.soc["cheated"]
+
+        def g(c):
+            j = c[0]
+            if (i, j) in ch:
+                return 2
+            return 0 if ((i, j) in rf or (j, i) in rf) else 1
+        return sorted(cands, key=g)
+
+    def _imit_pool(self, i):
+        """Imitation models of i. tie_imitation: the communities linked to i by help given or received (mh > 0), ordered
+        by distance then id like S.nb; a community with no such tie falls back to its neighbours within R (S.nb)."""
+        adj = self.soc["adj"][i]
+        if not self.soc["tie"] or not adj:
+            return self.S.nb[i][0]
+        xy = self.S.xy
+        v = np.fromiter(adj, np.int64, len(adj))
+        d = np.hypot(xy[v, 0] - xy[i, 0], xy[v, 1] - xy[i, 1])
+        return v[np.lexsort((v, d))]
+
     # ------------------------------------------------------------------ helpers
     def wdist(self, p, loc, tgt=None):
         """Walking distance of community p's people to loc. S9: min(straight line, sea travel time x walk speed);
@@ -1089,6 +1179,8 @@ class AllianceModel:
             hs[0] += mh; hs[1] += 1
             k = (self.season, perf, owner)
             self.help_log[k] = self.help_log.get(k, 0.0) + mh
+            if self.soc is not None and mh > 0.0:              # v13: help ties (imitation along ties, logging)
+                self.soc["adj"][perf].add(owner); self.soc["adj"][owner].add(perf)
         w = mh - walk
         if stage == "build":
             ls = self.lift_share if self.S.tech is None else self.site_lift_share[owner]
@@ -1128,10 +1220,12 @@ class AllianceModel:
                 ok = self.rng[j].random() < float(fixed)
             else:
                 x = (A["beta0"] + A["beta1"] * self.T(j, i) - A["beta2"] * self.backlog_days(j)
-                     - A["beta3"] * dij / 1000.0)
+                     - (0.0 if self.soc is not None and self.soc["kd"] and _kd_pair(self, i, j) else A["beta3"] * dij / 1000.0))   # v13kd
                 if self.cz is not None and self.cz.feast is not None:   # v12 S12b: the host's surplus attracts help
                     x += self.cz.feast[i]
                 ok = self.rng[j].random() < sigmoid(x)
+            if self.soc is not None:                     # v13 partner choice / reputation (no random draws)
+                ok = self._social_gate(i, j, ok)
             # ask/refusal counters (a Nurnet collaborator's patch, all decision branches; no random draws)
             ak = self.asks.setdefault((i, j), [0, 0]); ak[0] += 1
             ks = self.asks_stage.setdefault((i, j, PAIR_STAGE[stage]), [0, 0]); ks[0] += 1
@@ -1202,6 +1296,11 @@ class AllianceModel:
         return out
 
     def candidates(self, i, stage, quarry_xy=None, nearer_than=None):
+        if self.soc is not None and self.soc["pc"]:     # v13 partner choice: reorder the existing list
+            return self._partner_order(i, self._candidates(i, stage, quarry_xy, nearer_than))
+        return self._candidates(i, stage, quarry_xy, nearer_than)
+
+    def _candidates(self, i, stage, quarry_xy=None, nearer_than=None):
         if self.ties is not None:
             out = self.tie_candidates(i, stage, quarry_xy, nearer_than)
             if not self.sc.get("trust", False):
@@ -1235,10 +1334,15 @@ class AllianceModel:
         if self.sc.get("imitation", True) and rng.random() < float(A["p_imit"]):
             own = self.last_strategy[i][1] if self.last_strategy[i] else math.inf
             best = None
-            for j in self.S.nb[i][0]:
+            src = -1
+            for j in (self.S.nb[i][0] if self.soc is None else self._imit_pool(i)):   # v13: help ties (tie_imitation)
                 ls = self.last_strategy[int(j)]
                 if ls and ls[1] < own and (best is None or ls[1] < best[1]):
                     best = ls
+                    src = int(j)
+            if self.soc is not None:                      # v13 bookkeeping: imitated source, and is it a help tie?
+                self.soc["src"] = src if best is not None else -1
+                self.soc["linked"] = int(best is not None and src in self.soc["adj"][i])
             if best is not None:
                 imit = True
                 for dname, vals in dims_values.items():
@@ -1491,6 +1595,9 @@ class AllianceModel:
         self.strategy_log.append((self.season, strat.get("quarry_face"), strat.get("req_quarry", 0),
                                   strat.get("req_dress", 0), strat.get("req_build", 0), strat.get("relay", 0.0),
                                   strat.get("track", 0), int(imit)))
+        if self.soc is not None:                          # v13: who started, imitated source (-1 none), help-tie source
+            self.soc["strat"].append((i, self.soc["src"] if imit else -1, self.soc["linked"] if imit else 0))
+            self.soc["src"], self.soc["linked"] = -1, 0
 
         join = sc.get("help_mode") == "join"              # MOST_REALISTIC: helpers add hands, they do not take over
 
@@ -1804,6 +1911,12 @@ class AllianceModel:
         if self.walk_info is not None:                     # M4
             rows["walk_pieces"] = self.walk_info[:, 0]
             rows["walk_tonnes"] = self.walk_info[:, 1]
+        if self.soc is not None:                           # v13 social counters (appended; only when a switch is on)
+            for k in ("n_shunned", "n_shun_given", "n_bad", "n_good", "n_pc_refused", "n_pc_refuse_given", "n_cheat"):
+                rows["soc_" + k] = self.soc[k]
+            rows["soc_bad_final"] = [int(self.soc["rep"] and bool(self.soc["log"][g]) and not self.soc["log"][g][-1][1])
+                                     for g in range(self.N)]    # last logged act an unjustified refusal
+            rows["soc_help_ties"] = [len(a) for a in self.soc["adj"]]; _kd_cols(self, rows)   # v13kd: soc_n_kd if on
         pairs = []
         keys = set(self.help_mh) | set(self.trust)
         und = {}
@@ -1836,6 +1949,9 @@ class AllianceModel:
         lg = pd.DataFrame(self.strategy_log, columns=["season", "quarry_face", "req_quarry", "req_dress", "req_build",
                                                       "relay", "track", "imitated"])
         lg["seed"] = self.seed
+        if self.soc is not None:                           # v13: starter, imitated source, source a help tie (0/1)
+            ex = np.array(self.soc["strat"], np.int64).reshape(-1, 3)
+            lg["gid"], lg["imit_src"], lg["imit_tie"] = ex[:, 0], ex[:, 1], ex[:, 2]
         spec = pd.DataFrame(self.given_stage, columns=["given_" + s for s in STAGES])
         for k, s in enumerate(SKILL_STAGES):
             spec["skill_" + s] = (1.0 + self.cum[:, k]) ** self.expo if self.b != 1.0 else 1.0
@@ -1914,7 +2030,7 @@ def signature(cfg, sc, haul):
     keys = ["hours_per_day", "builders", "stone", "transport"]
     al = {k: v for k, v in cfg["alliance"].items() if k not in ("list", "verify_scenarios", "sensitivity")}
     h = hashlib.sha1(json.dumps({**{k: cfg[k] for k in keys}, "alliance": al}, sort_keys=True, default=str).encode())
-    h.update(json.dumps(sc, sort_keys=True).encode())
+    h.update(json.dumps(_sig_sc(sc), sort_keys=True).encode())   # v13g: = sc unless reputation_rule "all" is explicit
     h.update(haul[["UID", "TWR_N", "haul_flatm", "haul_m"]].to_csv(index=False).encode())
     h.update(json.dumps(cfg["lit_scenarios"]["webster_md_per_tower"]).encode())
     h.update(json.dumps(cfg["lit_scenarios"]["lift_share_of_build"]).encode())          # B3: build/lift split
@@ -1949,6 +2065,10 @@ def signature(cfg, sc, haul):
         h.update(json.dumps(cfg.get("census_v12") or {}, sort_keys=True, default=str).encode())
         if sc.get("bichrome"):
             h.update(open(os.path.join(cfg["paths"]["cache_dir"], "census", "bichrome_dist.csv"), "rb").read())
+    if any(sc.get(k) for k in SOCIAL_KEYS):              # v13 social mechanisms: their code version and cfg['scenarios']
+        h.update((SOCIAL_VERSION + _rule_tag(sc)).encode())   # (split_cost_mh acts on every alliance run; was never hashed)
+        h.update(json.dumps({k: v for k, v in cfg["scenarios"].items() if k != "list"}, sort_keys=True,
+                            default=str).encode())
     nf = near_face_m(cfg)
     if nf is not None:                                   # v14 near-site face rule: hashed only when on
         h.update(NEARFACE_VERSION.encode())
@@ -2053,3 +2173,76 @@ class _Light:
 
     def __init__(self, S):
         self.xy, self.T, self.H, self.W = S.xy.copy(), S.T.copy(), S.H, S.W
+
+
+# ------------------------------------------------------------------ v13g reputation rule (2 Nov 2026)
+# Appended at the end of the file so that every earlier line keeps its number (the ODD cites them); the three call
+# sites are one-line edits: _init_social (soc["gentle"]), _social_gate (which refusals are logged as bad) and
+# signature (_sig_sc, _rule_tag). reputation_rule: which refusals count as bad acts in the reputation log.
+#   "all" (default) = every unjustified refusal (the rule of the five v13 runs);
+#   "gentle" = only a refusal by a defector, or by a community that has received help from the requester
+#   (ingratitude: (j, i) in received_from, the same condition as the delta_down trust update and as cheating under
+#   partner choice). Other refusals (backlog, distance, capacity, by a community that owes the requester nothing) are
+#   not logged, so they cost no standing; helps and justified refusals are treated as before.
+# No numeric parameter and no random draws. The key acts only when a SOCIAL_KEYS key is set. The signature changes only
+# when the rule is not "all" (REPUTATION_RULE_VERSION and the rule are appended to SOCIAL_VERSION; an explicit "all"
+# is dropped from the hashed scenario), so every v13 run keeps its signature.
+REPUTATION_RULES = ("all", "gentle")
+REPUTATION_RULE_VERSION = "2026-11-02-v13g-gentle-1"
+
+
+def reputation_rule(sc):
+    """The scenario's reputation rule ("all" when the key is absent); any other value is an error."""
+    r = sc.get("reputation_rule", "all")
+    if r not in REPUTATION_RULES:
+        raise ValueError(f"reputation_rule {r!r} not in {REPUTATION_RULES}")
+    return r
+
+
+def _rule_tag(sc):
+    """Signature tag of the reputation rule: empty for "all", so the hash of every earlier v13 run is unchanged."""
+    r = reputation_rule(sc)
+    return ("" if r == "all" else "|" + REPUTATION_RULE_VERSION + ":" + r) + \
+        ("|" + TRUSTED_NODIST_VERSION + ":on" if sc.get("trusted_nodist") else "")   # v13kd: empty when off
+
+
+def _sig_sc(sc):
+    """The scenario as hashed: sc itself, minus an explicit default reputation_rule ("all")."""
+    return {k: v for k, v in sc.items() if not (k == "reputation_rule" and v == "all")
+            and not (k == "trusted_nodist" and not v)}   # v13kd: an explicit false is not hashed
+
+
+# ------------------------------------------------------------------ v13kd trusted partners: no distance penalty (3 Nov 2026)
+# Appended at the end of the file (as v13g) so that every earlier line keeps its number; the call sites are one-line
+# edits: SOCIAL_KEYS (line 64), _init_social (line 1027), the acceptance logit in request (line 1201), results (line 1891).
+# trusted_nodist: in the asked community's acceptance logit the distance term beta3 * d_km is set to 0 when requester i
+# and asked community j form a RECIPROCAL dyad: help has flowed in both directions between them so far in the run
+# (help_mh > 0 for (j, i) and for (i, j); help_mh = man-hours charged, the same structure the pairs output and the
+# "reciprocated share" measure use). Every other pair keeps beta3 * d. The help radius R (who can be asked) is NOT changed,
+# only the acceptance penalty. No numeric parameter, no random draws (the acceptance draw is made as before).
+# Form: Kasper & Borgerhoff Mulder 2015, Curr. Anthropol. 56: 709-710 (Fig. 2) and 712: distance does not lower help in
+# contingent (reciprocal) dyads; the D x C interaction was not tested statistically (raw-data plot only).
+# The key is in SOCIAL_KEYS, so with it on the soc state exists (the other social rules stay off unless set) and the
+# signature changes: TRUSTED_NODIST_VERSION is appended to SOCIAL_VERSION via _rule_tag; an explicit false is not hashed.
+TRUSTED_NODIST_VERSION = "2026-11-03-v13kd-1"
+
+
+def _init_kd(m, sc):
+    """v13kd state: the switch, and per requester the number of asks in which the distance term was dropped."""
+    m.soc["kd"] = bool(sc.get("trusted_nodist"))
+    m.soc["n_kd"] = np.zeros(m.N, np.int64)
+
+
+def _kd_pair(m, i, j):
+    """Is (requester i, asked j) a reciprocal dyad (help with mh > 0 both ways so far)? Counts the ask if so."""
+    h = m.help_mh
+    if h.get((j, i), 0.0) > 0.0 and h.get((i, j), 0.0) > 0.0:
+        m.soc["n_kd"][i] += 1
+        return True
+    return False
+
+
+def _kd_cols(m, rows):
+    """sites column soc_n_kd (asks made by the community with the distance term dropped); only when the switch is on."""
+    if m.soc["kd"]:
+        rows["soc_n_kd"] = m.soc["n_kd"]
