@@ -148,7 +148,7 @@ lit_scenarios:
   # --- S2 dressing
   # v11 citation fix (b): these are Boswinkel 2021's TOTAL construction costs per m3 (all stages: quarrying, transport,
   # dressing, assembly, ramps) of the conglomerate facades (96-167 ph/m3) and the cyclopean walls (6.7-75 ph/m3),
-  # Table 8.3, p. 144 (midpoints) - NOT dressing rates. The model adds their difference (90.65 ph/m3) to the facing of
+  # Table 8.3, p. 144 (midpoints) - NOT dressing rates. The model adds their difference (90.25 ph/m3) to the facing of
   # fine-dressed complexes as the EXTRA total cost of facade masonry over cyclopean masonry (value unchanged in v11).
   # Boswinkel's dressing rates proper (0.0162-0.0175 m3/ph = 57-62 ph/m3, pp. 120-121, Table 7.8) are the variant C3_dress.
   facade: {facade_ph_m3_mid: 131.2, cyclopean_ph_m3_mid: 40.95}     # GEN 57, 199: Boswinkel 2021: 144, Table 8.3 totals
