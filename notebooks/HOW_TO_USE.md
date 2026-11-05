@@ -57,7 +57,7 @@ environment):
 
 | what | version | notes |
 |---|---|---|
-| Python | 3.10 or later; tested with 3.13.5 | |
+| Python | 3.12 or later; tested with 3.13.5 | 3.12+ for byte-identical reproduction (built-in float `sum()` changed in 3.12); 3.10-3.11 differ in the last digits |
 | MPI with compiler wrappers (`mpicc`, `mpicxx`) | OpenMPI or MPICH | Ubuntu / Debian / Colab: `sudo apt-get install -y openmpi-bin libopenmpi-dev`; macOS: `brew install open-mpi`; Windows: use WSL2 (Ubuntu) and the Ubuntu command; conda: `conda install -c conda-forge openmpi mpi4py` |
 | repast4py | >= 1.1.6; tested 1.3.1 | Collier, N. and Ozik, J. 2022. Distributed agent-based simulation with Repast4Py. *Proceedings of the 2022 Winter Simulation Conference*. doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015389). Install guide: https://repast.github.io/repast4py.site/ (compiles against MPI: `CC=mpicxx CXX=mpicxx pip install repast4py`) |
 | mpi4py | >= 3.1; tested 4.1.2 | compiles against MPI |

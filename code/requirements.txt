@@ -1,4 +1,4 @@
-# Python 3.10+ ; OpenMPI (or MPICH) must be installed first, then:
+# Python 3.12+ (needed for byte-identical reproduction, see README; tested 3.13.5) ; OpenMPI (or MPICH) must be installed first, then:
 #   CC=mpicxx CXX=mpicxx pip install repast4py
 repast4py>=1.1.6
 mpi4py>=3.1

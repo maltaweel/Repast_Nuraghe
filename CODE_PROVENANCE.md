@@ -77,7 +77,7 @@ each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`,
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (62; 221 lines in total)
+## Changed files (62; 222 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
@@ -94,7 +94,7 @@ README).
 | `phasing.py` | yes | 1 | comments/docstrings |
 | `pop_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `preprocess.py` | yes | 1 | comments/docstrings |
-| `requirements.txt` | no | 4 | packages appended (imported by the code, missing from the run's list) |
+| `requirements.txt` | no | 5 | Python line 3.10+ -> 3.12+; packages appended (imported by the code, missing from the run's list) |
 | `rerun1030.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `rerun1030b.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `run_all.sh` | yes | 1 | comments/docstrings |
@@ -169,7 +169,8 @@ Not in `CODE_SHA256SUMS` or `CODE_V13_SHA256SUMS`:
   layout);
 - `config/check_sea_meta.py` (run-level check called by the queue; comments scrubbed);
 - `code/requirements.txt` is in the snapshot but not in the checksum files (only `.py`, `.sh`, `.yaml` are); the
-  repository copy appends `scipy`, `matplotlib` and `networkx`, which the code imports but the run's list omitted.
+  repository copy appends `scipy`, `matplotlib` and `networkx`, which the code imports but the run's list omitted,
+  and states Python 3.12+ (the run's list says 3.10+; 3.12+ is needed for byte-identical reproduction, see README).
 
 `notebooks/inputs_manifest.csv` (group `code`) holds the size and SHA-256 of every file of this repository's `code/`
 (the copy that `notebooks/repro.py` expects).

@@ -111,7 +111,8 @@ CODE_SHA256SUMS  checksums of the run's code snapshot;  CODE_PROVENANCE.md  what
 
 ## Requirements / Installation
 
-Linux or macOS (Windows: WSL2 with Ubuntu), Python 3.10 or later (the tested environment is Python 3.13.5).
+Linux or macOS (Windows: WSL2 with Ubuntu), Python 3.12 or later for exact (byte-identical) reproduction, because from 3.12 Python's built-in float `sum()` uses compensated summation and the model sums floats with it; the tested environment is Python 3.13.5.
+On Python 3.10-3.11 the model runs and results agree except for last-digit differences.
 
 | what | version (minimum in `code/requirements.txt`; tested in `notebooks/requirements-colab.txt`) |
 |---|---|
