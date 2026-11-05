@@ -33,7 +33,9 @@ from repast4py import core, schedule
 import lit
 import phasing
 
-CODE_VERSION = "2026-10-29-bugfix"   # bump whenever a code change alters results: part of every run signature
+CODE_VERSION = lit.CODE_VERSION     # bump whenever a code change alters results: part of every run signature
+#   (code_v16_final: "2026-11-05-v16_final", set in lit.py so model.run_signature hashes the same string; was
+#   "2026-10-29-bugfix" in every code from 29 Oct to code_v16_flags, so those signatures never covered code changes)
 TECH_VERSION = "2026-10-30-fix1030"   # tech_rules code path only (MOST_REALISTIC); hashed only when tech_rules is set
 #   (was "2026-10-29-merged-1"; bumped 30 Oct for NEW-1 lift/hoist per piece + the sea payload split)
 SEA_VERSION = "2026-10-30-payload"    # S9 sea faces: 2,000 kg craft payload split (30 Oct); hashed only when sea_kn is set
@@ -68,6 +70,14 @@ SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log", "t
 # skipped, not drawn and discarded). Off (absent / none / 0) = the v12 code path; hashed only when on, so every run
 # with the key off keeps its signature (identity test: v14_nearface/identity/).
 NEARFACE_VERSION = "2026-11-05-nearface-1"
+# v16 (5 Nov 2026; addendum 4 of the specification; CHANGES_V16.md). Always hashed: v16 also
+# changes reporting (S1 relay_made in the strategy parts) and the S3 ceiling basis, so no v16 run reuses v15b parts.
+# The addendum-4 rules L1-L4 sit behind config flags add4.* (code_v16_final defaults: L2, L3 ON; L1, L4 OFF; lit.py).
+# code_v16_final: their effective settings are ALWAYS hashed (code_v16_flags hashed them only when one was on).
+V16_VERSION = "2026-11-05-v16-flags-2"   # -2: relay leg-1 nearer-than-owner filter removed (-1 = the test runs)
+# code_v16_final (CHANGES_V16_FINAL.md): D3 no dress work = no dress task traffic, D6 join parties at their own skill,
+# D11 the site's stone = the class of its gated face 0. Always on (no flag); covered by CODE_VERSION.
+ADD4_VERSION = "2026-11-05-add4-1"
 
 
 def near_face_m(cfg):
@@ -230,14 +240,26 @@ class Static:
             h = t.reindex(self.haul.UID.to_numpy()).reset_index()
             h["uid_int"] = self.haul.uid_int.to_numpy()
             return h
-        mh = lit.mixed_haul(cfg, L, load)
+        F = lit.add4(cfg)
+        self.add4 = F
+        k38 = np.load(os.path.join(cfg["paths"]["cache_dir"], "alliance", "kbest_mu038.npz"))
+        self.mv_c038 = k38["mv_c038"].astype(np.float64)
+        use_long = None
+        if F["rails_cost_choice"]:                        # v16 L1: rails vs dry ground by total cost, per site
+            use_long = self._l1_choice(cfg, L, load, F)
+        mh = lit.mixed_haul(cfg, L, load, use_long=use_long)
         assert mh.on_outcrop.notna().all(), "tech_rules: a site is missing from the short-haul table"
+        # code_v16_final D11: the site's stone (S6 density -> block mass, hardness -> quarry / dress) is the class of
+        # the face it hauls from: face 0 of the gated mu 0.3 table (self.haul = cache sites_haul.csv, the table whose
+        # rows are face 0 of kbest.npz; stone rule = the set actually quarried incl. fallback). The mixed table's own
+        # quarry_stone came from separate least-cost searches on the mu 0.38 / mu 0.1 rasters and could name another
+        # outcrop class (bug D11, CHANGES_V16_FINAL.md). The mixed table still decides friction (lit_haul_rule, PM:22).
+        mh["quarry_stone_mixed"] = mh.quarry_stone.to_numpy()
+        mh["quarry_stone"] = self._face0_stone(mh)
         self.tech = {"lit": L, "rule": mh.lit_haul_rule.to_numpy(), "stone": mh.quarry_stone.to_numpy(),
                      "site": [lit.resolve_site(cfg, L, r) for r in mh[["TWR_N", "on_outcrop", "lit_haul_rule",
                                                                        "lit_type"]].to_dict("records")],
                      "table": mh[["UID", "on_outcrop", "lit_haul_rule", "lit_type", "quarry_stone"]]}
-        k38 = np.load(os.path.join(cfg["paths"]["cache_dir"], "alliance", "kbest_mu038.npz"))
-        self.mv_c038 = k38["mv_c038"].astype(np.float64)
         if self.sea_kn:                                   # sea faces: split the trip into land legs and boat
             for fl in self.faces:
                 for fc in fl:
@@ -245,6 +267,137 @@ class Static:
                         boat = fc["trip_h"] - fc["land_h"]
                         fc["boat_h"] = boat
         self.tech["n_long"] = int((self.tech["rule"] == "long").sum())
+        self.lay_len = None                               # v16 L1: rail-laying length (m) of face 0, rails sites
+        if F["rails_cost_choice"]:
+            self.lay_len = np.where(self.tech["rule"] == "long", self.l1_len, 0.0)
+        if self.sea_kn and F["sea_priced_as_charged"]:    # v16 L4: sea faces chosen on the charged cost
+            self._l4_sea_faces(cfg, F)
+        self.info = {"n_rails_sites": self.tech["n_long"], "n_sites": int(self.N),
+                     "n_sea_faces": int(sum(any(fc.get("sea") for fc in fl) for fl in self.faces)),
+                     "add4": {k: F[k] for k in lit.ADD4_FLAGS}, "rail_lay_mh_per_m": F["rail_lay_mh_per_m"],
+                     "load_ph_per_t": F["load_ph_per_t"]}
+        if getattr(self, "l4_info", None):
+            self.info.update(self.l4_info)
+
+    def _face0_stone(self, tab):
+        """code_v16_final D11: per row of `tab` (UID column, this run's sites in order), the quarry_stone of the gated
+        face-0 table self.haul (the class of the outcrop the site's face 0 starts at)."""
+        st = self.haul.set_index("UID").quarry_stone.reindex(tab.UID.to_numpy())
+        assert st.notna().all(), "D11: a site has no face-0 stone in sites_haul.csv"
+        return st.to_numpy()
+
+    # ------------------------------------------------------------------ v16 addendum-4 static choices (L1, L4)
+    def _face0_costs(self, i):
+        """Face-0 (cheapest land face) drag costs exactly as _leg_mh_tech0 charges a whole route: (C on dry ground
+        mu 0.38 moves, C on rails mu 0.1 moves, L real length)."""
+        f = self.faces[i][0]
+        if f["route"] < 0 or f["a"] == f["b"]:
+            return f["C"], f["C"], f["L"]
+        return float(self.mv_c038[f["a"]:f["b"]].sum()), float(self.mv_c01[f["a"]:f["b"]].sum()), f["L"]
+
+    def _l1_choice(self, cfg, L, load, F):
+        """v16 L1 (addendum 4): every site takes the cheaper of dry ground (mu 0.38 crews and moves) and rails (mu 0.1
+        crews and moves + rail_lay_mh_per_m x real route length, paid once per site) for ALL its towers on face 0,
+        computed once before the run: crews = expected crews per tonne of the block draw (lit.crews_per_tonne, S6
+        density of that rule's stone) x the site's tonnes; trip = the model's whole-route trip (min haul floor), with
+        the per-crew loading (load_unload_h) or, under L3, load_ph_per_t x tonnes (equal in both, kept for clarity).
+        Returns use_long per site (lit.mixed_haul); sets self.l1_len (laying length, m) and self.l1_cost."""
+        m = L["mixed"]
+        tp = cfg["transport"]
+        short = load(lit.haul_csv(cfg, {"haul": m["short"]["haul"]}))
+        lng = load(lit.haul_csv(cfg, {"haul": m["long"]["haul"]}))
+        ok = lng.haul_flatm.notna().to_numpy()
+        fl, v, vb = float(tp["min_haul_flatm"]), float(tp["drag_speed_ms"]), float(tp["return_walk_ms"])
+        L3 = F["load_per_tonne"]
+        p_s = lit.transport(cfg, dict(L, **m["short"]))[0]
+        p_l = lit.transport(cfg, dict(L, **m["long"]))[0]
+        tpt = float(cfg["stone"]["tonnes_per_tower"])
+        tw = self.haul.TWR_N.to_numpy().astype(np.float64)
+        st0 = self._face0_stone(short)                    # code_v16_final D11: one stone per site, face 0's class
+        use = np.zeros(self.N, bool)
+        self.l1_len = np.zeros(self.N)
+        self.l1_cost = np.zeros((self.N, 2))
+        for i in range(self.N):
+            c38, c01, Lr = self._face0_costs(i)
+            out = []
+            for C, pull, st in ((c38, p_s, st0[i]), (c01, p_l, st0[i])):
+                mf = lit.mass_factor(cfg, L, st if isinstance(st, str) else "")
+                cpt = lit.crews_per_tonne(cfg, pull, mf)[0]
+                tn = tpt * tw[i] * mf
+                trip = max(C, fl) / v / 3600.0 + max(Lr, fl) / vb / 3600.0 + (0.0 if L3 else float(tp["load_unload_h"]))
+                out.append(cpt * tn * trip + (F["load_ph_per_t"] * tn if L3 else 0.0))
+            self.l1_len[i] = max(Lr, fl)
+            out[1] += F["rail_lay_mh_per_m"] * self.l1_len[i]
+            self.l1_cost[i] = out
+            use[i] = bool(ok[i]) and out[1] < out[0]
+        return use
+
+    def _l4_sea_faces(self, cfg, F):
+        """v16 L4 (addendum 4): the choice between land and sea is made on the cost the model charges. Every sea route
+        the v16 table builder found (r_* columns) is a candidate; per site, before the run, with expected crews per
+        tonne (lit.crews_per_tonne): land legs at the site's own rule (L1 on: each leg takes rails or dry ground by its
+        own cost incl. laying x leg length; L1 off: the site's rule, rails if 'long'), loading per crew at each landing
+        (sea.transfer_h) or, under L3, load_ph_per_t x tonnes per land leg; boat crews at 100 kg/person x boat time
+        (as S9); hoist per block. The site gets the sea face iff that cost per tonne is below its charged face-0 land
+        cost per tonne. Replaces the S9 sea faces of the table's 'mode' column."""
+        import sea as seamod
+        L = self.tech["lit"]
+        tp = cfg["transport"]
+        fl, v, vb = float(tp["min_haul_flatm"]), float(tp["drag_speed_ms"]), float(tp["return_walk_ms"])
+        L1, L3 = F["rails_cost_choice"], F["load_per_tonne"]
+        lay, lp = F["rail_lay_mh_per_m"], F["load_ph_per_t"]
+        trf = seamod.params(cfg)["transfer_h"]
+        hoist_m = seamod.params(cfg)["hoist_ph_per_block_m"]
+        pS = lit.transport(cfg, dict(L, **L["mixed"]["short"]))[0]
+        pL = lit.transport(cfg, dict(L, **L["mixed"]["long"]))[0]
+        p03 = float(tp["pull_kg_per_person"])
+        tpt = float(cfg["stone"]["tonnes_per_tower"])
+        rt = seamod.load_routes(self.haul, cfg, self.sea_kn)
+        n_old = sum(any(fc.get("sea") for fc in fl_) for fl_ in self.faces)
+        for fl_ in self.faces:                            # drop the S9 (table 'mode') sea faces
+            fl_[:] = [fc for fc in fl_ if not fc.get("sea")]
+        n_cand = n_new = n_leg_rails = 0
+        for i, r in enumerate(rt.to_dict("records")):
+            if not r["r_found"]:
+                continue
+            n_cand += 1
+            long_i = self.tech["rule"][i] == "long"
+            mf = lit.mass_factor(cfg, L, self.tech["stone"][i] if isinstance(self.tech["stone"][i], str) else "")
+            cS, mblk = lit.crews_per_tonne(cfg, pS, mf)
+            cL = lit.crews_per_tonne(cfg, pL, mf)[0]
+            c03 = lit.crews_per_tonne(cfg, p03, mf)[0]
+            tn_site = tpt * float(self.haul.TWR_N.iat[i]) * mf
+            c_site = cL if long_i else cS
+            # land face 0 at the site's rule, per tonne
+            c38, c01, Lr = self._face0_costs(i)
+            land = c_site * (max(c01 if long_i else c38, fl) / v + max(Lr, fl) / vb) / 3600.0 + \
+                (lp if L3 else c_site * float(tp["load_unload_h"]))
+            if L1 and long_i:
+                land += lay * max(Lr, fl) / tn_site
+            # sea chain per tonne
+            sea_ = 0.0
+            legs, rails = [], []
+            for hf, hm in ((r["r_hf1"], r["r_hm1"]), (r["r_hf2"], r["r_hm2"])):
+                t_k = (max(hf, fl) / v + max(hm, fl) / vb) / 3600.0
+                dry_k = cS * (t_k + (0.0 if L3 else trf))
+                rl_k = cL * (t_k + (0.0 if L3 else trf)) + (lay * max(hm, fl) / tn_site if L1 else 0.0)
+                rk = (rl_k < dry_k) if L1 else bool(long_i)
+                sea_ += rl_k if rk else dry_k
+                legs.append((float(hf), float(hm)))
+                rails.append(bool(rk))
+            bh = seamod.boat_h(r["r_sea_km"], cfg, self.sea_kn)
+            sea_ += (2.0 * lp if L3 else 0.0) + c03 * bh + hoist_m * float(r["r_hoist_m"]) / mblk
+            if not sea_ < land:
+                continue
+            n_new += 1
+            n_leg_rails += sum(rails)
+            self.faces[i].append({"route": -2, "a": 0, "b": 0, "region": int(r["r_quarry_region"]),
+                                  "C": float(r["r_hf1"] + r["r_hf2"]), "L": float(r["r_hm1"] + r["r_hm2"]),
+                                  "qx": float(r["r_quarry_x"]), "qy": float(r["r_quarry_y"]), "handoff": {},
+                                  "sea": True, "boat_h": bh, "hoist_ph": hoist_m * float(r["r_hoist_m"]),
+                                  "legs": legs, "leg_rails": rails, "l4_cost_pt": (land, sea_)})
+        self.l4_info = {"l4_sea_candidates": n_cand, "l4_sea_faces_old": int(n_old), "l4_sea_faces_new": n_new,
+                        "l4_sea_land_legs_rails": n_leg_rails}
 
 
 # ----------------------------------------------------------------------------------- agents
@@ -272,6 +425,13 @@ class AllianceModel:
         Ls = cfg["lit_scenarios"]
         self.pull03 = tp["pull_kg_per_person"]
         self.pull01 = Ls["f_person_kgf"] / float(A["track_mu"])
+        # v16 addendum-4 flags (tech rules only; lit.add4): None / False = the v15b code paths
+        self.F = getattr(S, "add4", None) if S.tech is not None else None
+        self.L3 = bool(self.F and self.F["load_per_tonne"])
+        self.L4 = bool(self.F and self.F["sea_priced_as_charged"] and S.sea_kn)
+        self.lp = float(self.F["load_ph_per_t"]) if self.F else 0.0
+        self.tw_n = S.haul.TWR_N.to_numpy().astype(np.float64)
+        self.c01 = [None] * N if self.L4 else None       # v16 L4: rails crews per tower (land legs of sea faces)
         st = lit.stage_hours(cfg, lit.scenario(cfg, "webster"), 1, "", 0)      # Webster stages per tower
         self.base_stage = {"quarry": st["quarry"], "dress": st["dress"], "build": st["build"] + st["lift"]}
         self.lift_share = st["lift"] / (st["build"] + st["lift"])
@@ -436,6 +596,8 @@ class AllianceModel:
                             int(np.ceil(mp[tp_ == t] / self.pull03).sum()), scm * float(cuts[t]))
                 mp, tp_, cuts = pieces(math.inf)
                 self.tower_tech.append([tech_t(mp, tp_, cuts, t) for t in range(tw)])
+                if self.c01 is not None:                       # v16 L4: rails crews of the same pieces
+                    self.c01[i] = [int(np.ceil(mp[tp_ == t] / self.pull01).sum()) for t in range(tw)]
                 if prof_i is not None:                         # crews per profile and tower; hands = their sum
                     self._profile_crews(i, prof_i[1], mp, tp_, tw)
                 npc = np.bincount(tp_, minlength=tw)
@@ -465,6 +627,9 @@ class AllianceModel:
                         lift_pp *= self.hgt_f[i]
                     ts = [{"S03": None, "S01": None, "nblk": int(nps[t]), "split_mh": scm * float(cs[t]),
                            "tech": tech_t(ms, tps, cs, t), "xlift": lift_pp * float(nps[t] - npc[t])} for t in range(tw)]
+                    if self.L4:                                # v16 L4: rails crews of the payload-split pieces
+                        for t in range(tw):
+                            ts[t]["c01"] = int(np.ceil(ms[tps == t] / self.pull01).sum())
                 self.tower_sea.append(ts)
                 if self.unit_stage is not None:                # S10 smaller addition crews / S13 extra units
                     self._gaps_units(i, seed, rec, tw, m, tid, mf, (mu, sg, lo, hi), d, pieces, tech_t, pull_i,
@@ -543,6 +708,7 @@ class AllianceModel:
         self.track_use = {}                                   # cell -> use count
         self.handoff_use = {}                                 # (x, y) -> count
         self.strategy_log = []
+        self.relay_made = []                                  # v16 S1: per logged tower, 1 = relay hand-off executed
         # ---- tasks (grow as needed)
         self.nt = 0
         cap0 = 4096
@@ -597,10 +763,12 @@ class AllianceModel:
         tws = S.haul.TWR_N.to_numpy().astype(int)
         res = np.array([lit.draw_residents(rule, int(tws[i]), np.random.default_rng([seed, int(S.haul.uid_int[i])]))
                         for i in range(N)])
-        frac = sc.get("phase_frac")
-        groups = phasing.cohorts(N, frac, seed) if frac else [np.arange(N)]
-        if getattr(self, "units", None) is not None:      # S10 / S11: the sites with a unit in each cohort
-            groups = [np.array([u[0] for u in c], np.int64) for c in self.units]
+        # v16 S3 (addendum 4): the ceiling is checked against all residents of the communities that exist at that time,
+        # started or waiting, i.e. every community of the run (was: the active cohort only; v15b code below for the
+        # record). The redraw rule is unchanged.
+        #   frac = sc.get("phase_frac"); groups = phasing.cohorts(N, frac, seed) if frac else [np.arange(N)]
+        #   (S10 / S11: groups = the sites with a unit in each cohort)
+        groups = [np.arange(N)]
         peak = lambda r: max(float(r[g].sum()) for g in groups)
         k, scaled = 0, 1.0
         while peak(res) > ceil_ and k < 100:
@@ -612,7 +780,8 @@ class AllianceModel:
             res = res * scaled
         self.residents = res
         self.pop_info = {"seed": int(seed), "total_residents": float(res.sum()), "active_peak_residents": peak(res),
-                         "ceiling": ceil_, "binding": bool(k > 0 or scaled < 1.0), "redraws": k, "scale": scaled}
+                         "ceiling": ceil_, "binding": bool(k > 0 or scaled < 1.0), "redraws": k, "scale": scaled,
+                         "ceiling_binding": bool(k > 0 or scaled < 1.0), "ceiling_basis": "all_communities_v16_S3"}
         return np.array([lit.builders_of(rule, r) for r in res], np.int64)
 
     # ------------------------------------------------------------------ 1 Nov 2026 scenario gaps (S10-S14)
@@ -1435,8 +1604,12 @@ class AllianceModel:
         Ssite, S038, S03p, _ = self.tower_tech[o][int(self.tower_idx[o])]
         if face.get("sea"):
             sv = self._sea_variant()
+            c01 = None
             if sv is not None:                            # payload split: the pieces' crews and hoists (30 Oct)
                 (Ssite, S038, S03p, _), nblk = sv["tech"], sv["nblk"]
+                c01 = sv.get("c01")
+            if "legs" in face:                            # v16 L4: land legs at the site's rule, loading per L3
+                return self._sea_l4_mh(o, face, Ssite, S038, S03p, nblk, c01), 0
             return S038 * face["land_h"] + S03p * face["boat_h"] + nblk * face["hoist_ph"], 0
         if self.carry is not None and part == "whole" and face["L"] <= float(self.carry["max_m"]):
             # C2 (Erasmus 1965): short hauls at a literature rate per tonne (flat up to max_m) or per tonne-metre
@@ -1475,11 +1648,52 @@ class AllianceModel:
             return mh, 0
         if face["route"] < 0 or a == b:
             C, L = (face["C"], face["L"]) if part == "whole" else (0.0, 0.0)
-            return Ssite * self.trip(C, L, part), 0
+            return self._crew_trip_mh(Ssite, C, L, part, o), 0
         mv = S.mv_c01 if S.tech["rule"][o] == "long" else S.mv_c038
         C = float(mv[a:b].sum())
         L = face["L"] if (part == "whole" and a == face["a"] and b == face["b"]) else float(S.mv_len[a:b].sum())
-        return Ssite * self.trip(C, L, part), 0
+        return self._crew_trip_mh(Ssite, C, L, part, o), 0
+
+    def _crew_trip_mh(self, crews, C, L, part, o):
+        """Man-hours of a land trip (whole route or relay leg) for `crews` person-trips. v15b: crews x trip, the trip
+        including load_unload_h per crew member (half per relay leg). v16 L3 (add4.load_per_tonne): crews x (drag +
+        walk) + load_ph_per_t x tonnes of the tower (half per relay leg), independent of crew size and friction."""
+        if not self.L3:
+            return crews * self.trip(C, L, part)
+        tn = float(self.towers[o][int(self.tower_idx[o])][0])
+        return crews * self.trip(C, L, part, float(self.tp["drag_speed_ms"]), 0.0) + \
+            tn * self.lp * (1.0 if part == "whole" else 0.5)
+
+    def _lay_share(self, i, face):
+        """v16 L1: the site's rail-laying cost (rail_lay_mh_per_m x face-0 real route length, paid once per site) in
+        equal parts per tower; land faces of rails sites only (sea faces carry their own legs' laying, L4). 0 when off."""
+        S = self.S
+        if S.tech is None or S.lay_len is None or face.get("sea"):
+            return 0.0
+        return self.F["rail_lay_mh_per_m"] * float(S.lay_len[i]) / self.tw_n[i]
+
+    def _sea_l4_mh(self, o, face, Ssite, S038, S03p, nblk, c01):
+        """v16 L4: man-hours of a sea face: each land leg by its static rule (Static._l4_sea_faces: rails or dry
+        ground) with its crews (rails = the site's crews if the site is on rails, else the rails crews of the same
+        pieces; dry = S038), drag + walk with the min-haul floor per leg, loading per crew per landing (sea.transfer_h)
+        or under L3 load_ph_per_t x tonnes per land leg, rail laying per rails leg (L1: x leg length / towers); boat
+        and hoist as S9."""
+        F, tp = self.F, self.tp
+        t = int(self.tower_idx[o])
+        if c01 is None:
+            c01 = self.c01[o][t]
+        crews_r = Ssite if self.S.tech["rule"][o] == "long" else c01
+        fl, v, vb = float(tp["min_haul_flatm"]), float(tp["drag_speed_ms"]), float(tp["return_walk_ms"])
+        trf = float(self.cfg["sea"].get("transfer_h", tp["load_unload_h"]))
+        mh = 0.0
+        for (hf, hm), rk in zip(face["legs"], face["leg_rails"]):
+            cr = crews_r if rk else S038
+            mh += cr * ((max(hf, fl) / v + max(hm, fl) / vb) / 3600.0 + (0.0 if self.L3 else trf))
+            if rk and F["rails_cost_choice"]:
+                mh += F["rail_lay_mh_per_m"] * max(hm, fl) / self.tw_n[o]
+        if self.L3:
+            mh += 2.0 * float(self.towers[o][t][0]) * self.lp
+        return mh + S03p * face["boat_h"] + nblk * face["hoist_ph"]
 
     def _sea_variant(self):
         """Sea-face (payload-split) values of the current owner's current tower, or None (nothing to split)."""
@@ -1517,35 +1731,61 @@ class AllianceModel:
             h_eff = max(0.0, min(h_eff, float(self.food_cap[i]) - float(self.B[i])))
         return h_eff / (float(self.B[i]) + h_eff) if h_eff > 0 else 0.0
 
-    def _join_task(self, i, helper, stage, mh, loc, up, final, nblk):
+    def _join_task(self, i, helper, stage, mh, loc, up, final, nblk, parts=None):
         """Owner part (owner) + helper part (helper, + its walk), both downstream of `up`; the next task waits for
-        both (t_up2). Returns the owner part's id."""
-        f = self._join_split(i, helper, stage, nblk)
-        to = self.add_task(i, mh * (1.0 - f), stage, up, final)
-        self.charge(i, i, mh * (1.0 - f), stage)
+        both (t_up2). Returns the owner part's id. parts=None: the stage's man-hours mh split by the hands share f
+        (relay leg 1); parts=(f, owner mh, helper mh): already priced per party (code_v16_final D6, skill stages)."""
+        if parts is None:
+            f = self._join_split(i, helper, stage, nblk)
+            mo, mhp = mh * (1.0 - f), mh * f
+        else:
+            f, mo, mhp = parts
+        to = self.add_task(i, mo, stage, up, final)
+        self.charge(i, i, mo, stage)
         if f > 0:
             walk = self.B[helper] * self.wdist(helper, loc, i if stage == "build" else None) / \
                 self.tp["return_walk_ms"] / 3600.0
-            th = self.add_task(helper, mh * f + walk, stage, up, final)
-            self.charge(i, helper, mh * f + walk, stage, walk)
+            th = self.add_task(helper, mhp + walk, stage, up, final)
+            self.charge(i, helper, mhp + walk, stage, walk)
             self.join_part[to] = th
         return to
 
+    def _owner_skill(self, i, stage, t_i):
+        """Owner's factor on its own skill-stage work: its A3 skill, or under tech rules the larger discount of that
+        and S8 within-site learning (1 - s8_rate)^t_i (never both; PM:23)."""
+        sk = self.skill(i, stage)
+        if self.S.tech is not None and self.s8_rate > 0:
+            sk = min(sk, (1.0 - self.s8_rate) ** t_i)
+        return sk
+
     def _perform_join(self, i, helper, stage, loc, up, final, base, extra, t_i, nblk, cur, credit=True):
-        """Join mode for a skill stage. Skill: the main performer (the party contributing more hands) sets the
-        discount, as in handover: owner -> min(S8, own A3 skill), helper -> the helper's A3 skill; it also gets the
-        learning credit (specialisation rule as in handover)."""
+        """Join mode for a skill stage. code_v16_final D6 (PM:23 "A helper uses its own skill"): each party's share of
+        the stage is priced at that party's own factor: the owner's share (1 - f) at _owner_skill (min of A3 skill and
+        S8), the helper's share f at the helper's A3 skill (was: the main performer's factor for the whole stage).
+        `extra` (setup, cuts, soil) is not skill-discounted and is split by f as before. The learning credit is
+        unchanged: the main performer (the party contributing more hands, f > 0.5 = helper) gets it (specialisation
+        rule as in handover)."""
         f = self._join_split(i, helper, stage, nblk)
         p = helper if f > 0.5 else i
-        sk = self.skill(p, stage) if base is not None else 1.0
-        if base is not None and self.S.tech is not None and p == i and self.s8_rate > 0:
-            sk = min(sk, (1.0 - self.s8_rate) ** t_i)
-        mh = (base * sk if base is not None else 0.0) + extra
-        t = self._join_task(i, helper, stage, mh, loc, up, final, nblk)
+        if base is not None:
+            mo = base * (1.0 - f) * self._owner_skill(i, stage, t_i) + extra * (1.0 - f)
+            mhp = base * f * self.skill(helper, stage) + extra * f
+        else:
+            mo, mhp = extra * (1.0 - f), extra * f
+        t = self._join_task(i, helper, stage, mo + mhp, loc, up, final, nblk, parts=(f, mo, mhp))
         if credit and base is not None and stage in SKILL_STAGES and (p == i or self.sc.get("specialisation", False)):
             self.cum[p, SKILL_STAGES.index(stage)] += 1.0
         cur.setdefault("join_share", {})[stage] = f
         return t
+
+    def _no_work_task(self, i, stage, up, final=False):
+        """code_v16_final D3: a stage with no work (PM:20 "Dressing: none for 1 tower"; any skill stage whose labour
+        before skill is 0 with no extra) is the owner's 0-man-hour task, kept only so the chain order is unchanged. No
+        help is asked (no ask counters, no acceptance draw, no trust change, no alliance), no levy, no helper walk, no
+        skill credit (SC:169 counts work performed). The Q-learning dimension (e.g. req_dress) is still drawn (the
+        strategy draw is unchanged; the choice has no effect on such a tower); the acceptance draws that the old
+        zero-work asks took from the asked communities' streams are no longer made, so later draws shift."""
+        return self.add_task(i, 0.0, stage, up, final)
 
     def start_tower(self, i):
         sc, A, S = self.sc, self.A, self.S
@@ -1577,6 +1817,7 @@ class AllianceModel:
             pool = sum(self.base_stage.values()) if S.tech is None else sum(self.site_stage[i].values())
             for qi, fc in enumerate(faces):
                 m, _ = self.leg_mh(i, fc, fc["a"], fc["b"], S03, S01, "whole", nblk=nblk)
+                m += self._lay_share(i, fc)                       # v16 L1: rail laying share (0 when off)
                 qd[qi] = -(m + pool + float(sc.get("setup_mh", A["setup_mh"]))) / tonnes
         strat, imit = self.choose(i, dims)
         q = int(strat["quarry_face"])
@@ -1595,6 +1836,8 @@ class AllianceModel:
         self.strategy_log.append((self.season, strat.get("quarry_face"), strat.get("req_quarry", 0),
                                   strat.get("req_dress", 0), strat.get("req_build", 0), strat.get("relay", 0.0),
                                   strat.get("track", 0), int(imit)))
+        k_log = len(self.relay_made)
+        self.relay_made.append(0)
         if self.soc is not None:                          # v13: who started, imitated source (-1 none), help-tie source
             self.soc["strat"].append((i, self.soc["src"] if imit else -1, self.soc["linked"] if imit else 0))
             self.soc["src"], self.soc["linked"] = -1, 0
@@ -1603,6 +1846,8 @@ class AllianceModel:
 
         def perform(stage, want_help, loc, up, final=False, base=None, extra=0.0, credit=True):
             """Create the task; returns task id. base: labour before skill (for skill stages)."""
+            if base is not None and base <= 0.0 and extra <= 0.0:   # code_v16_final D3: no work in this stage
+                return self._no_work_task(i, stage, up, final)
             helper = -1
             if self.cz is not None and self.cz.levy is not None:   # v12 S21: a seat levies a community of its canton
                 helper = self.cz.levy_helper(i)
@@ -1675,20 +1920,26 @@ class AllianceModel:
                 for c in new:
                     self.track_owner[c] = i
                 up = tt
-        # 4 transport: whole route, or relay leg 1 (neighbour nearer the quarry) + leg 2 (self)
+        # 4 transport: whole route, or relay leg 1 (a helper from the ordinary candidate list; the v15b "nearer the
+        # quarry than the owner" filter is removed, code_v15c / code_v16) + leg 2 (self)
         f = float(strat.get("relay", 0.0))
         a, b = face["a"], face["b"]
+        lay = self._lay_share(i, face)                    # v16 L1: rail laying share, booked to the owner's transport
         relay_ok = f > 0 and face["route"] >= 0 and face["C"] >= float(A["relay_min_flatm"]) and f in face["handoff"]
         helper = -1
         if relay_ok:
-            dself = math.hypot(S.xy[i, 0] - qxy[0], S.xy[i, 1] - qxy[1])
-            helper = self.request(i, "leg1", qxy, self.candidates(i, "leg1", qxy, nearer_than=dself))
+            # v16 (specified by the authors, 5 Nov 2026): the leg-1 "nearer the quarry than the owner" candidate filter is
+            # REMOVED; leg-1 candidates = the ordinary candidate list (as code_v15c_norelayfilter). v15b passed
+            # nearer_than=dself. Measured before removal (CHANGES_V16.md).
+            helper = self.request(i, "leg1", qxy, self.candidates(i, "leg1", qxy))
             self.charge_brokers(i, "leg1")
             cur["helpers"]["leg1"] = helper
         if helper >= 0 and join:                          # join: helper's hands join the owner on leg 1
             h = a + face["handoff"][f]
             m1, _ = self.leg_mh(i, face, a, h, S03, S01, "leg")
             m2, _ = self.leg_mh(i, face, h, b, S03, S01, "leg")
+            m2 += lay
+            self.relay_made[k_log] = 1
             t1 = self._join_task(i, helper, "leg1", m1, qxy, up, False, nblk)
             t2 = self.add_task(i, m2, "transport", t1)
             self.charge(i, i, m2, "transport")
@@ -1700,6 +1951,8 @@ class AllianceModel:
             h = a + face["handoff"][f]
             m1, _ = self.leg_mh(helper, face, a, h, S03, S01, "leg")
             m2, _ = self.leg_mh(i, face, h, b, S03, S01, "leg")
+            m2 += lay
+            self.relay_made[k_log] = 1
             walk = self.B[helper] * self.wdist(helper, qxy) / walk_ms / 3600.0
             t1 = self.add_task(helper, m1 + walk, "leg1", up)
             self.charge(i, helper, m1 + walk, "leg1", walk)
@@ -1713,6 +1966,7 @@ class AllianceModel:
             ttr = t2
         else:
             m, _ = self.leg_mh(i, face, a, b, S03, S01, "whole", nblk=nblk)
+            m += lay
             ttr = self.add_task(i, m, "transport", up)
             self.charge(i, i, m, "transport")
         if self.cz is not None:                           # v12 S17 fill carrying, S20 lintel (may wait for hands)
@@ -1949,6 +2203,7 @@ class AllianceModel:
         lg = pd.DataFrame(self.strategy_log, columns=["season", "quarry_face", "req_quarry", "req_dress", "req_build",
                                                       "relay", "track", "imitated"])
         lg["seed"] = self.seed
+        lg["relay_made"] = np.array(self.relay_made, np.int64)   # v16 S1 (appended column)
         if self.soc is not None:                           # v13: starter, imitated source, source a help tie (0/1)
             ex = np.array(self.soc["strat"], np.int64).reshape(-1, 3)
             lg["gid"], lg["imit_src"], lg["imit_tie"] = ex[:, 0], ex[:, 1], ex[:, 2]
@@ -2073,6 +2328,13 @@ def signature(cfg, sc, haul):
     if nf is not None:                                   # v14 near-site face rule: hashed only when on
         h.update(NEARFACE_VERSION.encode())
         h.update(json.dumps({"near_site_fixed_face_m": nf}).encode())
+    h.update(V16_VERSION.encode())                       # v16: always (S1 parts column, S3 ceiling basis)
+    h.update(ADD4_VERSION.encode())                      # code_v16_final: the effective add4 settings, always
+    h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
+    if lit.add4_any(cfg):
+        if sc.get("sea_kn") and lit.add4(cfg)["sea_priced_as_charged"]:
+            import sea as seamod
+            h.update(seamod.load_routes(haul.reset_index(drop=True), cfg, sc["sea_kn"]).to_csv(index=False).encode())
     h.update(CODE_VERSION.encode())                      # stale part files from older code are never reused
     return h.hexdigest()[:12]
 
@@ -2111,6 +2373,10 @@ def run(a, cfg, haul, names, seeds, out_root=None):
         run_dir = os.path.join(a.parts_dir or os.path.join(cfg["paths"]["cache_dir"], "runs"), tag, signature(cfg, sc, haul))
         if rank == 0:
             os.makedirs(run_dir, exist_ok=True)
+            if getattr(S, "info", None):                  # v16: static per-site choices (rails sites, sea faces)
+                with open(os.path.join(run_dir, "static_info.json"), "w") as fh:
+                    json.dump(S.info, fh, indent=1)
+                print(f"[{tag}] v16 static: {json.dumps(S.info)}", flush=True)
             done = set() if a.fresh else {s for s in seeds if os.path.exists(os.path.join(run_dir, f"seed_{s:04d}.done"))}
         else:
             done = None

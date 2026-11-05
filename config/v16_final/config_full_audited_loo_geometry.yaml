@@ -1,0 +1,638 @@
+# V16_FINAL (5 Nov 2026): config/v15_haul15/config_full_audited_loo_geometry.yaml with cache_dir -> its own ../outputs/caches/config_full_audited_loo_geometry (the prepared
+# tables of that v15 config's cache, rebuilt with code/, + its own runs/) and output_dir -> ../outputs.
+# Code: code/ = the v16_final code (CHANGES_V16_FINAL.md; add4 defaults L2, L3 ON, L1, L4 OFF; D3, D6, D11 fixed).
+# LOO config MOST_REALISTIC_LOO_geometry_P10 (full audited leave-one-out, specified by the authors) = config_full_audited.yaml with lit_scenarios.geometry tower_height_m 14 -> 15, top_diam_m 6.8 -> 8 (MR_P10 v12); run --alliance MOST_REALISTIC_LOO_geometry_P10 (made by make_loo.py)
+# FULL AUDITED config (2 Nov 2026, specified by the authors): copy of outputs/config_v12_audited.yaml (AUDITED_LIT, all 9 audited values)
+# + mr_work_party.adult_share 0.5 -> 0.4 (every MR scenario that inherits *mr_work_party), + per-scenario handling of
+# param_audit/AUDITED_LIT_SPEC.md section 3 (S4d_spiral_full h_m 15 -> 14; S11 type_cost heights 5/14, 7/14, 10/14),
+# + MOST_REALISTIC_AUDITED_LIT_POPFROZEN (residents fixed at the midpoint of each MR tower-class range, adult_share 0.4),
+# cache_dir / output_dir -> full_audited/outputs (inputs symlinked as in outputs/cache; own runs/ so nothing overwrites v12).
+# X_nurtime spiralfull_c10/c20/c40: lift_ramp h_m 15 -> 14 (full height, as S4d_spiral_full; project team 2 Nov).
+# Queue: full_audited/queue_full.tsv (+ queue_full_p23.tsv); chain: full_audited/code/full_chain.sh (frozen code snapshot).
+# Nuraghe build ABM - single configuration file.
+# All input paths are relative to data_dir. Change data_dir (one line) to move the inputs.
+# cache_dir / output_dir are relative to the folder holding this config file (or absolute).
+
+data_dir: /ABSOLUTE/PATH/TO/data   # PLACEHOLDER: absolute folder holding the inputs (layout: data/README.md)
+paths:
+  sites: sites/nurnet_nuraghi.shp
+  cost_raster: costsurface/sardinia_drag_cost_8dir_mu03_25832_int.tif
+  lithology: geology/sardinia_lithology_25832.shp
+  cache_dir: ../outputs/caches/config_full_audited_loo_geometry
+  output_dir: ../outputs
+
+crs: EPSG:25832
+
+# --- Quarry stone (the authors' list). The code of each type = position in this list (1-based).
+lithology_field: STONE
+# Stone rule (specified by the authors): HYBRID baseline = the recorded building stone where it is known
+# (Nurnet's data (site building stone), field `materiale`), otherwise the nearest of the 7 permitted classes.
+stone_rule: hybrid            # hybrid | stones7 (7 classes, no recorded stone) | stones4 (the authors' original 4)
+allowed_stones: [limestone/marble, metamorphic, basalt, granite, acid volcanic, trachyte, andesite]
+stones4: [limestone/marble, metamorphic, basalt, granite]
+materiale:
+  file: stone/nid_materiale_prod.csv     # relative to data_dir; columns codice (= UID), sa_materiale
+  citation: "Nurnet's data (site building stone)"
+  # token -> ARPAS STONE classes. A value is split on ' e ' and ','; a mix = the union of its mapped tokens;
+  # tokens not listed (Arenaria, Marna, Non determinato, Selce, Dolomia, dacite, Granodiorite, truncated 'Sc', empty)
+  # contribute nothing; a value with no mapped token falls back to the 7-stone rule.
+  map:
+    Basalto: [basalt]
+    Granito: [granite]
+    Porfido: [granite, other intrusive]
+    Calcare: [limestone/marble]
+    Marmo: [limestone/marble]
+    Trachite: [acid volcanic, trachyte, tuff]
+    Riolite (Liparite): [acid volcanic, trachyte, tuff]
+    Tufo (Ignimbrite): [acid volcanic, trachyte, tuff]
+    Ignimbrite: [acid volcanic, trachyte, tuff]
+    Andesite: [andesite]
+    Scisto: [schist, metamorphic]     # schist allowed for these sites only (general list excludes it, pending the authors)
+rasterize_all_touched: false   # false = an outcrop claims a cell only if it covers the cell centre
+
+# --- Site fields
+site_fields: {uid: UID, name: NAME, comune: COMUNE, towers: TWR_N, tower_filled: TWR_FILL}
+nodata_snap_radius_cells: 20   # if a site falls on nodata / unreachable cell, search this far for the nearest valid cell
+# Sites from which no allowed outcrop can be reached over land (6 on Isola di San Pietro, which has only
+# acid volcanic rock): 'local_min_haul' = keep them, assume a local quarry at min_haul_flatm, flag them;
+# 'exclude' = leave them out of the model.
+unreachable_policy: local_min_haul
+
+# --- Model parameters
+hours_per_day: 8
+builders:
+  base: 50              # builders for a 1-tower nuraghe
+  per_extra_tower: 25   # + per additional tower (7 towers -> 200)
+  rand_min: 0.9         # uniform multiplicative factor
+  rand_max: 1.1
+  min: 50
+  max: 200
+stone:
+  tonnes_per_tower: 1350        # Webster 1991: ~3,000 blocks x ~450 kg
+  block_median_kg: 450          # ~0.19 m3 x 2,386 kg/m3
+  block_sigma: 0.6              # lognormal sigma (log space)
+  block_min_kg: 60
+  block_max_kg: 2400
+transport:
+  pull_kg_per_person: 100       # ASSUMPTION (v12 relabel): press reports of the UCL 2016 sledge give ~10 people per ~1 t; the primary
+                                #   (Harris 2016, Public Archaeology 15: 148-156, AAM p. 1, 4) gives only "approximately half" of stone 93
+                                #   and a minimum crew of 10 (plus 14 slipway relayers), no tonnage. Value unchanged.
+  drag_speed_ms: 0.27           # ASSUMPTION (v12 relabel): sustained mean below the reported 1 m/s peak (Harris 2016, AAM p. 4);
+                                #   press reports ~0.6 m/s ("10 feet every 5 seconds"). Value unchanged; 1.0 = sensitivity MR_P10_v12_drag10.
+  return_walk_ms: 1.39
+  load_unload_h: 0.25
+  min_haul_flatm: 15            # v15 (specified by the authors, SPEC_ADDENDUM_2026-11-05b_on_outcrop_haul.md): audited 100 -> 15
+other_mandays_per_tower: 2500   # Webster 1991: 852 Table 1: ~3,600 man-days/tower minus ~1,100 transport
+                                # (= quarry 500 + dressing 1,300 + walling 700; v11 converts each at its source day, see v11:)
+
+# --- v11 (2 Nov 2026, approved by the authors). Webster 1991: 852 (Table 1 and text) takes quarrying (2,700 kg per
+# man-day, Erasmus 1965: 286) and man-hauling with tumpline and sled (1,200 kg per man-day, Erasmus 1965: 286-7) from
+# Erasmus, whose working day is ~5 h (Erasmus 1965: 283, via Boswinkel 2021: 145); dressing (0.40 m3 per man-day,
+# Abrams 1984: 165) and wall construction (0.80 m3 per man-day, Abrams 1984: 175-6) from Abrams, whose man-day is 8 h
+# (Abrams 1994: 46-47 via Boswinkel 2021: 109; Abrams & Bolland 1999 via Boswinkel 2021: 146; Devolder 2013's
+# 0.1 m3/ph "based on experiment by Abrams" = 0.8 m3 / 8 h, Boswinkel 2021: 125, Table 7.11). Webster himself states no
+# day length. webster_day_fix: false reproduces v10 (every man-day x hours_per_day). Webster's transport man-days
+# (1,100) are never used as labour (hauling is simulated); the 5 h is listed for completeness and the calibration table.
+v11:
+  webster_day_fix: true
+  webster_day_hours: {quarry: 5, transport: 5, dress: 8, build: 8}
+max_days: 20000                 # safety stop for the scheduler (never reached in practice)
+
+# --- Replicates: run i uses seed i
+seeds: {first: 1, last: 100}
+
+# --- Verification
+verify:
+  spot_check_n: 3
+  spot_check_pad_m: 15000
+  webster_target_haul_m: 200
+  dem: dem/sardinia_dem_GLO30_25832.tif   # only used by tests/verify_hauls.py (relative to data_dir)
+  dem_mu: 0.3
+
+# --- Cooperation scenarios (python model.py config.yaml --scenario NAME | all)
+# Cooperation is a Builder attribute, drawn per builder per run from the site's RNG stream (after the
+# block draw). Cooperators pool freely into crews of any size. Non-cooperators work only as one fixed
+# crew per household (their non-cooperating members), dragging blocks <= size x pull_kg_per_person.
+# The baseline (no --scenario) is p_coop = 1, no help - identical to `full`.
+scenarios:
+  household_size: 5         # builders packed consecutively into households; the last may be smaller
+  split_cost_mh: 1.0        # man-hours added to the quarry/build pool per split (cut) of a heavy block
+  help_radius_m: 10000      # inter-site help: straight-line radius to look for an unfinished site
+  help_walk_ms: 1.39        # helpers walk there at this speed; the walk is charged to the helped site
+  coupled_max_ranks: 2      # memory guard: in the help scenario each rank holds the whole island (~1.7-1.9 GB)
+  list:
+    none:      {p_coop: 0.0}
+    low:       {p_coop: 0.25}
+    mixed:     {p_coop: 0.5}
+    mostly:    {p_coop: 0.75}
+    full:      {p_coop: 1.0}
+    high:      {p_coop: 1.0, inter_site_help: true}
+    patchwork: {site_coop_prob: 0.5}   # per site: p_coop = 1 with this probability, else 0
+    # S9 sea access (section `sea:` below; tools/sea_routes.py builds cache/sea/*)
+    S9_sea_4kn: {p_coop: 1.0, sea_kn: 4}
+    S9_sea_5kn: {p_coop: 1.0, sea_kn: 5}
+    S9_sea_6kn: {p_coop: 1.0, sea_kn: 6}
+    S9_sea_2kn: {p_coop: 1.0, sea_kn: 2}   # laden craft (H&F 2006 p.18 'corrected speed of 2 knots'); tables in cache/sea
+    high_sea:   {p_coop: 1.0, inter_site_help: true, sea_kn: 5}
+
+# --- Literature-based chaîne opératoire scenarios: see lit_scenarios below (filled in step by step)
+lit_scenarios:
+  # Sources: literature/general_energetics_logistics.md (GEN, line numbers) and literature/nuraghe_specific.md (NUR).
+  # FREE = no empirical value in either review; a stated assumption, flagged in METHODS.md section 8.
+  dem: dem/sardinia_dem_GLO30_25832.tif      # relative to data_dir; used to rebuild cost rasters per mu
+  complex_far_min_towers: 3     # S5c: TWR_N >= 3 (plan's mapping; FREE)
+  complex_far_min_dist_m: 3000  # S5c: S'Urachi, basalt "almost 3 km" (NUR 49, 198)
+  # --- stage-explicit Webster baseline
+  webster_md_per_tower: {quarry: 500, transport: 1100, dress: 1300, build: 700}   # NUR 181 (Webster 1991: 852, Table 1, single tower); hours per man-day: v11.webster_day_hours
+  webster_density_kg_m3: 2386   # NUR 155
+  lift_share_of_build: 0.5      # FREE (plan): half of Webster's building stage is lifting
+  baseline_mu: 0.3
+  # --- S1 procurement, person-hours per m3 of stone
+  quarry_ph_m3: {scree: 2.0, joints_low: 11.1, joints_high: 17.5}   # GEN 48, 45, 200 (Boswinkel 2021 Table 7.2)
+  # --- S2 dressing
+  # v11 citation fix (b): these are Boswinkel 2021's TOTAL construction costs per m3 (all stages: quarrying, transport,
+  # dressing, assembly, ramps) of the conglomerate facades (96-167 ph/m3) and the cyclopean walls (6.7-75 ph/m3),
+  # Table 8.3, p. 144 (midpoints) - NOT dressing rates. The model adds their difference (90.25 ph/m3) to the facing of
+  # fine-dressed complexes as the EXTRA total cost of facade masonry over cyclopean masonry (value unchanged in v11).
+  # Boswinkel's dressing rates proper (0.0162-0.0175 m3/ph = 57-62 ph/m3, pp. 120-121, Table 7.8) are the variant C3_dress.
+  facade: {facade_ph_m3_mid: 131.2, cyclopean_ph_m3_mid: 40.95}     # GEN 57, 199: Boswinkel 2021: 144, Table 8.3 totals
+  facing_thickness_m: 0.5       # FREE (plan)
+  fine_min_towers: 2            # plan: complex nuraghi only; late-phase isodomic masonry (NUR 61)
+  # --- S4 lifting; tower geometry is FREE (plan): 15 m, truncated cone 12 m -> 8 m, 0.9 m courses
+  geometry: {tower_height_m: 15.0, course_height_m: 0.9, base_diam_m: 12.0, top_diam_m: 8.0}   # LOO_geometry: v12 values (audited 14 / 6.8)
+  lever_ph_per_block_course: 0.37   # GEN 77, 204 (Hodges 1989 / de Haan 2009 via Boswinkel 2021: 116, 124)
+  stair_lever_last_m: 1.0       # FREE (plan, Laner's internal stair): only the last metre per course is levered
+  ramp:
+    slope: 0.2                  # GEN 78, 205
+    width_m: 3.0                # FREE (plan)
+    dig_ph_m3: 4.2              # GEN 78 (Turner 2018)
+    compact_kg_per_ph: 1000     # GEN 78 (Lacquement 2009)
+    carry_load_kg: 50           # GEN 68, 205 (DeLaine via Boswinkel 2021: 122)
+    carry_h_per_m: 0.000444     # GEN 68, 205
+    carry_dist_m: 50            # FREE: mean carrying distance of ramp earth
+    earth_density_kg_m3: 1600   # FREE: standard value for earth (not in the reviews)
+    build_remove_factor: 2      # plan: build + remove
+    check_boswinkel: {height_m: 3.0, range_ph: [971, 1208], vol_6m_m3: 354, vol_9m_m3: 796}  # GEN 78, 205
+  # --- S3 transport
+  f_person_kgf: 30              # GEN 202: 300 N per person = a PEAK / short-burst draught effort (Cotterell & Kamminga 1990: 219 and de Haan 2009, via Boswinkel 2021: 47 n. 25, 52, 111); sustained ~125 N (Boswinkel 2021: 52): sensitivity MR_P10_v11_pull125; 30/0.3 = 100 kg
+  oxen:
+    pull_N_per_ox: 515          # v11 citation fix (c): 481-549 N midpoint (350-400 kg ox x 14% x 9.81; Boswinkel 2021: 52 n. 37; the text's "491" is a misprint of 481). v10: 520 (491-549)
+    yoke_efficiency: [0.95, 0.80, 0.63]   # GEN 203: 1, 2, 3 pairs (Barwell & Ayre 1982); >3 pairs keep 0.63 (FREE)
+    speed_ms: 0.75              # GEN 69, 203: 0.7-0.8 m/s
+    return_speed_ms: 0.75       # FREE: team walks back at ox pace
+    men_per_team: 2             # plan: 1 drover + 1 helper per team (DeLaine: 1 driver per yoke, GEN 69)
+    mu: 0.3                     # cost surface and friction kept at the baseline
+  # --- S6 density and hardness (FREE: standard values; GEN 212 gives basalt ~2.9-3.0, limestone ~2.5)
+  density_kg_m3: {basalt: 3000, granite: 2700, limestone/marble: 2600, metamorphic: 2750}
+  hardness: {basalt: 2.0, granite: 2.0, limestone/marble: 1.0, metamorphic: 1.0}   # FREE (Turner 2020: 71 critique, GEN 136)
+  # --- S7 Webster's class totals (NUR 157-158, 181-183); TWR_N -> class mapping is FREE (plan)
+  webster_classes:
+    - {name: single,    min_towers: 1, max_towers: 1, tonnes: 1350, blocks: 3000,  quarry_md: 500,  dress_md: 1300, build_md: 700}
+    - {name: multi,     min_towers: 2, max_towers: 3, tonnes: 3100, blocks: 7000,  quarry_md: 1200, dress_md: 3000, build_md: 1600}
+    - {name: bastioned, min_towers: 4, max_towers: 99, tonnes: 6700, blocks: 15000, quarry_md: 2500, dress_md: 6400, build_md: 3500}
+  learning_rate: 0.15           # FREE (GEN 91: no archaeological learning rate; sensitivity only)
+  # --- duration and threshold
+  duration:
+    workforces: {household: 6, trump: 15, canton: 500}   # NUR 205 (5-6), NUR 130/206 (10-20), GEN 26 (500 = regional draw)
+    calendars_days: {webster40: 40, webster90: 90, long255: 255}   # NUR 185; GEN 36, 206 (220-290, midpoint 255)
+  community_threshold_ph: 30000 # GEN 26, 207 (Wunderlich et al. 2024)
+  defaults: {quarry: webster, dress: webster, lift: webster, mu: 0.3, haul: base}
+  list:
+    webster:            {}
+    S1a_scree:          {quarry: scree}
+    S1b_joints_low:     {quarry: joints_low}
+    S1b_joints_high:    {quarry: joints_high}
+    S2a_unworked:       {dress: none}
+    S2b_fine:           {dress: fine}
+    S3a_rails_tallow:   {mu: 0.1,  haul: mu0.1}
+    S3b_rails_grease:   {mu: 0.05, haul: mu0.05}
+    S3c_dry_ground:     {mu: 0.38, haul: mu0.38}
+    S3d_rough:          {mu: 0.5,  haul: mu0.5}
+    S3e_oxen:           {oxen: true}
+    S4a_lever:          {lift: lever}
+    S4b_ramp:           {lift: ramp}
+    S4c_internal_stair: {lift: stair}
+    S5a_onsite:         {onsite: true}
+    S5b_any_buildstone: {haul: buildstone}
+    S5c_complex_far:    {haul: complexfar}
+    S6_density:         {density: true}
+    S7_webster_classes: {classes: true}
+    S8_learning:        {learning: true}
+    LOW:                {quarry: scree, dress: none, mu: 0.1, haul: buildstone_mu0.1, lift: stair}
+    HIGH:               {quarry: joints_high, dress: fine, mu: 0.5, haul: mu0.5, lift: ramp, density: true}
+    # REALISTIC: per-site mixed rules within the literature family (lit.mixed_haul / lit.resolve_site), hybrid
+    # stone base, S6 density + S8 learning on, no ramp, no S5c, no oxen. Each rule and its source: REALISTIC_NOTES.md.
+    REALISTIC:
+      density: true                          # S6 (GEN 136, 212)
+      learning: true                         # S8 (FREE rate; NUR 107, 132: complexes as one planned project)
+      mixed:
+        quarry_on_outcrop: joints_low        # S1b: site on its outcrop, bedrock broken along joints (NUR 27-29)
+        quarry_off_outcrop: scree            # S1a: collected boulders from slopes nearby (NUR 20, 35)
+        dress_none_max_towers: 1             # S2a: simple towers cyclopean, undressed (NUR 39, 58; GEN 57)
+        dress_fine_min_towers: 3             # S2b: polylobate complexes (Santu Antine, Su Nuraxi, S'Urachi; NUR 60-61)
+        long_min_haul_m: 1000                # rails only where the sledge route > 1 km (FREE; NUR 45-46, 195-196)
+        short: {mu: 0.38, haul: mu0.38}      # S3c sledge on dry ground (GEN 64, 201)
+        long: {mu: 0.1, haul: mu0.1}         # S3a tallowed timber rails (GEN 65, 89, 214)
+        type_field: TYPE                     # sites shapefile attribute
+        lift_by_type: {"Nuraghe a corridoio (protonuraghe)": lever}   # S4a: no tholos stair (NUR 81)
+        lift_default: stair                  # S4c: Laner's intramural stair as the builders' ramp (NUR 79-80)
+    REALISTIC_oxen:                          # optional variant: ox teams instead of rails on the long routes
+      density: true
+      learning: true
+      mixed:
+        quarry_on_outcrop: joints_low
+        quarry_off_outcrop: scree
+        dress_none_max_towers: 1
+        dress_fine_min_towers: 3
+        long_min_haul_m: 1000
+        short: {mu: 0.38, haul: mu0.38}
+        long: {oxen: true, mu: 0.3, haul: base}   # S3e (GEN 69, 203); cattle LBA only (NUR 54)
+        type_field: TYPE
+        lift_by_type: {"Nuraghe a corridoio (protonuraghe)": lever}
+        lift_default: stair
+
+# --- Adaptive alliance scenarios (python model.py ... --alliance NAME|all; alliance.py). FREE = assumption.
+alliance:
+  k_quarries: 5               # spec: the 5 cheapest distinct quarry faces (outcrop regions) per site
+  kbest_max_settle: 3000000   # search cap per site (cells settled)
+  # time
+  season_days: 90             # NUR 185: 90 communal days a year (Renfrew 1973 via Webster 1991); one season = one year
+  start_rate: 0.0022222222    # FREE: fraction of all sites starting each season (1/450): ~450 seasons, cf. ~500 years
+                              #       of nuraghe building (Ialongo 2018, NUR 116). Start order random per seed.
+  max_seasons: 3000           # safety stop
+  # requests, relays, trust (all FREE)
+  R_m: 10000                  # FREE: neighbourhood radius (straight line) for requests, relays, imitation, track allies
+  relay_fractions: [0.25, 0.5, 0.75]   # spec: hand-off at this fraction of the route's drag cost
+  relay_min_flatm: 300        # FREE: no relay on routes cheaper than this (on-outcrop sites haul 100 m)
+  max_asks: 3                 # FREE: candidates asked per task before doing it oneself
+  trust0: 0.5                 # FREE
+  delta_up: 0.1               # FREE: trust gain when the asked community helps
+  delta_down: 0.2             # FREE: trust loss when it refuses after having received help from the asker
+  alliance_threshold: 0.7     # FREE: alliance = mutual trust >= this
+  beta0: 0.0                  # FREE: acceptance logit = beta0 + beta1 trust - beta2 backlog_days - beta3 distance_km
+  beta1: 2.0
+  beta2: 0.05
+  beta3: 0.2
+  # learning (all FREE)
+  epsilon: 0.1                # exploration probability per action dimension
+  alpha: 0.5                  # Q learning rate
+  p_imit: 0.3                 # probability per tower of copying a cheaper neighbour's strategy
+  # cooperation mechanisms
+  track_mu: 0.1               # GEN 65 (tallowed timber rails, Richards & Whitby 1997: 237-239)
+  setup_mh: 200               # FREE: man-hours to open a fresh quarry face
+  max_ranks: 8                # seed-parallel ranks (whole island per rank, ~0.4 GB each)
+  defaults: {requests: false, trust: false, specialisation: false, tracks: false, shared_quarry: false,
+             b: 0.85, track_cost_mh_per_m: 2.0, defector_frac: 0.0, imitation: true}
+  list:
+    A0_alone:          {}
+    A1_ask:            {requests: true, accept_fixed: 0.5}
+    A2_trust:          {requests: true, trust: true}
+    A3_trust_learning: {requests: true, trust: true, specialisation: true}
+    A4_trust_track:    {requests: true, trust: true, tracks: true}
+    A5_full:           {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true}
+    A5_full_freerider: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2}
+  verify_scenarios:
+    A0_verify:         {b: 1.0, setup_mh: 0, imitation: false, fixed_actions: {quarry_face: 0}}
+  sensitivity:        # on A5_full, 10 seeds each (full factorial)
+    base: A5_full
+    seeds: [1, 10]
+    R_m: [5000, 10000, 20000]
+    b: [0.85, 0.95, 1.0]          # Wright 1936 progress ratio per doubling (GEN 91); 1.0 = no learning
+    track_cost_mh_per_m: [0.5, 2.0, 5.0]
+
+# --- Pre-existing networks (pre_networks.py; python model.py config.yaml --pre NAME|all|sensitivity). FREE = assumption.
+# Self-contained: every scenario is the alliance A2 rule set with requests restricted to these ties.
+pre_networks:
+  p_tie: 0.9                 # FREE: probability a tied community accepts a request (no trust needed)
+  broker_people: 1           # FREE: people per broker who walk the request on (reach > 1), there and back
+  generator_seed: 2026       # FREE: seed of the group / shape generator (ties identical in every run of a scenario)
+  smallworld_p: 0.1          # FREE: Watts-Strogatz rewiring probability (to a community outside the group)
+  smallworld_radius_m: 10000 # FREE: rewired ties go to a community within this radius
+  density_cell_m: 30000      # plan: 30 km cells for the "dense" region variant
+  sizes:
+    G3_canton:  {seed_rule: multi_tower, target_size: 2.65}  # Ugas via Moravetti et al. 2009 p. ~361 (copyrighted): ~2,700 canton seats
+    G5:         {size: 5}                                    # FREE lower bound
+    G9_verify:  {size: 9}                                    # sensitivity only: ~800-canton reading, UNVERIFIED in Ugas 2005
+    G20_system: {size: 20}                                   # Perra 2008 (>= 350 territorial systems), second-hand
+    G50:        {size: 50}                                   # FREE
+    G133_tribe: {size: 133, two_level: G3_canton}            # 7,167 / 54 tribes; ~50 canton chiefs per tribe (Ugas via Moravetti et al. 2009)
+  main_grid:                 # size x shape at reach 1, 100 seeds
+    sizes: [G3_canton, G5, G20_system, G50, G133_tribe]
+    shapes: [chain, kmesh2, kmesh4, kmesh8, hub, smallworld, complete]
+  extra:
+    P_partners2:  {all: {partners: 2}}
+    P_partners5:  {all: {partners: 5}}
+    P_partners10: {all: {partners: 10}}
+    P_G20_system_kmesh4_h2: {all: {groups: G20_system, shape: kmesh4}, reach: 2}
+    P_G20_system_kmesh4_h3: {all: {groups: G20_system, shape: kmesh4}, reach: 3}
+    P_G133_tribe_hub_h2:    {all: {groups: G133_tribe, shape: hub}, reach: 2}
+    P_G133_tribe_hub_h3:    {all: {groups: G133_tribe, shape: hub}, reach: 3}
+    P_G9_verify_kmesh4:     {all: {groups: G9_verify, shape: kmesh4}}
+    P_G20_kmesh4_on_outcrop:  {all: {groups: G20_system, shape: kmesh4, seed_from: on_outcrop}}
+    P_G20_kmesh4_off_outcrop: {all: {groups: G20_system, shape: kmesh4, seed_from: off_outcrop}}
+    P_G20_kmesh4_north:   {all: {groups: G20_system, shape: kmesh4, region: north}}
+    P_G20_kmesh4_central: {all: {groups: G20_system, shape: kmesh4, region: central}}
+    P_G20_kmesh4_south:   {all: {groups: G20_system, shape: kmesh4, region: south}}
+    P_G20_kmesh4_dense:   {all: {groups: G20_system, shape: kmesh4, region: dense}}
+    P_wide_stone_local_build: {stone: {groups: G133_tribe, shape: kmesh4}, move: {groups: G20_system, shape: chain},
+                               build: {groups: G3_canton, shape: hub}}
+    P_local_stone_wide_build: {stone: {groups: G3_canton, shape: hub}, move: {groups: G20_system, shape: chain},
+                               build: {groups: G133_tribe, shape: kmesh4}}
+    P_D7_G20_kmesh4_trust:    {all: {groups: G20_system, shape: kmesh4}, trust: true}
+    P_D8_G20_kmesh4_tieloss:  {all: {groups: G20_system, shape: kmesh4}, tie_loss_refusals: 2}   # FREE r = 2
+    P_G20_kmesh4_learning:    {all: {groups: G20_system, shape: kmesh4}, specialisation: true}
+    P_G20_kmesh4_track:       {all: {groups: G20_system, shape: kmesh4}, tracks: true}
+  sensitivity:               # 10 seeds per cell
+    seeds: [1, 10]
+    sizes: [G3_canton, G5, G9_verify, G20_system, G50, G133_tribe]
+    shapes: [chain, kmesh2, kmesh4, kmesh8, hub, smallworld, complete]
+    reach: [1, 2, 3]
+    learning: [false, true]
+
+# --- S9 sea access (specified by the authors; DEV_SEA S9_NOTES.md). Paths relative to data_dir.
+# Alliance / pre-network sea versions: append '_sea' (default_kn) or '_sea<kn>kn' to any scenario name,
+# e.g. --alliance A1_ask_sea,A5_full_sea  --pre P_G50_hub_sea.  Sea off (no sea_kn) = the original code path.
+sea:
+  dem: dem/sardinia_dem_GLO30_25832.tif        # nodata -9999; land = z > 0
+  slope: costsurface/sardinia_slope_deg_25832.tif   # same grid; used for the beach rule
+  speeds_kn: [4, 5, 6]          # specified by the authors; H&F 2006 p.18-19: 5 kn benchmark, ~4 kn average voyage
+  default_kn: 5
+  extra_speeds_kn: [2]          # haul-table sensitivity only: H&F 2006 p.18 laden raft 'corrected speed of 2 knots'
+  sea_grid_factor: 3            # boat routing on 90 m blocks (3 x 3 cells), block = water if >= 50% sea cells
+  sea_band_m: 2000              # coastal water band: water within 2 km of land (no open-sea crossing). ASSUMPTION
+  coast_band_m: 2000            # sites and quarries within 2 km of the coast may use the sea (specified by the authors)
+  land_band_m: 5000             # land legs are routed within 5 km of the coast (compute domain). ASSUMPTION
+  beach_max_z_m: 10             # specified by the authors: land "close to sea level" -> z <= 10 m and slope < 10 deg
+  beach_max_slope_deg: 10
+  hoist_max_z_m: 5              # specified by the authors: cliff "a few meters above sea level", pulley -> top <= 5 m
+  attach_radius_blocks: 2       # a landing attaches to a water block within 2 blocks (180 m)
+  payload_kg: 2000              # H&F 2006 p.12, 18: 2,000 kg benchmark stone load per craft (tsukupin, buoyancy)
+  crew: 10                      # H&F 2006 p.18: 800 kg of crew in the 2,000 kg-load tsukupin; / 80 kg per person (ASSUMPTION)
+  transfer_h: 0.25              # load/unload at each landing = transport.load_unload_h (sledge loading). ASSUMPTION
+  people_walk_to_landing_m: 2000   # people walk at most 2 km (straight line) to / from a landing. ASSUMPTION
+  people_embark_h: 0.25         # embark + disembark per sea journey of a helper group. ASSUMPTION
+  people_max_h: 6.0             # people sea journeys longer than this are not tabulated (never faster than walking in practice)
+
+# --- MOST_REALISTIC (specified by the authors; MOST_REALISTIC_NOTES.md). Top-level key, read by alliance.scenario() only,
+# so no other run signature changes. Phasing by name suffix: MOST_REALISTIC_P10 (headline), _P20, _P100 (all at once).
+#   social = A3_trust_learning (requests, trust, specialisation; b = 0.85 skill learning)
+#   tech_rules = the per-site literature rules of lit_scenarios.list.REALISTIC (stages, S6 density, mu 0.38 / rails)
+#   sea_kn = 2 (laden craft, Hazell & Fitzpatrick 2006 p.18)
+#   builders_rule (specified by the authors): the per-nuraghe work party. residents ~ U[lo, hi] by tower count, builders =
+#     round(0.5 x residents) (adults of both sexes; 0.5 = ASSUMPTION). TWR1 5-40 -> 3-20; 2 40-110 -> 20-55;
+#     3 110-185 -> 55-93; 4 185-260 -> 93-130; 5 260-330 -> 130-165; 6-7 330-400 -> 165-200. Context (NUR C4): Webster
+#     2015: 51 (5-6 per household), Webster 1991: 853 (~40 per nuraghe, Borore; Porcarzos ~400), Webster & Webster
+#     1998 (Duos 70-110), Ugas via secondary (166-259 per canton). Interpolation between anchors: ours.
+#   max_seasons 20000: small work parties alone under P10 can exceed the default 3,000-season safety stop.
+mr_work_party: &mr_work_party
+  residents_by_towers: [[5, 40], [40, 110], [110, 185], [185, 260], [260, 330], [330, 400], [330, 400]]
+  adult_share: 0.4             # FULL AUDITED (specified by the authors): 0.5 -> 0.4 (Webster 1991: 854, Table 2 n. 4, x 2; AUDITED_LIT_SPEC #2)
+#   help_mode join (specified by the authors): a helper adds its work party's hands to the requester's stage (quarry, dress, relay
+#     leg 1, build/lift) instead of taking it over; duration = MH / (own + helper hands), hands capped per block
+#     (join_hands_per_block: FREE; transport: each block's own crew). MOST_REALISTIC_handover = the 11:30 behaviour.
+#   population_ceiling (specified by the authors): <= 300,000 inhabitants on the island (Calo et al. 2008: 41, second-hand
+#     via Day 1988) - a CEILING on the residents of simultaneously active communities, not a baseline.
+alliance_extra:
+  MOST_REALISTIC: &mr   {requests: true, trust: true, specialisation: true, tech_rules: REALISTIC, sea_kn: 2,
+                         builders_rule: *mr_work_party, max_seasons: 20000, help_mode: join, population_ceiling: 300000,
+                         join_hands_per_block: {quarry: 4, dress: 2, build: 6}}
+  MOST_REALISTIC_handover: {requests: true, trust: true, specialisation: true, tech_rules: REALISTIC, sea_kn: 2,
+                         builders_rule: *mr_work_party, max_seasons: 20000, population_ceiling: 300000}
+  MOST_REALISTIC_alone: {tech_rules: REALISTIC, sea_kn: 2, builders_rule: *mr_work_party, max_seasons: 20000,
+                         population_ceiling: 300000}   # A0 rules: network-need baseline
+
+# --- 1 Nov 2026 scenario gaps (specified by the authors; NEW_SCENARIOS_1101.md): S10-S14, each = MOST_REALISTIC + ONE switch,
+# run as NAME_P10 so they compare with the headline MOST_REALISTIC_P10. Every value: source or ASSUMPTION in
+# NEW_SCENARIOS_1101.md and the report section "New scenarios S10-S14".
+#   S10 staged complexes (phase_order.rule staged): keeps / single towers / unitary complexes first, additions of the
+#       staged complexes as later units (keeps before additions); staged_share = share of complexes built in stages
+#       (no count exists: Melis 2017: 40-41, Vanzetti et al. 2013 'rari casi' of single-build masonry -> ASSUMPTION).
+#   S11 protonuraghi first (rule types_first): the 688 'Nuraghe a corridoio (protonuraghe)' sites form the first units;
+#       type_cost = their stone volume and height relative to the model tower (566 m3, 15 m): derived bracket.
+#   S12 food-limited crews (food_cap): hands on a site's stage <= surplus_share x P / (ration_kg x season_days);
+#       P from the catchment's land-capability classes (tools/food_capacity.py, catchment_file in cache_dir).
+#   S13 antemurali + villages (extra_units): masonry volume = length x height x thickness x fill, built after the towers.
+#   S14 maintenance (maintenance): collapse probability per finished tower per year, repair = repair_frac x the site's
+#       mean man-hours per tower (owner, in the build period); occupation span applied post hoc (tools/gaps_summary.py).
+gaps_proto: &proto "Nuraghe a corridoio (protonuraghe)"
+gaps_food_classes: &food_arable {I: 1.0, II: 1.0, III: 1.0, IV: 1.0, V: 0.0, VI: 0.0, VII: 0.0, VIII: 0.0, urban: 0.274, water: 0.0}
+gaps_wall_central: &wall_c {min_towers: 5, perimeter_by_towers: [145.0], height_m: 6.8, thickness_m: 1.9, fill: 0.8}
+gaps_wall_high: &wall_h {min_towers: 4, perimeter_by_towers: [177.2], height_m: 10.0, thickness_m: 2.0, fill: 0.8}
+gaps_village_central: &vill_c {min_towers: 2, huts_by_towers: [0, 20, 30, 40, 60, 60, 60], hut_diam_m: 4.5, wall_thick_m: 1.0,
+                               wall_height_m: 1.0, fill: 0.8}
+gaps_village_high: &vill_h {min_towers: 2, huts_by_towers: [0, 40, 60, 100, 150, 200, 200], hut_diam_m: 4.5, wall_thick_m: 1.0,
+                            wall_height_m: 2.0, fill: 0.8}
+alliance_gaps:   # merged into alliance_extra by alliance.scenario(); names end in _P10 when run
+  MOST_REALISTIC_S10_all:      {<<: *mr, phase_order: {rule: staged, staged_share: 1.0}}
+  MOST_REALISTIC_S10_s70:      {<<: *mr, phase_order: {rule: staged, staged_share: 0.7}}
+  MOST_REALISTIC_S10_half:     {<<: *mr, phase_order: {rule: staged, staged_share: 0.5}}
+  MOST_REALISTIC_S10_unitary:  {<<: *mr, phase_order: {rule: staged, staged_share: 0.0}}   # = MR_P10 cohorts (code check)
+  MOST_REALISTIC_S10_all_crew50: {<<: *mr, phase_order: {rule: staged, staged_share: 1.0, addition_crew_factor: 0.5}}
+  MOST_REALISTIC_S11_order:    {<<: *mr, phase_order: {rule: types_first, types: [*proto]}}
+  MOST_REALISTIC_S11_low:      {<<: *mr, phase_order: {rule: types_first, types: [*proto]},
+                                type_cost: {*proto : {volume: 0.835, height: 0.357}}}   # FULL AUDITED: 5/14 (absolute 5 m kept)
+  MOST_REALISTIC_S11_mid:      {<<: *mr, phase_order: {rule: types_first, types: [*proto]},
+                                type_cost: {*proto : {volume: 2.084, height: 0.5}}}     # FULL AUDITED: 7/14 (absolute 7 m kept)
+  MOST_REALISTIC_S11_high:     {<<: *mr, phase_order: {rule: types_first, types: [*proto]},
+                                type_cost: {*proto : {volume: 3.508, height: 0.714}}}   # FULL AUDITED: 10/14 (absolute 10 m kept)
+  MOST_REALISTIC_S12_low:      {<<: *mr, food_cap: {catchment_file: food/site_food_r1000.csv, arable_share: *food_arable,
+                                cropped_share: 0.333, net_yield_kg_ha: 240, pasture_kg_ha: 0, surplus_share: 0.1,
+                                ration_kg: 1.2, min_hands: 1}}
+  MOST_REALISTIC_S12_central:  {<<: *mr, food_cap: {catchment_file: food/site_food_r1500.csv, arable_share: *food_arable,
+                                cropped_share: 0.5, net_yield_kg_ha: 440, pasture_kg_ha: 15, surplus_share: 0.2,
+                                ration_kg: 1.0, min_hands: 1}}
+  MOST_REALISTIC_S12_s10:      {<<: *mr, food_cap: {catchment_file: food/site_food_r1500.csv, arable_share: *food_arable,
+                                cropped_share: 0.5, net_yield_kg_ha: 440, pasture_kg_ha: 15, surplus_share: 0.1,
+                                ration_kg: 1.0, min_hands: 1}}   # one-at-a-time: central with surplus 0.1
+  MOST_REALISTIC_S12_s30:      {<<: *mr, food_cap: {catchment_file: food/site_food_r1500.csv, arable_share: *food_arable,
+                                cropped_share: 0.5, net_yield_kg_ha: 440, pasture_kg_ha: 15, surplus_share: 0.3,
+                                ration_kg: 1.0, min_hands: 1}}   # one-at-a-time: central with surplus 0.3
+  MOST_REALISTIC_S12_high:     {<<: *mr, food_cap: {catchment_file: food/site_food_r2000.csv, arable_share: *food_arable,
+                                cropped_share: 0.5, net_yield_kg_ha: 700, pasture_kg_ha: 30, surplus_share: 0.3,
+                                ration_kg: 0.9, min_hands: 1}}
+  MOST_REALISTIC_S13_walls:    {<<: *mr, extra_units: {wall: *wall_c}}
+  MOST_REALISTIC_S13_walls_village: {<<: *mr, extra_units: {wall: *wall_c, village: *vill_c}}
+  MOST_REALISTIC_S13_high:     {<<: *mr, extra_units: {wall: *wall_h, village: *vill_h}}
+  MOST_REALISTIC_S14_low:      {<<: *mr, maintenance: {p_collapse: 0.001, repair_frac: 0.2, occupation_years: 300}}
+  MOST_REALISTIC_S14_central:  {<<: *mr, maintenance: {p_collapse: 0.003, repair_frac: 0.5, occupation_years: 450}}
+  MOST_REALISTIC_S14_high:     {<<: *mr, maintenance: {p_collapse: 0.005, repair_frac: 1.0, occupation_years: 700}}
+
+# --- 1 Nov 2026 (b) wider-literature scenarios (specified by the authors; WIDER_LIT_1101.md): each = MOST_REALISTIC + ONE switch,
+# run as NAME_P10 so they compare with the headline MOST_REALISTIC_P10. Every value: source (page) or ASSUMPTION in
+# WIDER_LIT_1101.md and the report chapter "Scenarios from the wider literature".
+#   haul_profile (C1, C3 loading, M3, M4): land-haul crews / speed / friction / loading per site rule (short = sledge on
+#       dry ground mu 0.38, long = rails mu 0.1); wet = sledge on wetted sand; walk = walked blocks. Sea faces unchanged.
+#   stage_rates (C2, C3): stage person-hours per m3 swapped (quarry by S1 rule, walling, facade dressing).
+#   carry (C2): hauls up to max_m costed per tonne (Erasmus sled hauling via Webster 1991: 852).
+#   masons (M2): island pool of master masons for the vault share of the build stage, travelling between sites.
+#   phase_order rule emulation (M1): later P10 cohorts drawn with weight 1 + strength x built towers within R_m.
+wl_masons_c: &mas_c {pool0: 50, per_new: 20, vault_share: 0.5, need: tholos, exempt_types: [*proto]}
+wl_walk: &walk {kg_per_person: 241.67, min_crew: 3, speed_ms: 0.041667, load_h: 0.25}
+alliance_wl:     # merged by alliance.scenario(); names end in _P10 when run
+  # C1 Harris 2016: 10 haulers per ~1 t on a timber slipway (100 kg per person; friction equivalent 30 kgf / 100 kg = 0.3)
+  MOST_REALISTIC_C1_rails:     {<<: *mr, haul_profile: {long: {pull_kg: 100.0, moves: c03}}}
+  MOST_REALISTIC_C1_rails_relay: {<<: *mr, haul_profile: {long: {pull_kg: 41.667, moves: c03}}}   # + 14 slipway relayers
+  MOST_REALISTIC_C1_all:       {<<: *mr, haul_profile: {short: {pull_kg: 100.0, moves: c03}, long: {pull_kg: 100.0, moves: c03}}}
+  MOST_REALISTIC_C1_all_slow:  {<<: *mr, haul_profile: {short: {pull_kg: 100.0, moves: c03, speed_ms: 0.447},
+                                                        long: {pull_kg: 100.0, moves: c03, speed_ms: 0.447}}}
+  # C2 Erasmus 1965 (5-h man-days): walling 10.5 ph/m3 (p. 291 via Kaner 2022: 182); sled hauling 1,200 kg per
+  # 5-h man-day over <= 200 m (pp. 286-7 via Webster 1991: 852) = 4.167 ph/t; Webster's man-days read as 5-h days
+  MOST_REALISTIC_C2_wall:      {<<: *mr, stage_rates: {build_ph_m3: 10.5}}
+  MOST_REALISTIC_C2_sled200:   {<<: *mr, carry: {ph_per_t: 4.1667, max_m: 200.0}}
+  MOST_REALISTIC_C2_day5:      {<<: *mr, stage_rates: {build_ph_m3: 3.0934, webster_dress_hours: 5.0}}
+  # C3 Boswinkel 2021 (Mycenae, Teichos Dymaion): stage by stage
+  MOST_REALISTIC_C3_quarry:    {<<: *mr, stage_rates: {quarry_ph_m3: {joints_low: 17.5}}}
+  MOST_REALISTIC_C3_load:      {<<: *mr, haul_profile: {short: {load_ph_per_t: 1.2}, long: {load_ph_per_t: 1.2}}}
+  MOST_REALISTIC_C3_set_low:   {<<: *mr, stage_rates: {build_ph_m3: 6.289}}
+  MOST_REALISTIC_C3_set_high:  {<<: *mr, stage_rates: {build_ph_m3: 10.0}}
+  MOST_REALISTIC_C3_dress:     {<<: *mr, stage_rates: {facade_dress_ph_m3: 59.5}}
+  MOST_REALISTIC_C3_all:       {<<: *mr, stage_rates: {quarry_ph_m3: {joints_low: 17.5}, build_ph_m3: 7.849, facade_dress_ph_m3: 59.5},
+                                haul_profile: {short: {load_ph_per_t: 1.2}, long: {load_ph_per_t: 1.2}}}
+  # M1 peer-polity emulation (ASSUMPTION values)
+  MOST_REALISTIC_M1_s1_R5:     {<<: *mr, phase_order: {rule: emulation, strength: 1.0, R_m: 5000}}
+  MOST_REALISTIC_M1_s01_R5:    {<<: *mr, phase_order: {rule: emulation, strength: 0.1, R_m: 5000}}
+  MOST_REALISTIC_M1_s10_R5:    {<<: *mr, phase_order: {rule: emulation, strength: 10.0, R_m: 5000}}
+  MOST_REALISTIC_M1_s1_R2500:  {<<: *mr, phase_order: {rule: emulation, strength: 1.0, R_m: 2500}}
+  MOST_REALISTIC_M1_s1_R10:    {<<: *mr, phase_order: {rule: emulation, strength: 1.0, R_m: 10000}}
+  # M2 mobile master masons (ASSUMPTION values)
+  MOST_REALISTIC_M2_central:   {<<: *mr, masons: *mas_c}
+  MOST_REALISTIC_M2_small:     {<<: *mr, masons: {<<: *mas_c, pool0: 10, per_new: 50}}
+  MOST_REALISTIC_M2_large:     {<<: *mr, masons: {<<: *mas_c, pool0: 200, per_new: 10}}
+  MOST_REALISTIC_M2_complex:   {<<: *mr, masons: {<<: *mas_c, need: complex}}
+  # M3 wetted sand (Fall et al. 2014): dynamic friction -26% / -40% on wettable sand; bounds on any ground
+  MOST_REALISTIC_M3_sand26:    {<<: *mr, haul_profile: {wet: {mu: 0.2812, moves: c0281, mode: route_share, key: sandwet500}}}
+  MOST_REALISTIC_M3_sand40:    {<<: *mr, haul_profile: {wet: {mu: 0.228, moves: c0228, mode: route_share, key: sandwet500}}}
+  MOST_REALISTIC_M3_stream40:  {<<: *mr, haul_profile: {wet: {mu: 0.228, moves: c0228, mode: route_share, key: wet500}}}
+  MOST_REALISTIC_M3_all_half:  {<<: *mr, haul_profile: {wet: {mu: 0.19, moves: c019, mode: all}}}
+  # M4 walked blocks (Lipo et al. 2013: 18 people, 4.35 t, 100 m in 40 min)
+  MOST_REALISTIC_M4_1t:        {<<: *mr, haul_profile: {walk: {<<: *walk, min_kg: 1000}}}
+  MOST_REALISTIC_M4_any:       {<<: *mr, haul_profile: {walk: {<<: *walk, min_kg: 0}}}
+
+# --- 2 Nov 2026 (v12) census scenarios (census/TESTABLE_PLAN.md; code/CENSUS_V12.md; census_v12.py). Each = MOST_REALISTIC +
+# ONE switch, run as NAME_P10 (S22 and X_nurtime unphased). Shared rates below: page or ASSUMPTION / FREE.
+census_v12:
+  lift_ref_kg: 450              # S4_graded: 0.37 ph per course x piece mass / 450 kg (TESTABLE_PLAN D07; 450 = model block median)
+  vault_dress_ph_m3: 59.5       # S2c: Boswinkel 2021: 120-121, Table 7.8 (0.0162-0.0175 m3/ph = 57-62 ph/m3, midpoint)
+  mortar_ph_m3: 6.91            # S16: dig 4.2 (GEN 68, Turner 2018) + mixing and water 2.0 (ASSUMPTION) + carry 0.71 (GEN 78)
+  rubble_ph_m3: 2.0             # S17: rubble collection, Boswinkel 2021: 108 (Table 7.2, scree)
+  rubble_set_ph_m3: 6.29        # S17: rubble setting, Boswinkel 2021: 125, Table 7.11
+  basket_kg: 20                 # S17: carried loads ~20 kg (Erasmus 1965: 287 via Turner 2018: 200); time per m = ramp carry_h_per_m
+  footprint_m2: 113.1           # S15: model tower base 12 m (FREE geometry), per tower
+  soil_ph_m3: 4.91              # S15: dig 4.2 (GEN 68) + carry 0.71 (GEN 78, 205)
+  mudbrick_ph_m3: 8.91          # S19: dig 4.2 (GEN 68) + moulding 4.0 (ASSUMPTION, no source) + carry 0.71 (GEN 78)
+  bichrome_pairs: {basalt: limestone/marble, limestone/marble: basalt}   # S23: ASSUMPTION
+  bichrome_detour: 1.3          # S23: route length / straight line to the contrast outcrop (ASSUMPTION)
+cz_lintel: &cz_lintel {max_asks: 10, fallback_seasons: 5}      # S20: asks per attempt (FREE); N = 5 seasons (FREE)
+cz_levy: &cz_levy {share: 0.5, min_towers: 2}                   # S21: levy share (ASSUMPTION); seats = complexes (TWR_N >= 2)
+cz_food: &cz_food {catchment_file: food/site_food_r1500.csv, arable_share: *food_arable, cropped_share: 0.5,
+                   net_yield_kg_ha: 440, pasture_kg_ha: 15, surplus_share: 0.2, ration_kg: 1.0}   # = S12_central
+cz_carts: &cz_carts {min_towers: 2, payload_t: 5.0, men_per_wagon: 6, loaded_ms: 0.46389, empty_ms: 0.69444, load_ph_per_t: 1.2}
+#   S24: 1.67 km/h loaded, 2.5 km/h empty, 12 oxen per 5 t (Boswinkel 2021: 114-118, App. 4 p. 210); one driver per yoke
+#   (DeLaine via GEN 69); loading 1.2 ph/t (Boswinkel, as C3_load)
+alliance_census:
+# --- 2 Nov 2026 population family (param_audit/POPULATION_SCENARIOS.md): MOST_REALISTIC + ONE population override.
+# Run each as NAME_P10. Sources and status: param_audit/POPULATION.md.
+  MOST_REALISTIC_POP_lilliu30:
+    {<<: *mr, builders_rule: {residents_by_towers: [[30,30],[30,30],[30,30],[30,30],[30,30],[30,30],[30,30]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_webster_household:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,6],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_webster_density:
+    {<<: *mr, builders_rule: {residents_by_towers: [[34,40],[34,40],[34,40],[34,40],[34,40],[34,40],[34,40]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_calo_6km2:
+    {<<: *mr, builders_rule: {residents_by_towers: [[2.5,19.9],[19.9,54.8],[54.8,92.2],[92.2,129.6],[129.6,164.5],[164.5,199.4],[164.5,199.4]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_ugas_high:
+    {<<: *mr, population_ceiling: null, builders_rule: {residents_by_towers: [[9.5,75.9],[75.9,208.6],[208.6,350.9],[350.9,493.2],[493.2,625.9],[625.9,758.7],[625.9,758.7]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_ugas400:
+    {<<: *mr, population_ceiling: null, builders_rule: {residents_by_towers: [[6.9,55.2],[55.2,151.7],[151.7,255.2],[255.2,358.7],[358.7,455.2],[455.2,551.8],[455.2,551.8]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_ugas700:
+    {<<: *mr, population_ceiling: null, builders_rule: {residents_by_towers: [[12.1,96.6],[96.6,265.5],[265.5,446.6],[446.6,627.7],[627.7,796.6],[796.6,965.6],[796.6,965.6]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_anchored:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[70,320],[80,350],[85,375],[90,400],[90,400],[90,400]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_adult04:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}}
+  MOST_REALISTIC_POP_men_only:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.2}}
+  MOST_REALISTIC_POP_adult06:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.6}}
+  MOST_REALISTIC_S4_graded_rate:   {<<: *mr, lift_graded: {mode: rate}}
+  MOST_REALISTIC_S4_graded_order:  {<<: *mr, lift_graded: {mode: order}}
+  MOST_REALISTIC_S20_lintels_1t5:  {<<: *mr, lintel: {<<: *cz_lintel, kg: 1500}}    # Webster 2001: 21; Murru 2018: 229
+  MOST_REALISTIC_S20_lintels_3t0:  {<<: *mr, lintel: {<<: *cz_lintel, kg: 3000}}
+  MOST_REALISTIC_S20_lintels_4t2:  {<<: *mr, lintel: {<<: *cz_lintel, kg: 4200}}
+  MOST_REALISTIC_S15_found_d1:     {<<: *mr, found: {depth_m: 1.0}}                 # Webster 1991: 848 (1-2 m)
+  MOST_REALISTIC_S15_found_d2:     {<<: *mr, found: {depth_m: 2.0}}
+  MOST_REALISTIC_S17_fill_f30:     {<<: *mr, fill: {f: 0.3}}                        # f: ASSUMPTION
+  MOST_REALISTIC_S17_fill_f40:     {<<: *mr, fill: {f: 0.4}}
+  MOST_REALISTIC_S17_fill_f50:     {<<: *mr, fill: {f: 0.5}}
+  MOST_REALISTIC_S2c_vault_v10:    {<<: *mr, vault_dress: {v: 0.10}}                # v: ASSUMPTION (Webster 2015: 51 geometry)
+  MOST_REALISTIC_S2c_vault_v30:    {<<: *mr, vault_dress: {v: 0.30}}
+  MOST_REALISTIC_S22_demog_r035:   {<<: *mr, population_ceiling: null, demog: {r: 0.0035, span_seasons: 550}}  # Webster 1991: 853
+  MOST_REALISTIC_S22_demog_r042:   {<<: *mr, population_ceiling: null, demog: {r: 0.0042, span_seasons: 400}}  # Ialongo 2018: 29
+  MOST_REALISTIC_S4d_spiral_7m5:   {<<: *mr, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_S4d_spiral_full:  {<<: *mr, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_S4e_laner_h3:     {<<: *mr, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}   # Laner 1999: 30
+  MOST_REALISTIC_S4e_laner_h4:     {<<: *mr, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
+  MOST_REALISTIC_S16_mud_m05:      {<<: *mr, mortar: {m: 0.05}}                      # m: ASSUMPTION
+  MOST_REALISTIC_S16_mud_m15:      {<<: *mr, mortar: {m: 0.15}}
+  MOST_REALISTIC_S13_rifascio_p80_s20:  {<<: *mr, rifascio: {min_towers: 4, perimeter_m: 80, height_m: 7.0, thickness_m: 3.0, fill: 0.8, share: 0.2}}
+  MOST_REALISTIC_S13_rifascio_p120_s50: {<<: *mr, rifascio: {min_towers: 4, perimeter_m: 120, height_m: 7.0, thickness_m: 3.0, fill: 0.8, share: 0.5}}
+  MOST_REALISTIC_S23_bichrome_b05: {<<: *mr, bichrome: {b: 0.05}}                    # b: ASSUMPTION
+  MOST_REALISTIC_S23_bichrome_b15: {<<: *mr, bichrome: {b: 0.15}}
+  MOST_REALISTIC_S21_levy_R1.7_D40:  {<<: *mr, levy: {<<: *cz_levy, R_m: 1680, days: 40}}    # Moravetti et al. 2009: 361; Webster 1991: 853
+  MOST_REALISTIC_S21_levy_R1.7_D90:  {<<: *mr, levy: {<<: *cz_levy, R_m: 1680, days: 90}}
+  MOST_REALISTIC_S21_levy_R1.1_D40:  {<<: *mr, levy: {<<: *cz_levy, R_m: 1130, days: 40}}
+  MOST_REALISTIC_S21_levy_R11.9_D40: {<<: *mr, levy: {<<: *cz_levy, R_m: 11900, days: 40}}
+  MOST_REALISTIC_M2_regional_tribes:  {<<: *mr, masons: *mas_c, mason_regions: tribes}      # 54 G133 tribes
+  MOST_REALISTIC_M2_regional_regions: {<<: *mr, masons: *mas_c, mason_regions: regions8}    # 8 k-means regions (ASSUMPTION proxy)
+  MOST_REALISTIC_S12b_feast_b05:   {<<: *mr, feast_attract: {<<: *cz_food, beta4: 0.5}}     # beta4: ASSUMPTION
+  MOST_REALISTIC_S12b_feast_b2:    {<<: *mr, feast_attract: {<<: *cz_food, beta4: 2.0}}
+  MOST_REALISTIC_S21_levy_masters: {<<: *mr, levy: {<<: *cz_levy, R_m: 1680, days: 40}, masons: *mas_c}
+  MOST_REALISTIC_S19_mudbrick_h2:  {<<: *mr, mudbrick: {h_m: 2.0}}                   # h: ASSUMPTION
+  MOST_REALISTIC_S19_mudbrick_h4:  {<<: *mr, mudbrick: {h_m: 4.0}}
+  MOST_REALISTIC_S18_clearance_y10:  {<<: *mr, clearance: {Y_t_ha: 10, R_m: 1500}}   # Y: ASSUMPTION (no published yield)
+  MOST_REALISTIC_S18_clearance_y50:  {<<: *mr, clearance: {Y_t_ha: 50, R_m: 1500}}
+  MOST_REALISTIC_S18_clearance_y200: {<<: *mr, clearance: {Y_t_ha: 200, R_m: 1500}}
+  MOST_REALISTIC_S24_carts:        {<<: *mr, carts: *cz_carts}
+  MOST_REALISTIC_S25_size:         {<<: *mr, size_draw: {floor_shares: [0.58, 0.38, 0.04], volume: [0.6, 1.0, 1.4], height: [0.6, 1.0, 1.4]}}
+  #   S25: shares Atzeni & Frau 2023: 326 (residual floors, not original); volume / height factors ASSUMPTION
+  # X_nurtime (R06): single-site predictions (3-tower site at Gergei), fixed crew c (ASSUMPTION: NurTime crew unknown)
+  MOST_REALISTIC_X_nurtime_stair_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair}
+  MOST_REALISTIC_X_nurtime_lever_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: lever}
+  MOST_REALISTIC_X_nurtime_ramp_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: ramp}
+  MOST_REALISTIC_X_nurtime_spiral7m5_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_spiralfull_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_laner3_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
+  MOST_REALISTIC_X_nurtime_laner4_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
+  MOST_REALISTIC_X_nurtime_stair_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair}
+  MOST_REALISTIC_X_nurtime_lever_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: lever}
+  MOST_REALISTIC_X_nurtime_ramp_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: ramp}
+  MOST_REALISTIC_X_nurtime_spiral7m5_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_spiralfull_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_laner3_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
+  MOST_REALISTIC_X_nurtime_laner4_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
+  MOST_REALISTIC_X_nurtime_stair_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair}
+  MOST_REALISTIC_X_nurtime_lever_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: lever}
+  MOST_REALISTIC_X_nurtime_ramp_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: ramp}
+  MOST_REALISTIC_X_nurtime_spiral7m5_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_spiralfull_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_laner3_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
+  MOST_REALISTIC_X_nurtime_laner4_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
+# --- 2 Nov 2026 audited parameter checks (param_audit/AUDITED_LIT_SPEC.md): single-change runs and the combined run.
+# Entries marked [config copy] are identical to MOST_REALISTIC in this file; run them ONLY with the named config copy.
+  MOST_REALISTIC_AUD_drag:      {<<: *mr}    # [config copy config_v12_aud_drag.yaml]      transport.drag_speed_ms 0.27 (de Haan 2009: 7, calculated, comparative)
+  MOST_REALISTIC_AUD_density:   {<<: *mr}    # [config copy config_v12_aud_density.yaml]   basalt 3000 (Lilliu 1955), granite 2700 (Sanna & Atzeni, Table 6.2 p. 96)
+  MOST_REALISTIC_AUD_geometry:  {<<: *mr}    # [config copy config_v12_aud_geometry.yaml]  tower_height_m 14 (Webster 1991), top_diam_m 6.8 (Contu 2002 batter)
+  MOST_REALISTIC_AUD_facade:    {<<: *mr}    # [config copy config_v12_aud_facade.yaml]    facade 131.2 / 40.95 (Boswinkel 2021: 144; negligible)
+  MOST_REALISTIC_AUD_walk:      {<<: *mr}    # [config copy config_v12_aud_walk.yaml]      return_walk_ms 1.39 (Tobler 1993; negligible)
+  MOST_REALISTIC_AUD_joints:    {<<: *mr, stage_rates: {quarry_ph_m3: {joints_low: 11.1}}}   # on config_v12.yaml itself (Boswinkel 2021: 108; negligible)
+  MOST_REALISTIC_AUDITED_LIT:   {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}}   # [config copy config_v12_audited.yaml]
+
+# --- FULL AUDITED companion (specified by the authors): AUDITED_LIT with residents FIXED at the midpoint of each MR tower-class
+# range (U[m, m] = m; lit.draw_residents still makes its one uniform draw, so block draws are unchanged), adult_share 0.4.
+  MOST_REALISTIC_AUDITED_LIT_POPFROZEN: {<<: *mr, builders_rule: {residents_by_towers: [[22.5,22.5],[75,75],[147.5,147.5],[222.5,222.5],[295,295],[365,365],[365,365]], adult_share: 0.4}}
+# --- LOO (specified by the authors): full audited set minus ONE audited group; run ONLY with config_full_audited_loo_geometry.yaml
+  MOST_REALISTIC_LOO_geometry: {<<: *mr}
+
+# --- v14 near-site face rule (specified by the authors; SPEC_ADDENDUM_2026-11-05_near_face.md). none / 0 = v12 behaviour.
+quarry:
+  near_site_fixed_face_m: 1000

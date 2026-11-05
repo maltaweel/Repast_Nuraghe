@@ -1,5 +1,5 @@
 # V13 A5FR_rep_pc (2 Nov 2026) = config_full_audited.yaml + ONE new scenario A5_full_freerider_V13reppc = A5_full_freerider + reputation: true, partner_choice: true (reputation + partner choice); nothing else changed.
-# Run ONLY with code/ (the v15 code; the run's code_v13/ + the near-site rule, see CODE_PROVENANCE.md; the switches do not exist in the frozen v12 code or the v14 code): --alliance A5_full_freerider_V13reppc. Notes: ODD 7.15, CODE_PROVENANCE.md
+# Run ONLY with a code with the switches (code/ from v15 on; the v13 runs used the run's code_v13/ = code/ before the v14 update, see CODE_PROVENANCE.md; the switches do not exist in the frozen v12 code or the v14 code): --alliance A5_full_freerider_V13reppc. Notes: ODD 7.15, CODE_PROVENANCE.md
 # FULL AUDITED config (2 Nov 2026, specified by the authors): copy of outputs/config_v12_audited.yaml (AUDITED_LIT, all 9 audited values)
 # + mr_work_party.adult_share 0.5 -> 0.4 (every MR scenario that inherits *mr_work_party), + per-scenario handling of
 # param_audit/AUDITED_LIT_SPEC.md section 3 (S4d_spiral_full h_m 15 -> 14; S11 type_cost heights 5/14, 7/14, 10/14),
@@ -289,7 +289,7 @@ alliance:
     A4_trust_track:    {requests: true, trust: true, tracks: true}
     A5_full:           {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true}
     A5_full_freerider: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2}
-    A5_full_freerider_V13reppc: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2, reputation: true, partner_choice: true}   # V13 A5FR_rep_pc: run ONLY with this config and code/ (the v15 code, or the run's code_v13/; CODE_PROVENANCE.md)
+    A5_full_freerider_V13reppc: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2, reputation: true, partner_choice: true}   # V13 A5FR_rep_pc: run ONLY with this config and a code with the v13 switches (code/ from v15 on; the v13 runs used the run's code_v13/ = code/ before the v14 update; CODE_PROVENANCE.md)
   verify_scenarios:
     A0_verify:         {b: 1.0, setup_mh: 0, imitation: false, fixed_actions: {quarry_face: 0}}
   sensitivity:        # on A5_full, 10 seeds each (full factorial)

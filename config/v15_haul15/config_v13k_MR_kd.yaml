@@ -1,5 +1,5 @@
 # V13kd _MR_kd (3 Nov 2026) = config_full_audited.yaml + ONE new scenario MOST_REALISTIC_AUDITED_LIT_V13kd = MOST_REALISTIC_AUDITED_LIT + trusted_nodist: true (no distance penalty in reciprocal dyads); nothing else changed.
-# Run ONLY with code/ (the v15 code, or the run's code_v13/; trusted_nodist exists from v13kd): --alliance MOST_REALISTIC_AUDITED_LIT_V13kd_P10. Notes: ODD 7.15, CODE_PROVENANCE.md section 11, WRITEUP_V13_SOCIAL.md
+# Run ONLY with a code that has trusted_nodist (code/ from v15 on; the v13 runs used the run's code_v13/ = code/ before the v14 update; it exists from v13kd): --alliance MOST_REALISTIC_AUDITED_LIT_V13kd_P10. Notes: ODD 7.15, CODE_PROVENANCE.md section 11, WRITEUP_V13_SOCIAL.md
 # FULL AUDITED config (2 Nov 2026, specified by the authors): copy of outputs/config_v12_audited.yaml (AUDITED_LIT, all 9 audited values)
 # + mr_work_party.adult_share 0.5 -> 0.4 (every MR scenario that inherits *mr_work_party), + per-scenario handling of
 # param_audit/AUDITED_LIT_SPEC.md section 3 (S4d_spiral_full h_m 15 -> 14; S11 type_cost heights 5/14, 7/14, 10/14),
@@ -628,7 +628,7 @@ alliance_census:
 # --- FULL AUDITED companion (specified by the authors): AUDITED_LIT with residents FIXED at the midpoint of each MR tower-class
 # range (U[m, m] = m; lit.draw_residents still makes its one uniform draw, so block draws are unchanged), adult_share 0.4.
   MOST_REALISTIC_AUDITED_LIT_POPFROZEN: {<<: *mr, builders_rule: {residents_by_towers: [[22.5,22.5],[75,75],[147.5,147.5],[222.5,222.5],[295,295],[365,365],[365,365]], adult_share: 0.4}}
-# --- V13kd _MR_kd (3 Nov 2026): run ONLY with config_v13k_MR_kd.yaml and code/ (the v15 code, or the run's code_v13/; CODE_PROVENANCE.md), as MOST_REALISTIC_AUDITED_LIT_V13kd_P10
+# --- V13kd _MR_kd (3 Nov 2026): run ONLY with config_v13k_MR_kd.yaml and a code with the v13 switches (code/ from v15 on; the v13 runs used the run's code_v13/ = code/ before the v14 update; CODE_PROVENANCE.md), as MOST_REALISTIC_AUDITED_LIT_V13kd_P10
   MOST_REALISTIC_AUDITED_LIT_V13kd: {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}, trusted_nodist: true}
 
 # --- v14 near-site face rule (specified by the authors; SPEC_ADDENDUM_2026-11-05_near_face.md). none / 0 = v12 behaviour.

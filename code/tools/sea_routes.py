@@ -451,6 +451,19 @@ def main(cfg_path, speeds):
         h["quarry_region"] = -1
         h.loc[use, "quarry_region"] = lab_flat[qf[use]]
         h["trip_h"] = np.where(use, st, land_h)
+        # v16 (addendum 4 L4): every found route (la != lb), whatever the mode, in r_* columns, so the model can
+        # choose sea vs land on the cost it charges (flag add4.sea_priced_as_charged). The columns above are unchanged.
+        rf = found & (la != lb)
+        qa = np.where(rf, rr["q_flat"], -1).astype(np.int64)
+        h["r_found"] = rf
+        for c_, k_ in (("r_hf1", "hf1"), ("r_hm1", "hm1"), ("r_hf2", "hf2"), ("r_hm2", "hm2")):
+            h[c_] = np.where(rf, rr[k_], np.nan)
+        h["r_sea_km"] = np.where(rf, rr["sea_m"] / 1000.0, np.nan)
+        h["r_hoist_m"] = np.where(rf, hA + hB, np.nan)
+        h["r_quarry_x"] = np.where(rf, T.c + (qa % W + 0.5) * T.a, np.nan)
+        h["r_quarry_y"] = np.where(rf, T.f + (qa // W + 0.5) * T.e, np.nan)
+        h["r_quarry_region"] = np.where(rf, lab_flat[np.maximum(qa, 0)], -1)
+        h["r_quarry_stone"] = [name_of[int(code_flat[q])] if q >= 0 else "" for q in qa]
         h.to_csv(os.path.join(out, f"sites_haul_sea{kn:g}kn.csv"), index=False)
         print(f"[8] wrote sites_haul_sea{kn:g}kn.csv: sea {int(use.sum())} of {int(elig.sum())} eligible sites", flush=True)
     del label, lab_flat, code, code_flat

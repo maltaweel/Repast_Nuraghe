@@ -29,24 +29,33 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   successful neighbours, and gains skill with experience (ODD sections 3-4). The 10 km help radius is the headline
   value; a sensitivity ran it at 5 and 15 km on the audited headline (`MOST_REALISTIC_AUDITED_LIT_R5_P10` /
   `_R15_P10`, `config/config_R5_audited.yaml` / `config_R15_audited.yaml`, ODD Appendix B).
-- **Quarry face choice and the near-site rule (v14, kept in v15).** Each site has up to 5 candidate quarry faces (the k-best
+- **Quarry face choice and the near-site rule (v14, kept in v15 and v16_final).** Each site has up to 5 candidate quarry faces (the k-best
   least-cost routes); at each tower it picks one by epsilon-greedy learning (exploration with epsilon = 0.1,
   otherwise the face with the best learned value) or by imitating a cheaper neighbour. From 5 November 2026 the code
-  has a near-site rule (config key `quarry.near_site_fixed_face_m`, 1,000 m in the v15 configs `config/v15_haul15/`;
+  has a near-site rule (config key `quarry.near_site_fixed_face_m`, 1,000 m in the v15 and v16_final configs;
   absent or 0 = off): a site whose dry-ground route to its nearest (cheapest) face is at most 1,000 m always quarries
   from that face, with no exploration, value choice or imitation of the face (the other choices are unchanged).
-  Sites farther away keep the choice among their faces. With the key off the outputs are identical to the frozen
-  code (ODD section 7.6; `code/CHANGES_V14_NEARFACE.md`).
+  Sites farther away keep the choice among their faces. With the key off the v14 code reproduced the frozen code
+  (ODD section 7.6; `code/CHANGES_V14_NEARFACE.md`).
 - **Minimum haul (v15).** `transport.min_haul_flatm` is 15 m in the v15 configs (100 m in the audited configs): the
   haul of a site that sits on its outcrop, and the floor of every whole route (drag and walk back; relay legs have
   no minimum). It is a config value only (no code change; the sea tables, which apply it, are rebuilt per config;
-  ODD section 7.5; `code/CHANGES_V15_HAUL15.md`). The results in the paper are being regenerated with v15: the v15
-  code with the v15 configs (this minimum haul and the near-site rule).
+  ODD section 7.5; `code/CHANGES_V15_HAUL15.md`). The v16_final configs keep it.
+- **v16_final (5 November 2026, the current `code/`).** The on-outcrop test uses the stone set a site actually
+  quarries (v15b). Four rules sit behind flags in a top-level `add4:` config block: L2 `bedrock_everywhere` (every
+  site quarries at the bedrock rate) and L3 `load_per_tonne` (loading per tonne) are ON by default, L1
+  `rails_cost_choice` and L4 `sea_priced_as_charged` OFF. The summary output adds the island-wide 95th percentile of
+  site finish seasons and spread statistics across seeds; the relay leg-1 "nearer the quarry" candidate filter is
+  removed; three fixes: D3 (a stage with no work creates no help request, walk, trust change or skill credit), D6
+  (join mode prices each party at its own skill), D11 (the site's stone is the class of the face it hauls from). The
+  run signature includes `CODE_VERSION` and the add4 settings (`code/CHANGES_V15B_OUTCROP.md`, `CHANGES_V16.md`,
+  `CHANGES_V16_FINAL.md`, `code/METHODS.md`). The results in the paper are being regenerated with v16_final: this
+  code with the configs in `config/v16_final/`. The ODD describes the rules up to v15.
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
   and island years (the time until the last tower is finished), over 100 seeds per scenario (ODD section 4.11).
-- **v13 social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), off by default and in the headline, used only by five v13 scenarios; with them off the outputs are identical to the frozen code (ODD section 7.15; `CODE_PROVENANCE.md`). A rule key `reputation_rule` (`all`, the default, or `gentle`: only defectors' and ungrateful refusals cost standing) is used by three v13g scenarios (`config/config_v13g_*.yaml`); with the default the outputs and signatures of the v13 runs are unchanged. A further switch `trusted_nodist` (no distance penalty in the acceptance of help between reciprocal partners, after Kasper & Borgerhoff Mulder 2015, Fig. 2) is used by two v13kd scenarios (`config/config_v13k_*.yaml`; ODD section 7.16); with it absent the outputs and signatures of every earlier run are unchanged. These switches are in the current `code/` (v15 = the v13 code + the near-site rule); the v14 code (5 November 2026, superseded) did not have them (`CODE_PROVENANCE.md`).
+- **v13 social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), off by default and in the headline, used only by five v13 scenarios; with them off the v13 code reproduces the frozen code (ODD section 7.15; `CODE_PROVENANCE.md`). A rule key `reputation_rule` (`all`, the default, or `gentle`: only defectors' and ungrateful refusals cost standing) is used by three v13g scenarios (`config/config_v13g_*.yaml`); with the default the outputs and signatures of the v13 runs are unchanged. A further switch `trusted_nodist` (no distance penalty in the acceptance of help between reciprocal partners, after Kasper & Borgerhoff Mulder 2015, Fig. 2) is used by two v13kd scenarios (`config/config_v13k_*.yaml`; ODD section 7.16); with it absent the outputs and signatures of every earlier run are unchanged. These switches are in `code/` from v15 on (v15 = the v13 code + the near-site rule; kept in v16_final); the v14 code (5 November 2026, superseded) did not have them (`CODE_PROVENANCE.md`).
 - **Parameters.** No parameter is calibrated: every value has an audited source (author, year, page) or is
   declared an assumption (`param_audit/`).
 
@@ -108,20 +117,21 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
 
 ```
 code/            the model and its tools: the code of the full audited run + the v13 social switches + the near-site face
-                 rule (v15; CODE_PROVENANCE.md)
+                 rule + the v15b / v16 changes (v16_final; CODE_PROVENANCE.md)
   model.py         entry point (baseline, cooperation, literature, alliance and pre-network scenarios)
   alliance.py      adaptive alliances / MOST_REALISTIC; lit.py, sea.py, phasing.py, pre_networks.py, census_v12.py
   preprocess.py    haul tables (least-cost quarry -> site); nbcommon.py config loader + Dijkstra
   tools/ tests/    derived-input builders, post hoc analyses, verification
   full_chain.sh    the serialized chain that ran the full audited queue
-config/          config_full_audited.yaml (+ 84 variants, tost_configs/), v15_haul15/ (the v15 rerun configs),
-                 v14_nearface/ (the superseded v14 rerun configs, kept as a record), queues/, sea_expect/, check_sea_meta.py
+config/          config_full_audited.yaml (+ 84 variants, tost_configs/), v16_final/ (the v16_final run configs),
+                 v15_haul15/, v14_nearface/ (the superseded v15 and v14 rerun configs, kept as a record), queues/,
+                 sea_expect/, check_sea_meta.py
 data/            data/nurnet/ (Nurnet's data, included); the other inputs are fetched (data/README.md; data/derived/README.md)
 notebooks/       01-05: setup, inputs (fetch_data.py), scenarios, analysis, audit; HOW_TO_USE.md; Jupyter or Colab
 param_audit/     parameter audit and traceability (public-safe copies)
 tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders; not in the frozen snapshot)
 outputs/         everything a run writes (NOT committed, except reference/ and summary/ for the audit)
-CODE_SHA256SUMS  checksums of the run's code snapshot (CODE_V13_/V14_/V15_SHA256SUMS: v13, v14, v15);  CODE_PROVENANCE.md  what differs and why
+CODE_SHA256SUMS  checksums of the run's code snapshot (CODE_V13_/V14_/V15_/V16_FINAL_SHA256SUMS: v13, v14, v15, v16_final);  CODE_PROVENANCE.md  what differs and why
 ```
 
 ## Requirements / Installation
@@ -230,27 +240,45 @@ cd $RUN && NURAGHE_RUN_DIR=$RUN PYTHON=$PYTHON CUTOFF="2099-12-31 23:59" \
 deadline; dropped entries are listed in `outputs/logs/dropped.tsv`). Progress lines go to `$RUN/FULL_NOTES.md`.
 The queue was estimated at about 34 hours of wall time on the 8 GB machine that ran it.
 
-### The v15 rerun (minimum haul 15 m + near-site rule, every scenario)
+### The v16_final run (the current code, every scenario)
 
-`config/queues/queue_v15.tsv` holds every entry of the full audited queue, the v13 social entries and the two
+`config/queues/queue_v16_final.tsv` holds the 432 model entries of the v15 queue, in the same order, each on its
+config in `config/v16_final/` (the v15 config of the same name; `output_dir` points to `v16_final/outputs` and
+`cache_dir` to its own `v16_final/outputs/caches/<config name>`, relative to the config; the two loading sensitivity
+rows `alt_load033` / `alt_load05` keep their own loading with `add4: {load_per_tonne: false}`). The queue has no
+preparation entries: each config's cache holds the prepared tables of the cache that the v15 config of the same name
+uses, built with the current `code/`. Its `preprocess.py` has the v15b on-outcrop fix, so a base cache built with an
+earlier code differs in one row (site NID9220200, `on_outcrop`): rebuild the base cache with `code/`, run the `cmd`
+entries of `queue_v15.tsv` with `code/` (sea tables of every cache, `cache_alt_stones7` inputs), then link every entry
+of that cache except `runs/` into `$RUN/v16_final/outputs/caches/<config name>/` and give each its own empty `runs/`.
+`code/v16f_chain.sh` runs the queue like `full_chain.sh`: copy `config/v16_final/*.yaml` to `$RUN/v16_final/configs/`,
+write the queue to `$RUN/v16_final/queue_v16_final.tsv` with the same `sed`, link `$RUN/code_v16_final` to
+`$REPO/code`, and start `bash code/v16f_chain.sh` from `$RUN` with `NURAGHE_RUN_DIR=$RUN`. The run signature
+includes `CODE_VERSION` and the effective add4 settings, so no part file of an earlier version is reused.
+
+### The v15 rerun (superseded, kept as a record)
+
+The v15 rerun (minimum haul 15 m + near-site rule, every scenario) is superseded by v16_final; its configs and queue
+are kept as a record. It runs with the v15 code (`code/` before the v16_final update, git history), which also
+holds `v15_chain.sh`. `config/queues/queue_v15.tsv` holds every entry of the full audited queue, the v13 social entries and the two
 help-radius entries, each on its config in `config/v15_haul15/` (the audited or v13 config with
 `transport.min_haul_flatm: 15` and `quarry.near_site_fixed_face_m: 1000`; the 200 / 210 / 300 m minimum-haul
 sensitivity configs keep their value; `cache_dir`/`output_dir` point to `v15_haul15/outputs`, relative to the
 config), plus a 10 m minimum-haul sensitivity of the headline (`config_full_audited_haul10.yaml`). Its first
 entries (`kind` = cmd) rebuild the sea tables of every cache at the new minimum and the own inputs of
-`cache_alt_stones7`. `code/v15_chain.sh` runs it like `full_chain.sh`. In the run folder above: copy
+`cache_alt_stones7`. `v15_chain.sh` runs it like `full_chain.sh`. In the run folder above: copy
 `config/v15_haul15/*.yaml` to `$RUN/v15_haul15/configs/`, write the queue to `$RUN/v15_haul15/queue_v15.tsv` with the
-same `sed`, link `$RUN/code_v15_haul15` to `$REPO/code`, give `$RUN/v15_haul15/outputs/cache*` the same inputs as
-the audited caches (links; `sea/` an empty real folder), and start `bash code/v15_chain.sh` from `$RUN` with
+same `sed`, link `$RUN/code_v15_haul15` to a checkout of the v15 `code/`, give `$RUN/v15_haul15/outputs/cache*` the same inputs as
+the audited caches (links; `sea/` an empty real folder), and start `bash v15_chain.sh` (from that checkout) from `$RUN` with
 `NURAGHE_RUN_DIR=$RUN`. Its runs get their own signatures, so the audited outputs are not touched.
 
 ### The v14 rerun (superseded, kept as a record)
 
-The v14 rerun (near-site rule only, minimum haul 100 m) is superseded by v15 and was not completed; its configs and
+The v14 rerun (near-site rule only, minimum haul 100 m) is superseded by v15 (and v16_final) and was not completed; its configs and
 queue are kept as a record. `config/queues/queue_v14.tsv` holds the entries of the full audited queue that the near-site rule affects (every
 entry with a quarry-face choice), each on its config in `config/v14_nearface/` (the audited config with
 `quarry.near_site_fixed_face_m: 1000`; `cache_dir`/`output_dir` point to `v14_nearface/outputs`, relative to the
-config). The current `code/` runs these configs as the v14 code did (the v13 switches are off in them);
+config). The v15 `code/` (git history) runs these configs as the v14 code did (the v13 switches are off in them);
 `v14_chain.sh` is in the git history of `code/`.
 
 ## Parameter audit and traceability
@@ -281,6 +309,16 @@ Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma 
 
 ## Changes
 
+- 2026-11-05 (v16_final): `code/` is now the v16_final code: the v15 code + the v15b on-outcrop fix (`preprocess.py`:
+  the on-outcrop test uses the stone set a site actually quarries) + the addendum-4 flags in an `add4:` config block
+  (L2 `bedrock_everywhere` and L3 `load_per_tonne` ON by default, L1 `rails_cost_choice` and L4
+  `sea_priced_as_charged` OFF), the island-wide 95th percentile of site finish seasons (L5), S1-S3, spread statistics
+  across seeds in the summary output, the relay leg-1 "nearer the quarry" filter removed, fixes D3, D6 and D11, and
+  `CODE_VERSION` in the run signature (`code/CHANGES_V15B_OUTCROP.md`, `CHANGES_V16.md`, `CHANGES_V16_FINAL.md`,
+  `code/v16f_chain.sh`, new tests `tests/test_add4_flags.py`, `tests/test_v16_final.py`). v16_final configs
+  `config/v16_final/`, queue `config/queues/queue_v16_final.tsv`, checksums `CODE_V16_FINAL_SHA256SUMS`; the v15
+  configs and queue are kept as a record (superseded; `v15_chain.sh` is in the git history of `code/`). The results
+  in the paper are being regenerated with v16_final.
 - 2026-11-05 (v15): minimum haul `transport.min_haul_flatm` 15 m instead of 100 m (the haul of a site on its
   outcrop and the floor of every whole route; config only), together with the near-site rule, on every scenario.
   `code/` is now the v15 code: the v13 code (social switches `reputation`, `partner_choice`, `tie_imitation`,

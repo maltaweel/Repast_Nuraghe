@@ -164,6 +164,53 @@ def oxen_yokes(mass, o):
         y[bad] += 1
 
 
+# --------------------------------------------------------------------------- v16: addendum 4 flags
+# Addendum 4 of the specification, L1-L4, each behind its own flag in the top-level config block `add4:`.
+# code_v16_flags: default OFF (5 Nov 2026). code_v16_final (CHANGES_V16_FINAL.md): L2 bedrock_everywhere and L3
+# load_per_tonne default ON (kept after the flag test, CHANGES_V16.md); L1 rails_cost_choice and L4 sea_priced_as_charged default
+# OFF (not kept). The flags stay, so a row can still switch any of them with its own `add4:` block.
+ADD4_FLAGS = ("rails_cost_choice", "bedrock_everywhere", "load_per_tonne", "sea_priced_as_charged")
+ADD4_DEFAULTS = {"rails_cost_choice": False, "bedrock_everywhere": True, "load_per_tonne": True,
+                 "sea_priced_as_charged": False, "rail_lay_mh_per_m": 2.0, "load_ph_per_t": 1.2}
+
+# Code version of every result-changing code path (code_v16_final). Hashed into EVERY run signature (alliance.signature,
+# model.run_signature) together with the effective add4 settings, so part files written by older code are never reused.
+CODE_VERSION = "2026-11-05-v16_final"
+
+
+def add4(cfg):
+    """Effective addendum-4 settings: ADD4_DEFAULTS updated by cfg['add4'] (flags as bool, params as float)."""
+    d = dict(ADD4_DEFAULTS)
+    d.update(cfg.get("add4") or {})
+    for k in ADD4_FLAGS:
+        d[k] = bool(d[k])
+    d["rail_lay_mh_per_m"] = float(d["rail_lay_mh_per_m"])
+    d["load_ph_per_t"] = float(d["load_ph_per_t"])
+    return d
+
+
+def add4_any(cfg):
+    return any(add4(cfg)[k] for k in ADD4_FLAGS)
+
+
+_CPT = {}
+
+
+def crews_per_tonne(cfg, pull, mf):
+    """Expected sledge crew (person-trips) per tonne of stone for blocks of the config's lognormal draw scaled by the
+    S6 mass factor mf: E[ceil(m mf / pull)] / E[m mf / 1000]. Fixed sample (default_rng(0), 200,000 blocks, as
+    tools/sea_routes.py mean_crew), so it is deterministic and seed-independent (used only for the v16 static
+    choices L1 / L4, which are made once per site before the run)."""
+    s = cfg["stone"]
+    key = (float(pull), float(mf), float(s["block_median_kg"]), float(s["block_sigma"]), float(s["block_min_kg"]),
+           float(s["block_max_kg"]))
+    if key not in _CPT:
+        m = np.clip(np.random.default_rng(0).lognormal(np.log(s["block_median_kg"]), s["block_sigma"], 200000),
+                    s["block_min_kg"], s["block_max_kg"]) * float(mf)
+        _CPT[key] = (float(np.ceil(m / float(pull)).mean()) / float(m.mean() / 1000.0), float(m.mean() / 1000.0))
+    return _CPT[key]
+
+
 # --------------------------------------------------------------------------- mixed (per-site) combinations
 # A scenario with a `mixed:` block (REALISTIC) picks, for every site, one value per axis from site attributes.
 # The result is an ordinary single-rule scenario dict per site (`resolve_site`), so stage_hours, transport and
@@ -178,14 +225,19 @@ def site_types(cfg, field):
     return dict(zip(t[uid], t[field]))
 
 
-def mixed_haul(cfg, lit, load):
+def mixed_haul(cfg, lit, load, use_long=None):
     """Haul table of a mixed scenario: each site's row from the short-haul (sledge) table, replaced by the
     long-haul table's row where the short-haul route is longer than long_min_haul_m. `load(path)` reads one
-    haul table (model.load_haul). Adds the per-site technique columns lit_haul_rule, lit_type."""
+    haul table (model.load_haul). Adds the per-site technique columns lit_haul_rule, lit_type.
+    v16 (addendum 4 L1, flag add4.rails_cost_choice): `use_long` (bool per row of the short table) replaces the
+    long_min_haul_m threshold; None (default) = the threshold rule, unchanged. Rows with no long-haul route stay short."""
     m = lit["mixed"]
     short = load(haul_csv(cfg, {"haul": m["short"]["haul"]}))
     lng = load(haul_csv(cfg, {"haul": m["long"]["haul"]})).set_index("UID").reindex(short.UID).reset_index()
-    use_long = (short.haul_m.to_numpy() > float(m["long_min_haul_m"])) & lng.haul_flatm.notna().to_numpy()
+    if use_long is None:
+        use_long = (short.haul_m.to_numpy() > float(m["long_min_haul_m"])) & lng.haul_flatm.notna().to_numpy()
+    else:
+        use_long = np.asarray(use_long, bool) & lng.haul_flatm.notna().to_numpy()
     h = short.copy()
     for c in short.columns:
         if c not in ("UID", "uid_int"):
@@ -203,6 +255,8 @@ def resolve_site(cfg, lit, rec):
     d = {k: v for k, v in lit.items() if k != "mixed"}
     d.update(m[rec["lit_haul_rule"]])                                     # mu, haul (+ oxen in a variant)
     d["quarry"] = m["quarry_on_outcrop"] if bool(rec["on_outcrop"]) else m["quarry_off_outcrop"]
+    if add4(cfg)["bedrock_everywhere"]:                                  # v16 L2: bedrock along joints everywhere
+        d["quarry"] = m["quarry_on_outcrop"]
     if tw <= int(m["dress_none_max_towers"]):
         d["dress"] = "none"
     elif tw >= int(m["dress_fine_min_towers"]):

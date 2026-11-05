@@ -47,6 +47,42 @@ def components(pairs):
     return list(roots.values())
 
 
+STAGE_KEYS = ["quarry", "dress", "transport", "build", "lift", "setup", "track", "walk"]
+
+
+def spread(x):
+    """v16: spread of a per-seed quantity across seeds: mean, sd (sample, ddof=1; 0 for one seed), min, max, p5, p95
+    (numpy linear percentiles)."""
+    x = np.asarray(x, dtype=float)
+    return {"mean": float(x.mean()), "sd": float(x.std(ddof=1)) if x.size > 1 else 0.0, "min": float(x.min()),
+            "max": float(x.max()), "p5": float(np.percentile(x, 5)), "p95": float(np.percentile(x, 95))}
+
+
+def island_years_q(sites, q=95.0):
+    """v16 L5 (addendum 4): per seed, the sum over cohorts of the q-th percentile site finish in seasons from the cohort
+    start (finish_season - cohort start season + 1). q = 100 (the max) gives the island years (max finish_season) of a
+    phased run, since each cohort starts the season after the previous one finished. Unphased runs (no 'phase' column):
+    one cohort starting in season 1. S10 / S11 unit cohorts: a site counts in the cohort of its last unit
+    (phase_add if set), the cohort start = the earliest start_season of the sites whose first unit is in it (else the
+    season after the previous cohort's last finish). Returns a Series indexed by seed."""
+    out = {}
+    for s, d in sites.groupby("seed"):
+        if "phase" not in d.columns:
+            out[s] = float(np.percentile(d.finish_season.to_numpy(), q))
+            continue
+        ph = d.phase.to_numpy()
+        last = np.where(d.phase_add.to_numpy() >= 0, d.phase_add.to_numpy(), ph) if "phase_add" in d.columns else ph
+        tot, prev_end = 0.0, 0
+        for k in sorted(set(last.tolist())):
+            fin = d.finish_season.to_numpy()[last == k]
+            st0 = d.start_season.to_numpy()[ph == k]
+            start = int(st0.min()) if st0.size else prev_end + 1
+            tot += float(np.percentile(fin - start + 1, q))
+            prev_end = int(fin.max())
+        out[s] = tot
+    return pd.Series(out)
+
+
 def write_scenario(cfg, S, haul, run_dir, seeds, out_dir, name, write_shp=True):
     os.makedirs(out_dir, exist_ok=True)
     H = float(cfg["hours_per_day"])
@@ -171,6 +207,37 @@ def write_scenario(cfg, S, haul, run_dir, seeds, out_dir, name, write_shp=True):
     st["max_alliance_size"] = int(np.max(sizes)) if sizes else 0
     st["track_cells_mean"] = n_track_cells
     st["relay_share_towers"] = float((lg.relay > 0).mean()) if len(lg) else 0.0
+    # v16 S1: relays chosen (strategy) vs relays made (hand-off executed); relay_share_towers above = the old name of
+    # relay_share_chosen, kept as an alias so existing readers keep working
+    st["relay_share_chosen"] = st["relay_share_towers"]
+    st["relay_share_made"] = float(lg.relay_made.mean()) if (len(lg) and "relay_made" in lg.columns) else float("nan")
+    # v16 spread across seeds (existing keys unchanged; new keys added): island years (= island seasons), the L5
+    # island_years_p95, total man-hours and man-hours by stage
+    # L5 (project team 5 Nov, replaces the per-cohort sum, which breaks when cohorts overlap): island_years_p95 = the
+    # island-wide 95th percentile of the site finish seasons (numpy linear); the per-cohort sum is kept as
+    # island_years_p95_cohortsum for the record
+    by = pd.DataFrame({"island_seasons": isl,
+                       "island_years_p95": sites.groupby("seed").finish_season.quantile(0.95),
+                       "island_years_p95_cohortsum": island_years_q(sites, 95.0), "island_mh": pr})
+    for k in STAGE_KEYS:
+        by["island_mh_" + k] = sites.groupby("seed")["mh_" + k].sum()
+    by.index.name = "seed"
+    by.to_csv(os.path.join(out_dir, "island_by_seed.csv"), float_format="%.4f")
+    for c in by.columns:
+        for k, v in spread(by[c]).items():
+            key = f"{c}_{k}"
+            if key not in st:                               # never overwrite an existing key (mean/min/max kept)
+                st[key] = v
+    pops = sorted(glob.glob(os.path.join(run_dir, "seed_*.population.json")))
+    pops = [json.load(open(f)) for f in pops if int(os.path.basename(f)[5:9]) in set(seeds)]
+    if pops:                                               # v16 S3: ceiling on all residents of existing communities
+        st["ceiling_binding"] = bool(any(p.get("binding") for p in pops))
+        st["ceiling_binding_seeds"] = int(sum(bool(p.get("binding")) for p in pops))
+        st["total_residents_mean"] = float(np.mean([p["total_residents"] for p in pops]))
+        st["total_residents_max"] = float(np.max([p["total_residents"] for p in pops]))
+    si = os.path.join(run_dir, "static_info.json")
+    if os.path.exists(si):                                 # v16: static choices (rails sites, sea faces, add4 flags)
+        st["static_info"] = json.load(open(si))
     d = sites[sites.defector == 1]; c = sites[sites.defector == 0]
     if len(d):
         st["defector_rcv_mh_mean"] = d.mh_received.mean(); st["coop_rcv_mh_mean"] = c.mh_received.mean()

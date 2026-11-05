@@ -570,6 +570,10 @@ def run_signature(cfg, haul, sc):
         h.update(haul["quarry_stone"].to_csv(index=False).encode())
         if sc["lit"].get("mixed"):     # per-site rule inputs of a mixed scenario
             h.update(haul[["on_outcrop", "lit_haul_rule", "lit_type"]].to_csv(index=False).encode())
+    # code_v16_final: the code version and the effective add4 settings (L2 acts in lit.resolve_site) are always hashed,
+    # so part files written by older code (or under other add4 settings) are never reused
+    h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
+    h.update(lit.CODE_VERSION.encode())
     return h.hexdigest()[:12]
 
 

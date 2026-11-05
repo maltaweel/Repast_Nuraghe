@@ -198,7 +198,7 @@ class Census:
         if self.carts:
             self.cart_site[i] = (self.tw[i] >= int(self.carts["min_towers"])) and S.tech["rule"][i] == "long"
         mix = None
-        if sc.get("clearance"):                              # S18: clearance stone first (scree rate, 100 m haul)
+        if sc.get("clearance"):                              # S18: clearance stone first (scree rate, min_haul_flatm haul)
             rem = float(self.clear_budget[i])
             qt, mix = [], []
             tmin = m.trip(0.0, 0.0, "whole")                 # min haul both ways (min_haul_flatm)
@@ -372,7 +372,11 @@ class Census:
     # ------------------------------------------------------------------ season start: levy budgets, lintel retries
     def season_start(self):
         if self.levy is not None:
-            self.levy_used_s[:] = 0.0
+            # v16 S2 (addendum 4): the levied days per community per year may not exceed `days`; the work booked in a
+            # season beyond the budget (days x share x party x hours) carries to the next season (v15b: reset to 0)
+            lv, H = self.levy, float(self.m.Hh)
+            budget = float(lv["days"]) * float(lv["share"]) * self.m.B.astype(np.float64) * H
+            self.levy_used_s[:] = np.maximum(0.0, self.levy_used_s - budget)
         if self.lintel and self.wait:
             for i in sorted(self.wait):
                 w = self.wait[i]

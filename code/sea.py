@@ -60,6 +60,29 @@ def load_haul(base_haul, cfg, kn):
     return h
 
 
+# v16 (addendum 4 L4, flag add4.sea_priced_as_charged): every sea route the table builder found (not only the rows
+# whose route beat the land route in the builder's own per-crew currency), written by v16 tools/sea_routes.py as r_*
+# columns. The model decides sea vs land on the cost it charges (alliance.Static._l4_sea_faces).
+ROUTE_COLS = ["r_found", "r_hf1", "r_hm1", "r_hf2", "r_hm2", "r_sea_km", "r_hoist_m", "r_quarry_x", "r_quarry_y",
+              "r_quarry_region", "r_quarry_stone"]
+
+
+def load_routes(base_haul, cfg, kn):
+    """The r_* route columns of the sea table for the sites of base_haul (same order). Needs a v16-built table."""
+    t = pd.read_csv(haul_csv(cfg, kn)).set_index("UID")
+    miss = [c for c in ROUTE_COLS if c not in t.columns]
+    assert not miss, f"add4.sea_priced_as_charged needs sea tables rebuilt with v16 tools/sea_routes.py (missing {miss})"
+    h = t.loc[base_haul.UID.to_numpy(), ROUTE_COLS].reset_index()
+    h["r_found"] = h["r_found"].astype(bool)
+    return h
+
+
+def boat_h(sea_km, cfg, kn):
+    """Boat leg crew hours per crew (out loaded + back empty), as trip_h's boat term."""
+    p = params(cfg)
+    return p["boat_factor"] * 2.0 * float(sea_km) * 1000.0 / (float(kn) * KN) / 3600.0
+
+
 class Travel:
     """People travel by sea: effective walking distance = min(straight line, t_sea x walk speed)."""
 

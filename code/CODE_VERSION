@@ -1,3 +1,4 @@
-code_v15_haul15 2026-11-05 (SOCIAL_VERSION 2026-11-02-v13-social-2 + v13kd trusted_nodist; NEARFACE_VERSION 2026-11-05-nearface-1; CODE_VERSION string unchanged 2026-10-29-bugfix)
-base: full_audited/code_v13 (v13 social switches, CODE_V13_SHA256SUMS) + the v14 near-face rule (code_v14_nearface/v12_to_v14_nearface.patch, same added lines); changes: CHANGES_V15_HAUL15.md
-min_haul_flatm 100 -> 15: config only (no code change needed; every floor reads transport.min_haul_flatm)
+code_v16_final 2026-11-05 (CODE_VERSION 2026-11-05-v16_final; = code_v16_flags + add4 defaults L2/L3 ON, L1/L4 OFF + D3, D6, D11 fixes + signature covers code version and add4; CHANGES_V16_FINAL.md)
+code_v15b_outcrop 2026-11-05 (= code_v15_haul15 + on-outcrop fix; SOCIAL_VERSION 2026-11-02-v13-social-2 + v13kd trusted_nodist; NEARFACE_VERSION 2026-11-05-nearface-1; CODE_VERSION string unchanged 2026-10-29-bugfix)
+base: full_audited/code_v15_haul15 (CODE_V15_SHA256SUMS); changes: CHANGES_V15B_OUTCROP.md (preprocess.py run_rule on_outcrop uses the stone set actually quarried)
+min_haul_flatm 15 (config), near_site_fixed_face_m 1000 (config), as v15
