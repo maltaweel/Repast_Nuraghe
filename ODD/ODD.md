@@ -8,11 +8,17 @@ date: "5 November 2026"
 
 **Model.** Nuraghe-construction agent-based model (ABM) by the authors, written in Python on repast4py (Collier and Ozik, 2022) with MPI, numba, numpy, pandas and scipy.
 
-**Version described.** The code and configuration of the full audited run of 2 November 2026, with the v13 social switches, the v13g reputation rule (7.15) and the v13kd switch `trusted_nodist` (7.16), the v14 near-site face rule of 5 November 2026 (7.6; `quarry.near_site_fixed_face_m`) and the v15 minimum haul of 15 m (7.5; `transport.min_haul_flatm`, config only). The results in the paper are being regenerated with v15: the v15 code with the v15 configs (`config/v15_haul15/`: minimum haul 15 m and the near-site rule on).
+**Version described.** The reference code v16_final of 5 November 2026 (`CODE_VERSION` `2026-11-05-v16_final`) with the configuration of the full audited run of 2 November 2026 as modified by the v16_final configs (`config/v16_final/`: minimum haul 15 m, 7.5; near-site rule on, 7.6). This is the code of the full audited run plus: the v13 social switches, the v13g reputation rule (7.15) and the v13kd switch `trusted_nodist` (7.16), all off in the headline; the v14 near-site face rule (7.6; `quarry.near_site_fixed_face_m`); the v15 minimum haul of 15 m (7.5; `transport.min_haul_flatm`, config only); the v15b on-outcrop test against the stone set actually quarried (7.1); and the v16 rules: quarrying along joints at every site (L2, 7.2), loading per tonne (L3, 7.5), no "nearer the quarry" filter for relay helpers (7.7), the face prior priced at the charged cost (7.6), the population ceiling checked against all communities (S3, 7.3), and three fixes: no help, credit or walk for a stage with no work (D3, 7.7), each party of a joint stage priced at its own skill (D6, 7.7, 7.9), and the site's stone taken from the face it hauls from (D11, 7.2). The results in the paper are being regenerated with v16_final: this code with the v16_final configs.
 
-- Code: `code/` (from 5 November 2026 the v15 code: the v13 code, i.e. the frozen code of the run plus three opt-in social switches in `alliance.py`, off by default, the v13g `reputation_rule` key, default `all`, and the v13kd switch `trusted_nodist`, off by default (7.15, 7.16), plus the v14 near-site face rule, key `quarry.near_site_fixed_face_m`, off when absent (7.6); with all of them off the outputs are identical to the frozen code, see `CODE_PROVENANCE.md`. The v14 code of 5 November, superseded, had the near-site rule but not the v13 switches; v15 has both again. The 15 m minimum haul of v15 is a config value, no code change). Checksums: `CODE_SHA256SUMS` (frozen code, used by every run of the full audited queue), `CODE_V13_SHA256SUMS` (v13), `CODE_V14_SHA256SUMS` (v14) and `CODE_V15_SHA256SUMS` (v15). The repository copy differs from these only in comments and docstrings (`CODE_PROVENANCE.md`). Line numbers of `alliance.py` are those of the v13 file; `CODE_PROVENANCE.md` converts them to the frozen, v14 and v15 files.
-- Configuration: `config/config_full_audited.yaml`, cited as `cfg:<line>`.
+- Code: `code/` (from 5 November 2026 the v16_final code; `code/CHANGES_V15B_OUTCROP.md`, `CHANGES_V16.md`, `CHANGES_V16_FINAL.md`). The v16 rules L1-L4 sit behind flags in a top-level `add4:` configuration block, with defaults in `code/lit.py` (`ADD4_DEFAULTS`, `add4`): L2 `bedrock_everywhere` and L3 `load_per_tonne` on, L1 `rails_cost_choice` and L4 `sea_priced_as_charged` off. The v16_final configs have no `add4:` block (defaults), except the two loading sensitivity configs, which switch L3 off. The other v16 changes have no switch, so unlike the v13-v15 codes, v16_final does not reproduce the frozen code with its new keys off (`CODE_PROVENANCE.md`). Checksums: `CODE_SHA256SUMS` (frozen code, used by every run of the full audited queue), `CODE_V13_SHA256SUMS` (v13), `CODE_V14_SHA256SUMS` (v14), `CODE_V15_SHA256SUMS` (v15) and `CODE_V16_FINAL_SHA256SUMS` (v16_final). The repository copy differs from these only in comments and docstrings (`CODE_PROVENANCE.md`). Line numbers of `alliance.py` are those of the v13 file; `CODE_PROVENANCE.md` converts them to the frozen, v14, v15 and v16_final files. Rules added in v16 are cited by function name only.
+- Configuration: `config/config_full_audited.yaml`, cited as `cfg:<line>`; the v16_final copy of it, `config/v16_final/config_full_audited.yaml`, differs in `cache_dir`, `output_dir`, `transport.min_haul_flatm` (15) and `quarry.near_site_fixed_face_m` (1,000).
 - Cached derived inputs: `cache_dir` of the configuration (`cache/` below; rebuild instructions in `data/derived/README.md`).
+
+**Change log of this description.**
+- 5 November 2026 (v16_final): version line; Guidance item 10; summary panels; 2.1, 2.7, 4.3, 4.6, 4.7, 4.9, 4.11, 4.12, 5.1, 5.2; 7.0 (run signature, code location); 7.1 (on-outcrop test); 7.2 (quarrying along joints everywhere, stone of face 0); 7.3 (ceiling on all communities, continuous residents); 7.4 (mass factor of the face-0 stone); 7.5 (loading per tonne); 7.6 (face prior at the charged cost); 7.7 (no-work stages, relay candidates, join priced per party); 7.9; 7.13; 7.14; 7.15 and 7.16 (codes that keep the switches); Appendix A (P1, P3, Q1-Q3, H5, H6, K2b, new row H5b, A.2 `add4` block); Appendix B (v16_final note, S21 levy); Appendix C (tests); Appendix D (D13, D14, D18).
+- 5 November 2026 (v15): minimum haul 15 m (7.5; rows H6, K2b).
+- 5 November 2026 (v14): near-site face rule (4.3, 7.6; row K2b).
+- 2-3 November 2026 (v13, v13g, v13kd): social switches (7.15, 7.16).
 
 **Scenario described.** `MOST_REALISTIC_AUDITED_LIT_P10` (run as `model.py <config> --alliance MOST_REALISTIC_AUDITED_LIT_P10 --seeds 1-100`). `alliance.scenario` (`code/alliance.py:1958-1998`) resolves it to the `MOST_REALISTIC` rule set of `alliance_extra` (cfg:392-394) with the audited work-party rule (cfg:624) and phasing in 10% cohorts (name suffix `_P10`, `code/phasing.py:38-45`). With this configuration the resolved scenario is identical, key for key, to `MOST_REALISTIC_P10`.
 
@@ -36,7 +42,7 @@ This description follows the ODD protocol as updated by Grimm et al. (2020), wit
    ODD+2D (Laatabi et al., 2018, in Grimm et al., 2027, Table 2) documents the data behind design and parameterisation. It was not adopted as a structure. Its content is covered by Section 6 and the parameter audit (Appendix A, Appendix C).
 8. **Rationale layer.** Each submodel ends with a short *Rationale*. The full justification of every value is the project's parameter audit and traceability record, mapped onto the elements of TRACE (Schmolke et al., 2010; Grimm et al., 2014; Ayllón et al., 2021) in Appendix C. Grimm et al. (2027, Sect. 5.2) recommend TRACE documents for recording the whole modelling process. Parameterisation and validation are not part of an ODD itself (Grimm et al., 2027, Sect. 7.4), so they are kept in the appendices.
 9. **Summaries and variants.** A text version of the visual-ODD panels (Szangolies et al., 2024) comes next. The scenario families are given as "delta" descriptions against the headline (Grimm et al., 2027, Sect. 6.2; Appendix B).
-10. **Edge cases and the use of AI.** The 2027 review warns that descriptions drafted with large language models can look complete while leaving out edge-case behaviour, and asks for a human-in-the-loop process (Sect. 7.2). This description was drafted by the modelling agent (an AI research agent) from the frozen code and configuration. Every statement is tagged to the code, and the edge cases and inactive branches are listed in 7.13. An independent AI agent then verified the description against the code and configuration (161 claims, 8 errors); the errors are corrected in this version. The v13 social mechanisms, the v13g reputation rule and the v13kd switch (7.15, 7.16 and the lines that refer to them) were added later, checked sentence by sentence against the v13 code by the modelling agent, and were not part of that independent verification. Human review by the PI was still pending when this was written.
+10. **Edge cases and the use of AI.** The 2027 review warns that descriptions drafted with large language models can look complete while leaving out edge-case behaviour, and asks for a human-in-the-loop process (Sect. 7.2). This description was drafted by the modelling agent (an AI research agent) from the frozen code and configuration. Every statement is tagged to the code, and the edge cases and inactive branches are listed in 7.13. An independent AI agent then verified the description against the code and configuration (161 claims, 8 errors); the errors are corrected in this version. The v13 social mechanisms, the v13g reputation rule and the v13kd switch (7.15, 7.16 and the lines that refer to them) were added later, checked sentence by sentence against the v13 code by the modelling agent, and were not part of that independent verification. The same holds for the v14, v15 and v16_final changes (see the change log above), checked by the modelling agent against the v16_final code. Human review by the PI was still pending when this was written.
 
 ## Summary panels (text version of a visual ODD)
 
@@ -47,7 +53,7 @@ This description follows the ODD protocol as updated by Grimm et al. (2020), wit
 | Initialization | Per seed: residents and work party per site; block masses; pieces per tower; stage labour; cohort membership. Static: least-cost routes, technique rules, sea faces. |
 | Submodels | Tower start (choice of face, help and relay; imitation), help requests (acceptance and trust), joint work (join mode), daily work (upstream cap), skill and learning, tower completion (value update), phasing (10% cohorts). |
 | Scenarios | The headline plus one-switch families (Appendix B). |
-| Observation | Per site and seed: man-hours by stage, own, received and given, start and finish, work party, tonnes. Per pair: trust, help, asks. Island man-hours and island years per seed. |
+| Observation | Per site and seed: man-hours by stage, own, received and given, start and finish, work party, tonnes. Per pair: trust, help, asks. Island man-hours and island years per seed, with mean, sd, min, max, p5 and p95 across seeds. |
 
 ## 1. Purpose and patterns
 
@@ -112,7 +118,7 @@ There is one `Community` per nuraghe site (`code/alliance.py:229-234`), a repast
 | `site_stage[i]` | per-tower labour of the quarry, dress and build (incl. lift) stages before learning and skill | person-hours | initialization (7.2) |
 | `site_lift_share[i]` | lift share of the build stage (accounting only) | fraction | initialization |
 | `S.tech["site"][i]` | the site's technique rule: quarry rule, dress rule, lift rule, friction mu, haul rule (short / long) | dict | static (7.2) |
-| `S.tech["stone"][i]` | quarry stone class used for density and hardness | str | static |
+| `S.tech["stone"][i]` | quarry stone class used for density and hardness: the class of the site's face 0 (7.2) | str | static |
 | `tower_idx[i]` | towers finished | count | dynamic |
 | `current[i]` | current tower: strategy, task ids, helpers per stage, join shares | dict / None | dynamic |
 | `start_day`, `finish_day`, `start_season`, `finish_season`, `phase` | timing and cohort | day, season, int | dynamic |
@@ -187,7 +193,7 @@ A sea face (route -2) is added when the site's 2-knot sea table gives the sea ro
   - interaction is limited by straight-line distance: requests, relays and imitation within `R_m` = 10 km (the
     headline value; 5 and 15 km sensitivity, Appendix B), acceptance falling by 0.2 logit per km, and helpers'
     walking charged by distance (7.7);
-  - relay helpers must be nearer the quarry than the asker (7.7), and 46 coastal sites have a sea face with a boat route (7.1, item 6).
+  - relay helpers come from the same candidate list as other helpers (no "nearer the quarry" filter since v16, 7.7), and 46 coastal sites have a sea face with a boat route (7.1, item 6).
   - Communities do not move; only stone and work parties travel, and travel is charged as labour.
 - **Resolutions and extents** are given in 2.6.
 
@@ -270,7 +276,7 @@ write per-seed output files (4.11, 7.12)
 ### 4.3 Adaptation
 
 At the start of each tower a community chooses (`start_tower`, lines 1532-1546; `choose`, lines 1306-1346):
-- its quarry face (one of up to 5, or a sea face; with the near-site rule on (v14, kept in v15), a site within 1,000 m of its nearest face always uses that face, 7.6);
+- its quarry face (one of up to 5, or a sea face; with the near-site rule on (v14, kept in v15 and v16_final), a site within 1,000 m of its nearest face always uses that face, 7.6);
 - whether to ask for help with quarrying, dressing and building (each 0 or 1);
 - the relay fraction (0, 0.25, 0.5 or 0.75).
 
@@ -291,7 +297,7 @@ The track dimension is absent because `tracks` is false. An asked community deci
 
 ### 4.6 Prediction
 
-There is no explicit forecasting. The only anticipation is the prior of the quarry-face values on the first tower: the community's own estimate of man-hours per tonne for each face, as transport labour plus its stage labour plus the setup cost (lines 1547-1552). Communities do not predict the behaviour of others.
+There is no explicit forecasting. The only anticipation is the prior of the quarry-face values on the first tower: the community's own estimate of man-hours per tonne for each face, as transport labour plus its stage labour plus the setup cost (lines 1547-1552). The transport labour is the cost the run charges for that face (7.6). Communities do not predict the behaviour of others.
 
 ### 4.7 Sensing
 
@@ -299,8 +305,7 @@ There is no explicit forecasting. The only anticipation is the prior of the quar
 - the costs of its own faces;
 - its own trust in others;
 - the last strategy and cost per tonne of every community within 10 km (for imitation);
-- the skill factor of its neighbours (requests go first to the most skilled);
-- for relays, which neighbours are nearer the quarry than itself.
+- the skill factor of its neighbours (requests go first to the most skilled).
 
 **The asked community knows:**
 - its trust in the asker;
@@ -326,7 +331,7 @@ Requests carry no labour cost in the headline (brokers exist only in the pre-net
 ### 4.9 Stochasticity
 
 **Random:**
-- residents per site (uniform within the range of the tower class);
+- residents per site (continuous uniform within the range of the tower class);
 - block masses (clipped lognormal);
 - cohort membership (random permutation per seed);
 - the decision draws: imitation, epsilon exploration, ties between equal values;
@@ -353,12 +358,13 @@ The random streams are listed in 7.14. Seeds 1-100 (cfg:98).
 |---|---|
 | `seed_NNNN.sites.csv.gz` | per site: `seed`, `gid`, `TWR_N`, the 12 man-hour accounts (`mh_total` ... `mh_walk`), `builders`, `defector`, `start_season`, `finish_season`, `years` = finish_season - start_season + 1, `days` = finish_day - start_day + 1, `tonnes`, `phase`, `start_day`, `finish_day` |
 | `seed_NNNN.pairs.csv.gz` | per pair: trust both ways, help both ways (total and per stage, with task counts), asks and refusals both ways (total and per stage), `allied`, `ask_only` |
-| `seed_NNNN.strategy.csv.gz` | per tower started: season, quarry face, the three ask choices, relay fraction, track, imitated |
+| `seed_NNNN.strategy.csv.gz` | per tower started: season, quarry face, the three ask choices, relay fraction, track, imitated; `relay_made` (v16: 1 if a relay hand-off was executed, i.e. a leg-1 helper accepted) |
 | `seed_NNNN.spec.csv.gz` | per site: labour given per stage, skill factor and experience per skill stage |
 | `seed_NNNN.handoffs.csv.gz`, `.tracks.csv.gz` | relay hand-off cells and their uses; track cells (empty in the headline) |
 | `seed_NNNN.helplog.csv.gz`, `.allied.csv.gz` | help man-hours per season, helper and owner; first allied season per pair |
-| `seed_NNNN.population.json` | residents, active peak, ceiling, whether the ceiling binds, redraws, scale |
+| `seed_NNNN.population.json` | total residents, the sum checked against the ceiling (`active_peak_residents`; since v16 the residents of all communities, 7.3), ceiling, whether it binds (`binding`, `ceiling_binding`), `ceiling_basis`, redraws, scale |
 | `seed_NNNN.done` | number of seasons simulated |
+| `static_info.json` | (v16, once per signature folder) static per-site choices: number of rails sites and of sea faces, the effective `add4` flags and their two parameters (`Static._init_tech`) |
 
 **Per scenario** (`code/report_alliance.py:write_scenario`, lines 50-193), in `outputs/scenarios_alliance/<scenario>/`:
 - `nuraghe_manhours_runs.csv.gz` (all site-runs);
@@ -373,7 +379,11 @@ The random streams are listed in 7.14. Seeds 1-100 (cfg:98).
   - island seasons, mean, min and max of the maximum `finish_season`;
   - median years of single towers;
   - alliances per seed, mean and largest alliance size;
-  - share of towers with a relay.
+  - share of towers with a relay: chosen (`relay_share_chosen`; the old key `relay_share_towers` is kept as an alias) and made (`relay_share_made`, from `relay_made`) (v16 S1);
+  - (v16) spread across seeds: for island seasons (= island years), `island_years_p95`, island man-hours and island man-hours by stage (quarry, dress, transport, build, lift, setup, track, walk), the keys `_mean`, `_sd` (ddof 1), `_min`, `_max`, `_p5` and `_p95` (numpy linear percentiles; `spread`). Existing keys are not overwritten;
+  - (v16 L5) `island_years_p95`: per seed, the island-wide 95th percentile of the site finish seasons (`finish_season`, numpy linear), a robust measure beside island years (the maximum). An earlier definition, the sum over cohorts of the 95th-percentile finish counted from each cohort's start (`island_years_q`), is kept as `island_years_p95_cohortsum`;
+  - (v16 S3) `ceiling_binding`, `ceiling_binding_seeds`, `total_residents_mean`, `total_residents_max` (from the `population.json` files), and `static_info`.
+- `island_by_seed.csv` (v16): the per-seed values behind the spread keys.
 - Shapefiles (`nuraghe_manhours.shp`, `alliances.shp`, `handoffs.shp`), except with `--no-shapefile`, which the full chain used.
 
 **Summary tools** (`code/tools/v12_summary.py`, `code/tools/family_summary.py`), per seed:
@@ -382,7 +392,7 @@ The random streams are listed in 7.14. Seeds 1-100 (cfg:98).
 - `site_years_mean` = mean of `days` / 90;
 - `transport_share`, total `tonnes`, total `builders`.
 
-Against a reference run, paired by seed: the percent change, with a 95% t interval over seeds. The verdict "moves results" requires the interval to exclude 0 and the change of the means to be at least 1%. The code thus has two island-time measures: day-based years (summary tools) and the count of seasons (`stats.json`).
+Against a reference run, paired by seed: the percent change, with a 95% t interval over seeds. The verdict "moves results" requires the interval to exclude 0 and the change of the means to be at least 1%. The code thus has two island-time measures: day-based years (summary tools) and the count of seasons (`stats.json`), with `island_years_p95` beside the latter since v16.
 
 ### 4.12 Individual decision-making (ODD+D)
 
@@ -393,7 +403,7 @@ Against a reference run, paired by seed: the percent change, with a 95% t interv
 | Decision model and rationality | Bounded: epsilon-greedy choice on values learned from the community's own experienced cost; imitation of a cheaper neighbour; no optimisation over the others' responses |
 | Adaptation to changing conditions | Through value updates after each tower and through trust; acceptance reacts at once to the asked community's backlog |
 | Social norms | Reciprocity: a refusal after having received help from the asker lowers the asker's trust in the refuser by 0.2; accepted help raises it by 0.1 |
-| Spatial aspects | Requests, relays and imitation within 10 km straight line; relay helpers must be nearer the quarry than the asker; acceptance falls by 0.2 logit per km |
+| Spatial aspects | Requests, relays and imitation within 10 km straight line; acceptance falls by 0.2 logit per km |
 | Temporal aspects | Decisions are made once per tower, at its start; there is no re-planning during a tower; values carry over between towers |
 | Uncertainty | No explicit representation; uncertainty is handled only through exploration (epsilon = 0.1) |
 
@@ -413,6 +423,7 @@ Initialization runs once per process (static data) and once per seed (`AllianceM
 - the site table `cache/sites_haul.csv`;
 - the k-best faces from `cache/alliance/kbest.npz`. Of the 7,167 sites, 7,165 have 5 faces and 2 have 1; there are 35,827 routes;
 - the technique rules from the mu 0.38 and mu 0.1 haul tables (7.2) and the mu 0.38 move costs (`cache/alliance/kbest_mu038.npz`);
+- the site's stone: the class of face 0 in `cache/sites_haul.csv` (`Static._face0_stone`, 7.2);
 - the sea faces from `cache/sea/sites_haul_sea2kn.csv`;
 - the neighbour lists.
 
@@ -423,7 +434,7 @@ Initialization runs once per process (static data) and once per seed (`AllianceM
 3. **Pieces, crews and splitting man-hours** for each tower; sea payload pieces if the site has a sea face (7.4).
 4. **Stage labour per tower** (7.2), learning off.
 
-Resulting work parties: builders = max(1, floor(0.4 x residents + 0.5)) with residents ~ U[lo, hi]:
+Resulting work parties: builders = max(1, floor(0.4 x residents + 0.5)) with residents ~ U[lo, hi], a continuous uniform (one real-valued draw, `lit.draw_residents`):
 
 | Towers | Residents (cfg:384) | Builders (range) |
 |---:|---|---|
@@ -483,12 +494,14 @@ The initial state differs between seeds only through the residents, the blocks, 
   - with a sea speed: the site sea-leg columns of the sea table, the `sea` block and the sea version string (lines 2015-2019, 2024-2025);
   - with tech rules: every `lit_scenarios` key except `list`, the chosen rule set and its version string (lines 2020-2023);
   - version strings and inputs of other scenario families, when used (none in the headline; lines 2012-2014, 2026-2039);
-  - `CODE_VERSION` (line 2044).
+  - (v14) the near-site rule's version string and value, only when the rule is on (7.6);
+  - (v16, always) `V16_VERSION`, `ADD4_VERSION` and the effective `add4` settings (`lit.add4`: the four flags and the two parameters, defaults included, so an explicit block equal to the defaults gives the same signature as none); with L4 on and a sea speed, also the sea-route columns;
+  - `CODE_VERSION` = `2026-11-05-v16_final` (`lit.CODE_VERSION`, the same string as `alliance.CODE_VERSION`; line 2044). Before v16_final it was `2026-10-29-bugfix` from 29 October 2026 on; from v16_final it is meant to change with every code change that alters results, so that part files written by older code are not reused. `model.run_signature` (baseline, cooperation and literature families) also hashes the `add4` settings and `CODE_VERSION`.
 
-  It does **not** cover the `scenarios` block of the configuration, for example `scenarios.split_cost_mh` (cfg:115), which acts on the headline (H13), and `scenarios.help_walk_ms` (cfg:117), which the sea-table builder reads for people's walks (`code/tools/sea_routes.py:472`). Nor does it cover the cached k-best and friction tables: `alliance/kbest.npz`, `alliance/kbest_mu038.npz`, `haul/sites_haul_mu0.38.csv` and `haul/sites_haul_mu0.1.csv`. Runs are additionally separated by scenario name (folder `alliance_<scenario>`) and by `cache_dir`. A change to an unhashed input under the same scenario name and `cache_dir` would therefore reuse stale part files. **This omission is a known limitation, scheduled to be fixed in the next code version.**
-- **Headline run.** `cache/runs/alliance_MOST_REALISTIC_AUDITED_LIT_P10/` of the run holds two signature folders of 100 seeds each. This description, and every result of the headline, refers to **`d01216d14207`** (run log of the chain: second launch of the headline, 16:01-16:07 on 2 November 2026, after the sea tables were rebuilt). Its sea tables were built at 0.27 m/s drag and 1.39 m/s walk (7.1, item 6). The other folder, `cc1399a1a252` (15:51-15:57), comes from the first launch, made on the earlier sea tables built at 0.6 m/s. It was discarded. The two signatures differ because the sea-leg columns are hashed. The per-scenario outputs of the headline were written from `d01216d14207`.
+  It does **not** cover the `scenarios` block of the configuration, for example `scenarios.split_cost_mh` (cfg:115), which acts on the headline (H13), and `scenarios.help_walk_ms` (cfg:117), which the sea-table builder reads for people's walks (`code/tools/sea_routes.py:472`). Nor does it cover the cached k-best and friction tables: `alliance/kbest.npz`, `alliance/kbest_mu038.npz`, `haul/sites_haul_mu0.38.csv` and `haul/sites_haul_mu0.1.csv`. Runs are additionally separated by scenario name (folder `alliance_<scenario>`) and by `cache_dir`. A change to an unhashed input under the same scenario name and `cache_dir` would therefore reuse stale part files. **This omission is a known limitation, still present in v16_final.** The v16_final configs work around it: each has its own `cache_dir` with its own `runs/` folder, so no part file of an earlier run can be reused.
+- **Headline run.** The v16_final headline runs into its own folder, `v16_final/outputs/caches/config_full_audited/runs/alliance_MOST_REALISTIC_AUDITED_LIT_P10/<signature>/` of the run folder (README, "The v16_final run"). The record below is that of the full audited run of 2 November 2026 with the frozen code, which the v16_final run supersedes. `cache/runs/alliance_MOST_REALISTIC_AUDITED_LIT_P10/` of that run holds two signature folders of 100 seeds each. Its results refer to **`d01216d14207`** (run log of the chain: second launch of the headline, 16:01-16:07 on 2 November 2026, after the sea tables were rebuilt). Its sea tables were built at 0.27 m/s drag and 1.39 m/s walk (7.1, item 6). The other folder, `cc1399a1a252` (15:51-15:57), comes from the first launch, made on the earlier sea tables built at 0.6 m/s. It was discarded. The two signatures differ because the sea-leg columns are hashed. The per-scenario outputs of the headline were written from `d01216d14207`.
 - **Software versions.** The full run used these versions, read from the run's environment: Python 3.13.5, repast4py 1.3.1, mpi4py 4.1.2 (on Open MPI 5.0.7), numpy 2.5.4, pandas 3.0.6, numba 0.68.0, scipy 1.18.1, rasterio 1.5.2, geopandas 1.2.0 and PyYAML 6.0.3. The same versions are pinned in `notebooks/requirements-colab.txt`. `code/requirements.txt` gives the minimum versions: Python 3.12+ (needed for byte-identical reproduction: from 3.12 the built-in float `sum()` uses compensated summation; on 3.10-3.11 results differ only in the last digits), repast4py >= 1.1.6, mpi4py >= 3.1, numpy >= 1.24, numba >= 0.58, pandas >= 2.0, rasterio >= 1.3, geopandas >= 0.14, pyogrio >= 0.7, PyYAML >= 6.0.
-- **Code location.** The code and configuration described are in this repository: `code/` (the run's code, v13 with the social switches off by default) and `config/config_full_audited.yaml`; this description is `ODD/ODD.md`.
+- **Code location.** The code and configuration described are in this repository: `code/` (the v16_final code, with the v13 social switches off by default) and `config/config_full_audited.yaml` with its v16_final copies in `config/v16_final/`; this description is `ODD/ODD.md`.
 - **Memory.** About 6 ranks fit the 8 GB container of the full run.
 
 ### 7.1 Preprocessing: cost surface, stone rule, routes and faces (run once)
@@ -496,6 +509,7 @@ The initial state differs between seeds only through the residents, the blocks, 
 1. **Drag cost** (`code/tools/build_cost_mu.py:band_cost`, lines 24-34; recipe as in `costsurface/build_drag8.py`). For a move of horizontal length d (30 m, or 42.43 m on the diagonal) with gradient t = clip((z_B - z_A)/d, -1, 1), cost = max(0.5, |mu + t| / mu) x d, rounded to an integer (np.rint). The unit is flat-metre equivalents. The delivered raster has mu = 0.3; rasters at mu 0.38 and 0.1 are rebuilt with the same recipe. Band k is the cost into neighbour k (N, NE, ... NW); 0 means impassable.
 2. **Outcrops** (`code/preprocess.py:run_rule`, lines 198-318). Lithology polygons are rasterised onto the cost grid with the cell-centre rule (`rasterize_all_touched: false`, cfg:47). Only polygons with `BUILDSTONE == 1` are rasterised (lines 215-221), so the permitted classes are those of `allowed_stones` (cfg:27) that are also BUILDSTONE classes.
 3. **Hybrid stone rule** (`stone_rule: hybrid`, cfg:26; `materiale_sets`, lines 170-195). A site whose recorded stone maps to one or more classes searches those classes; otherwise it searches the 7 permitted classes (cfg:27). One multi-source forward Dijkstra (`code/nbcommon.py:multi_source_dijkstra`) runs per distinct class set. It gives, for every cell, the least drag cost from any permitted outcrop cell (`haul_flatm`), the source cell (quarry location and stone) and the path length (`haul_m`). Recorded stone with no reachable outcrop falls back to the 7-class search.
+   - On-outcrop flag (`on_outcrop`; v15b, `run_rule`, the set `used`): a site is on its outcrop when the cell under it is an outcrop of a class in the stone set it actually quarries, i.e. its recorded set when reachable, else the fallback set of the 7 permitted classes (the set written to `site_stone_sets.csv`). Before v15b the flag was tested against the recorded set even when the site had fallen back; this changed the flag of one site in the hybrid tables. Such a site's own cell is a source of its search, so its haul is 0 and the minimum haul applies (7.5). Since v16 the flag no longer changes the quarrying rate in the headline (7.2); it is still read by the on/off-outcrop pre-network groups (Appendix B).
    - Snapping: sites on nodata or unreachable cells are moved to the nearest valid cell within 20 cells (cfg:51).
    - Unreachable sites: they get a local quarry (cfg:55; applied without reading the key at lines 300-305).
    - In the tables used, no site is snapped and none is unreachable (Appendix D, D6-D7).
@@ -521,12 +535,11 @@ The initial state differs between seeds only through the residents, the blocks, 
 **Rule per site** (`code/lit.py:mixed_haul`, lines 181-196; `resolve_site`, lines 199-213; settings `REALISTIC`, cfg:221). All rules are deterministic and identical in every seed.
 
 **Friction:**
-- Long rule (tallowed rails, mu 0.1, cfg:231): when the site's route in the mu 0.38 table is longer than `long_min_haul_m` = 1,000 m (cfg:229) and the site is reachable in the mu 0.1 table. That row's values (quarry, stone, on-outcrop) then replace the mu 0.38 row. This gives 786 sites.
+- Long rule (tallowed rails, mu 0.1, cfg:231): when the site's route in the mu 0.38 table is longer than `long_min_haul_m` = 1,000 m (cfg:229) and the site is reachable in the mu 0.1 table. That row's values (quarry, on-outcrop) then replace the mu 0.38 row; the stone is set separately (below). This gives 786 sites.
 - Short rule (sledge on dry ground, mu 0.38, cfg:230): all other sites.
+- The v16 alternative, L1 `add4.rails_cost_choice` (rails or dry ground by total cost, with a rail-laying cost `rail_lay_mh_per_m` = 2.0 man-hours per metre; `Static._l1_choice`), is off in v16_final: the 1,000 m threshold stays.
 
-**Quarrying:**
-- on the outcrop (`on_outcrop`; 4,940 sites): `joints_low`;
-- otherwise: `scree` (cfg:225).
+**Quarrying** (v16 L2, `add4.bedrock_everywhere`, on by default; `lit.resolve_site`): every site, on or off its outcrop, cuts bedrock along joints, `joints_low`, at whichever face it uses. The on-outcrop flag no longer changes the technique. With L2 off (no v16_final config) the earlier rule applies: `joints_low` on the outcrop (`on_outcrop`), `scree` otherwise (cfg:225).
 
 **Dressing:**
 - TWR_N <= 1: none;
@@ -541,7 +554,7 @@ The initial state differs between seeds only through the residents, the blocks, 
 
 **Stage labour** (`code/lit.py:stage_hours`, lines 92-139, called with learning off at `code/alliance.py:423`). For a site with T towers and n_p pieces:
 - V = 1,350,000 x T / 2,386 m³ of stone. The block volume is held fixed; density changes only the mass.
-- **Quarry** = r_q x V x h, with r_q = 11.1 ph/m³ (`joints_low`) or 2.0 ph/m³ (`scree`) (cfg:147). The hardness h is 2.0 for basalt and granite and 1.0 otherwise (cfg:183).
+- **Quarry** = r_q x V x h, with r_q = 11.1 ph/m³ (`joints_low`) at every site under L2 (2.0 ph/m³ `scree` only with L2 off) (cfg:147). The hardness h is 2.0 for basalt and granite and 1.0 otherwise (cfg:183).
 - **Dress**:
   - none: 0;
   - Webster: 1,300 md x 8 h x T x h;
@@ -552,28 +565,30 @@ The initial state differs between seeds only through the residents, the blocks, 
   - Lever: n_p x sum_k(k w_k) x 0.37 = 2.179 ph per piece (cfg:159).
 - **Per-tower values** `site_stage` = quarry/T, dress/T, (build + lift)/T (lines 432-435).
 
-**Mass factor.** mf = rho(stone) / 2,386 (cfg:182; `code/lit.py:mass_factor`, lines 64-69). Densities are 3,000 (basalt), 2,700 (granite), 2,600 (limestone/marble) and 2,750 (metamorphic) kg/m³. The other quarry stones (acid volcanic, andesite, schist, tuff, trachyte; 2,047 sites) keep mf = 1 and hardness 1. The stone used is the one in the site's mixed haul table, whichever face is later chosen (Appendix D, D13-D14).
+**Mass factor.** mf = rho(stone) / 2,386 (cfg:182; `code/lit.py:mass_factor`, lines 64-69). Densities are 3,000 (basalt), 2,700 (granite), 2,600 (limestone/marble) and 2,750 (metamorphic) kg/m³. The other quarry stones (acid volcanic, andesite, schist, tuff, trachyte, other intrusive; 2,050 sites in the headline cache) keep mf = 1 and hardness 1.
 
-*Rationale.* Each rule takes the option best supported for that kind of site: on-site quarrying along joints at Duos (Webster 1991: 848); collected stone (Lilliu & Zucca 2005: 41); fine masonry on complexes (Contu 2002: 29-32); the intramural stair as the builders' ramp (Laner 1999: 30). The thresholds are assumptions (Appendix A).
+**Stone of the site** (v16_final D11; `Static._init_tech`, `Static._face0_stone`). The stone that sets density (block mass, 7.4) and hardness (quarry and dress labour) is `quarry_stone` of the site's row in `cache/sites_haul.csv`: the class of the outcrop at which face 0 starts, under the stone rule (the set actually quarried, including the fallback; 7.1). Before v16_final it was the stone of the mixed haul table (mu 0.38 or, past 1 km, mu 0.1), which comes from separate least-cost searches and could name another class than face 0. The mixed table still decides the friction rule. There is one stone per site: whichever face is chosen later, including a sea face, the face-0 class is used (Appendix D, D13-D14).
+
+*Rationale.* Each rule takes the option best supported for that kind of site: on-site quarrying along joints at Duos (Webster 1991: 848); since v16, every site is assumed to cut bedrock, because loose stones are often too small to serve and no large pile of loose blocks is assumed next to a site (specified by the authors); collected stone (Lilliu & Zucca 2005: 41; used only with L2 off); fine masonry on complexes (Contu 2002: 29-32); the intramural stair as the builders' ramp (Laner 1999: 30). The thresholds are assumptions (Appendix A).
 
 ### 7.3 Work party and population ceiling
 
 `code/alliance.py:_population_ceiling` (lines 565-594) and `code/lit.py:draw_residents`, `residents_range`, `builders_of` (lines 230-244).
 
-1. **Residents.** r_i ~ U[lo, hi] from the row TWR_N of `residents_by_towers` (7 and more towers use the last row), as the first uniform of the site's stream.
-2. **Cohort sums.** The residents are summed within each P10 cohort (7.11). The peak is the largest cohort sum.
-3. **Redraws.** If the peak exceeds `population_ceiling` = 300,000 (cfg:393), all residents are redrawn from `default_rng([seed, 31337, k])` for k = 1, 2, ... up to 100. After that they would be scaled down in proportion. The block streams are untouched.
+1. **Residents.** r_i ~ U[lo, hi], a continuous uniform (one real-valued draw, not an integer draw on {lo, ..., hi}), from the row TWR_N of `residents_by_towers` (7 and more towers use the last row), as the first uniform of the site's stream.
+2. **Sum checked** (v16 S3). The residents of all communities of the run are summed, whether a community has started building or is waiting for its cohort (one group of all sites in `_population_ceiling`). Before v16 only the residents of each P10 cohort (7.11) were summed, and the largest cohort sum was checked.
+3. **Redraws.** If the sum exceeds `population_ceiling` = 300,000 (cfg:393), all residents are redrawn from `default_rng([seed, 31337, k])` for k = 1, 2, ... up to 100. After that they would be scaled down in proportion. The block streams are untouched.
 4. **Builders.** B_i = max(1, floor(`adult_share` x r_i + 0.5)) with `adult_share` = 0.4 (cfg:385).
-5. **Record.** `pop_info` is written per seed. In the 100 seeds of the headline run the ceiling never binds: the largest active peak is 32,681 residents (per-seed `population.json` files).
+5. **Record.** `pop_info` is written per seed (`population.json`, 4.11), with `ceiling_binding` = true when a redraw or scaling was needed; `stats.json` reports how many seeds bind.
 
-*Rationale.* The work party scales with towers, is drawn at random and rests on published population figures (rule specified by the authors). The adult share is Webster's men available (population/5, Webster 1991: 854, Table 2 n. 4) plus an equal number of women. The ceiling is Calò et al. (2008, p. 41), used as a ceiling.
+*Rationale.* The work party scales with towers, is drawn at random and rests on published population figures (rule specified by the authors). The adult share is Webster's men available (population/5, Webster 1991: 854, Table 2 n. 4) plus an equal number of women. The ceiling is Calò et al. (2008, p. 41), used as a ceiling. It is checked against the residents of all communities that exist at the time, started or waiting, not only the active cohort (v16 S3, specified by the authors).
 
 ### 7.4 Blocks, crews and splitting
 
 `AllianceModel.__init__`, lines 337-446.
 
 **Blocks:**
-1. Target mass: 1,350,000 kg x T x mf (cfg:67).
+1. Target mass: 1,350,000 kg x T x mf (cfg:67), with mf of the site's face-0 stone (7.2).
 2. Draws: lognormal with median 450 x mf kg (cfg:68) and sigma 0.6 (cfg:69), clipped to [60 mf, 2,400 mf] kg (cfg:70-cfg:71), in chunks of int(target / 450) + 16.
 3. Truncation: drawing stops when the cumulative mass reaches the target; the block list is cut at the first block where it does.
 4. Towers: block j goes to tower min(T - 1, floor(mass before j / per-tower mass)).
@@ -593,27 +608,30 @@ The initial state differs between seeds only through the residents, the blocks, 
 
 ### 7.5 Transport labour
 
-`trip` (lines 1363-1373), `leg_mh` (lines 1375-1392), `_leg_mh_tech0` (lines 1399-1454); `code/sea.py:trip_h`, `params`, `hoist_ph_per_block` (lines 21-43).
+`trip` (lines 1363-1373), `leg_mh` (lines 1375-1392), `_leg_mh_tech0` (lines 1399-1454), `_crew_trip_mh` (v16); `code/sea.py:trip_h`, `params`, `hoist_ph_per_block` (lines 21-43).
 
-**Trip time per crew member**, in hours:
+**Trip time per crew member**, in hours, as in the frozen code (with L3 off):
 - whole route: trip = max(C, 100) / 0.27 / 3600 + max(L, 100) / 1.39 / 3600 + 0.25 (cfg:76, cfg:78, cfg:79, cfg:80);
 - relay leg: C / 0.27 / 3600 + L / 1.39 / 3600 + 0.125, with no minimum haul.
 
-**Minimum haul (v15, 5 November 2026).** The 100 in these formulas (and in the sea-face land legs below) is `transport.min_haul_flatm` (cfg:80), 100 flat-m in the audited configs. In the v15 configs (`config/v15_haul15/`) it is 15: the haul of a site that sits on its outcrop and the floor of every whole route (both the drag and the walk-back term) are 15 m; relay legs still have no minimum, and the 200 / 210 / 300 m sensitivity configs keep their value. Every floor in the code reads this key (`trip`, the carry term, `census_v12.py`, `sea.py`, `tools/sea_routes.py`); the sea tables, the only prepared inputs that apply it, are rebuilt per config. *Rationale.* A nuraghe on an outcrop can build with the stone immediately around it, but some stone movement must still be assumed, hence a short minimum drag of 10-20 m (15 m), applied consistently in every scenario (specified by the authors).
+**Minimum haul (v15, 5 November 2026).** The 100 in these formulas (and in the sea-face land legs below) is `transport.min_haul_flatm` (cfg:80), 100 flat-m in the audited configs. In the v15 configs (`config/v15_haul15/`) and the v16_final configs (`config/v16_final/`) it is 15: the haul of a site that sits on its outcrop and the floor of every whole route (both the drag and the walk-back term) are 15 m; relay legs still have no minimum, and the 200 / 210 / 300 m sensitivity configs keep their value. Every floor in the code reads this key (`trip`, the carry term, `census_v12.py`, `sea.py`, `tools/sea_routes.py`); the sea tables, the only prepared inputs that apply it, are rebuilt per config. *Rationale.* A nuraghe on an outcrop can build with the stone immediately around it, but some stone movement must still be assumed, hence a short minimum drag of 10-20 m (15 m), applied consistently in every scenario (specified by the authors).
 
 **Cost and length on a land face:**
 - C = the sum of the route's move costs at the site's friction (`mv_c038`, or `mv_c01` for the long rule), in flat-metre equivalents;
 - L = the face length for the whole route, or the sum of the move lengths for a leg;
 - a face with no route (local stone) uses its C and L for the whole route.
 
-**Transport man-hours** = S_site x trip.
+**Transport man-hours** on a land face:
+- with L3 off: S_site x trip;
+- **loading per tonne** (v16 L3, `add4.load_per_tonne`, on by default; `_crew_trip_mh`): S_site x (drag term + walk term of the trip above, without the 0.25 h) + `load_ph_per_t` x tonnes of the tower, with `load_ph_per_t` = 1.2 person-hours per tonne, half of it on each relay leg. Loading thus no longer depends on crew size or friction, and `transport.load_unload_h` is not used on land faces. The two loading sensitivity configs (`config/v16_final/config_full_audited_alt_load05.yaml`, `_alt_load033.yaml`) set `add4: {load_per_tonne: false}` and keep their per-crew loading. Haul-profile rows (C1, C3, M3, M4), the C2 carry rule and carts (S24) set their own loading and keep it.
 
 **Sea face:** man-hours = S_038 x land_h + S_03 x boat_h + n_p x hoist_ph, where:
 - land_h = ((max(hf1, 100) + max(hf2, 100)) / 0.27 + (max(hm1, 100) + max(hm2, 100)) / 1.39) / 3600 + 2 x 0.25;
 - boat_h = boat_factor x 2 x sea_km x 1000 / (2 kn x 0.514444) / 3600, with boat_factor = crew x pull / payload = 10 x 100 / 2,000 = 0.5 (cfg:366), i.e. 0.27 h per km of sea route;
 - hoist_ph = (0.37 / 0.9) x hoist height. No sea-mode site at 2 kn lands at a hoist.
+- The 0.25 per landing in land_h is `sea.transfer_h` (S4). L3 does not change sea faces: their land legs keep this per-crew transfer time. The v16 alternative L4 `add4.sea_priced_as_charged` (sea face chosen and charged on the cost as charged, `Static._l4_sea_faces`, `_sea_l4_mh`) is off in v16_final, so the sea face of a site is still the one of the sea table (route choice in crew-hours, 7.1, item 6).
 
-*Rationale.* Crews drag at a sustained speed and walk back empty. The drag speed is de Haan's (2009: 7) power-based value; the walk is Tobler's (1993) flat-ground speed. The craft analogue is from Micronesia (Hazell & Fitzpatrick 2006: 12, 18).
+*Rationale.* Crews drag at a sustained speed and walk back empty. The drag speed is de Haan's (2009: 7) power-based value; the walk is Tobler's (1993) flat-ground speed. Loading and unloading are charged per tonne moved, independent of crew size and friction (v16 L3, specified by the authors; 1.2 person-hours per tonne is the value of the C3 haul profile, Appendix B). The craft analogue is from Micronesia (Hazell & Fitzpatrick 2006: 12, 18).
 
 ### 7.6 Tower start: decisions
 
@@ -624,14 +642,14 @@ The initial state differs between seeds only through the residents, the blocks, 
 - `req_quarry`, `req_dress`, `req_build`: 0 or 1 each;
 - `relay`: 0, 0.25, 0.5 or 0.75 (cfg:261).
 
-**Prior.** On the first tower the `quarry_face` table is filled with -(transport man-hours of the whole route + the site's per-tower stage labour + `setup_mh`) / tonnes (lines 1547-1552).
+**Prior.** On the first tower the `quarry_face` table is filled with -(transport man-hours of the whole route + the site's per-tower stage labour + `setup_mh`) / tonnes (lines 1547-1552). The transport man-hours are the cost the run charges for that face: they come from the same function, `leg_mh`, that charges the whole route (7.5), so they use the site's own haul rule and crews, L3 loading, and for a sea face its land legs, boat leg and hoists (with the payload split), plus the L1 rail-laying share when that flag is on (`_lay_share`). They are not the tower-formula price at mu 0.3 and 100 kg per person, except where the run uses that formula (clarification of 5 November 2026; the code already did this).
 
 **Choice.** Draws come from the community's own decision stream:
 1. **Imitation.** With probability `p_imit` = 0.3 (cfg:275; `imitation` true), the community looks at the last strategy of every neighbour within R. It takes the one with the lowest cost per tonne, if that is lower than its own last cost (or if it has none yet). It copies each dimension whose value is valid for itself; a quarry face is copied only if the neighbour's outcrop region is among its own faces.
 2. **Exploration.** For each remaining dimension, with probability `epsilon` = 0.1 (cfg:273) it picks a uniformly random value.
 3. **Exploitation.** Otherwise it picks the value with the highest Q. Untried values count as 0, and ties are broken uniformly at random.
 
-**Near-site rule (v14, 5 November 2026).** Config key `quarry.near_site_fixed_face_m` (`near_face_m`, `Static.near`, `choose`): absent, none or 0 = off (the steps above, unchanged); 1,000 m in the v14 configs (`config/v14_nearface/`, superseded) and in the v15 configs (`config/v15_haul15/`), with which the results in the paper are being regenerated. A site is near when its dry-ground route to its cheapest face (face 0; `haul_m` of `cache/haul/sites_haul_mu0.38.csv`, the same quantity as the rails threshold `long_min_haul_m`) is at most the key; a site with no mu 0.38 row is not near. A near site always quarries from face 0: its face is never copied in step 1 (the other dimensions are, and the `p_imit` draw is made as before), and in steps 2-3 the face gets 0 with no epsilon, Q or tie-break draw (the draws are skipped, not drawn and discarded, so the community's stream moves on to the next dimension). Sites over the threshold keep the choice among their `k_quarries` faces (and the sea face). `fixed_actions` (A0_verify) still take precedence. The rule and its value enter the run signature only when it is on, so every run with it off keeps its signature (identity tested). *Rationale.* A community next to an outcrop has no reason to fetch stone from a farther one (specified by the authors).
+**Near-site rule (v14, 5 November 2026).** Config key `quarry.near_site_fixed_face_m` (`near_face_m`, `Static.near`, `choose`): absent, none or 0 = off (the steps above, unchanged); 1,000 m in the v14 configs (`config/v14_nearface/`, superseded), the v15 configs (`config/v15_haul15/`, superseded) and the v16_final configs (`config/v16_final/`), with which the results in the paper are being regenerated. The rule is unchanged in v16_final; its own 1,000 m test on the dry-ground route is independent of the rails rule. A site is near when its dry-ground route to its cheapest face (face 0; `haul_m` of `cache/haul/sites_haul_mu0.38.csv`, the same quantity as the rails threshold `long_min_haul_m`) is at most the key; a site with no mu 0.38 row is not near. A near site always quarries from face 0: its face is never copied in step 1 (the other dimensions are, and the `p_imit` draw is made as before), and in steps 2-3 the face gets 0 with no epsilon, Q or tie-break draw (the draws are skipped, not drawn and discarded, so the community's stream moves on to the next dimension). Sites over the threshold keep the choice among their `k_quarries` faces (and the sea face). `fixed_actions` (A0_verify) still take precedence. The rule and its value enter the run signature only when it is on, so in the v14 and v15 codes every run with it off kept its signature (identity tested); v16_final changes every signature anyway (7.0). *Rationale.* A community next to an outcrop has no reason to fetch stone from a farther one (specified by the authors).
 
 **Sea face.** If the chosen face is the sea face and the tower has payload-split values, those are used (lines 1556-1562).
 
@@ -639,7 +657,7 @@ The initial state differs between seeds only through the residents, the blocks, 
 
 ### 7.7 Tasks of one tower, help requests and joint work
 
-`start_tower` (lines 1574-1713), `perform` (lines 1576-1609), `request` (lines 1187-1230), `_candidates_R` (lines 1291-1303), `_join_split` (lines 1480-1490), `_join_task` (lines 1492-1504), `_perform_join` (lines 1506-1520), `_hands_cap` (lines 1463-1478).
+`start_tower` (lines 1574-1713), `perform` (lines 1576-1609), `request` (lines 1187-1230), `_candidates_R` (lines 1291-1303), `_join_split` (lines 1480-1490), `_join_task` (lines 1492-1504), `_perform_join` (lines 1506-1520), `_hands_cap` (lines 1463-1478); v16_final: `_no_work_task`, `_owner_skill`, and the changed `_perform_join` and `_join_task`.
 
 **Task chain.** The tasks are created in order. Each is downstream of the previous one:
 1. **Quarry**, performed by the owner or with a helper (`req_quarry`). Labour = per-tower quarry labour x discount (7.9). On top, without discount: `setup_mh` = 200 man-hours (cfg:278) if the owner has not opened that region before (`shared_quarry` is false, so an ally's face is not free), plus the splitting man-hours.
@@ -647,9 +665,11 @@ The initial state differs between seeds only through the residents, the blocks, 
 3. **Transport.**
    - A relay is possible when relay > 0, the face has a route, its mu 0.3 cost C >= `relay_min_flatm` = 300 (cfg:262) and a hand-off exists.
    - The hand-off h is the first move at which the cumulative mu 0.3 cost reaches f x C (`Static.__init__`, lines 158-163).
-   - The owner asks for leg 1 among candidates nearer the quarry than itself (straight line).
-   - If one accepts, leg 1 (moves a..h) is a joint task and leg 2 (h..b) is done by the owner alone. Otherwise the owner hauls the whole route.
+   - The owner asks for leg 1 among its ordinary candidates (below). The "nearer the quarry than the owner" filter of the earlier codes (candidates whose site was nearer, straight line, to the face's quarry point than the owner's) was removed in v16 and is in no v16_final run.
+   - If one accepts, leg 1 (moves a..h) is a joint task and leg 2 (h..b) is done by the owner alone, and the tower's `relay_made` is set to 1 (4.11). Otherwise the owner hauls the whole route.
 4. **Build and lift** (`req_build`), at the site. This is the final task; its labour = (build + lift) per tower x discount.
+
+**Stage with no work** (v16_final D3; `perform`, `_no_work_task`). A quarry, dress or build stage whose labour before skill is 0 and that has no extra labour (setup, cuts) becomes the owner's 0-man-hour task, kept only so that the chain order is unchanged. In the headline this is the dress stage of single towers (dressing "none", 7.2). No help is asked (no ask counters, no acceptance draw, no trust change, no alliance), there is no levy, no helper walk and no skill credit. The `req_dress` dimension is still drawn, so the decision stream is unchanged; it has no effect on such a tower. Before v16_final such a stage could still be asked for help, give trust, move a helper's party and credit experience.
 
 **Candidates** (`_candidates_R`). Neighbours within `R_m` = 10 km (cfg:260; the headline value, decided 3 November
 2026; 5 and 15 km were run as a sensitivity on the audited headline, `MOST_REALISTIC_AUDITED_LIT_R5_P10` /
@@ -676,12 +696,13 @@ At most `max_asks` = 3 (cfg:263) are asked, in turn.
   - dress: 2 x pieces;
   - build: 6 x max(1, pieces / 16 courses);
   - leg 1: the sum of the pieces' crews;
-- the owner's task gets MH x (1 - f). The helper's task gets MH x f + walk, where walk = B_j x d / 1.39 / 3600: the helper's whole party, one way, d = straight-line distance from j to the quarry (quarry, dress, leg 1) or to the site (build);
+- skill stages (quarry, dress, build; v16_final D6, `_perform_join`): each party's share is priced at its own factor (7.9). The owner's task gets base x (1 - f) x the owner's discount (`_owner_skill`: the smaller of its skill factor and the S8 factor) + extra x (1 - f); the helper's task gets base x f x skill(j, s) + extra x f + walk. Base is the stage labour before skill; extra (setup, cuts) is not discounted. Before v16_final the main performer's factor was applied to the whole stage;
+- leg 1 (no skill): the owner's task gets MH x (1 - f), the helper's task MH x f + walk;
+- walk = B_j x d / 1.39 / 3600: the helper's whole party, one way, d = straight-line distance from j to the quarry (quarry, dress, leg 1) or to the site (build);
 - both parts are upstream of the next task (`t_up2`);
-- the discount (7.9) is that of the main performer: the helper if f > 0.5, else the owner;
-- that performer gets one unit of experience.
+- the main performer, the helper if f > 0.5, else the owner, gets one unit of experience (unchanged).
 
-*Rationale.* Asking outside one's own site and reciprocity-based trust are the mechanisms specified by the authors. The relay is the PI's example of neighbours dragging stone closer. "Join" replaced "handover" after handover slowed large sites (modelling agent's design choice, accepted by the authors). The logistic form, the betas, the trust steps, R and the number of asks have no published source (Appendix A).
+*Rationale.* Asking outside one's own site and reciprocity-based trust are the mechanisms specified by the authors. The relay is the PI's example of neighbours dragging stone closer. The "nearer the quarry" filter on relay helpers was dropped by the authors as a rule of little effect (v16). A stage with no work carries no help, walk or credit, and a helper uses its own skill (v16_final D3, D6: fixes that bring the code in line with the specification). "Join" replaced "handover" after handover slowed large sites (modelling agent's design choice, accepted by the authors). The logistic form, the betas, the trust steps, R and the number of asks have no published source (Appendix A).
 
 ### 7.8 Daily work
 
@@ -699,9 +720,10 @@ So a community spends its daily hours first on upstream stages, across its own a
 
 - **Skill.** skill(j, s) = (1 + cum[j, s])^(log2 b), with b = 0.85 (`alliance.defaults`, cfg:281; not overridden by `MOST_REALISTIC`), for s in quarry, dress, build (`skill`, lines 1117-1120).
 - **Discount.**
-  - Performed by the owner: min(skill(i, s), 0.85^t), where t is the tower index and the S8 rate is `learning_rate` = 0.15 (cfg:189) (lines 1597-1599; join mode: lines 1512-1514).
-  - Performed by a helper (main performer): skill(j, s).
-- **Experience.** Each credited task adds 1 to cum. With `specialisation` true, help given also counts.
+  - Performed by the owner: min(skill(i, s), 0.85^t), where t is the tower index and the S8 rate is `learning_rate` = 0.15 (cfg:189) (lines 1597-1599; join mode: `_owner_skill`).
+  - Performed by a helper alone: skill(j, s).
+  - Join mode (v16_final D6): the owner's share at min(skill(i, s), 0.85^t), the helper's share at skill(j, s) (7.7).
+- **Experience.** Each credited task adds 1 to cum. With `specialisation` true, help given also counts. A stage with no work (7.7) credits nothing.
 
 *Rationale.* Wright's (1936) curve gives the form; 0.85 is the midpoint of his 0.80-0.90 range. The S8 rate has no source; never applying both discounts avoids counting the same learning twice.
 
@@ -739,19 +761,21 @@ So a community spends its daily hours first on upstream stages, across its own a
 5. **Faces.** Two sites have only one face. The local-stone face (route -1) is never used: every site has at least one route.
 6. **Inactive preprocessing branches.** Snapping and the unreachable policy act on no site in the tables used (Appendix D).
 7. **Sea.** People never travel by sea at 2 kn (the people table is empty), so `wdist` is the straight-line distance. Sea faces exist at 46 sites; none uses a hoist landing.
-8. **Inactive switches.** Trackways (`tracks`), shared faces (`shared_quarry`), defectors, pre-existing ties, brokers and every v12, gaps and wider-literature switch are off. Their code paths are skipped by guards (`self.cz is None`, `hp is None`, `self.masons` false, `self.units is None`). The v13 social switches (`reputation`, `partner_choice`, `tie_imitation`, `social_log`) are off too, the v13g `reputation_rule` (default `all`) acts only through them, and the v13kd switch `trusted_nodist` (7.16) is off; their code is skipped by the guard `self.soc is None`, and with them off the outputs are identical to the frozen code (7.15).
+8. **Inactive switches.** Trackways (`tracks`), shared faces (`shared_quarry`), defectors, pre-existing ties, brokers and every v12, gaps and wider-literature switch are off. Their code paths are skipped by guards (`self.cz is None`, `hp is None`, `self.masons` false, `self.units is None`). The v13 social switches (`reputation`, `partner_choice`, `tie_imitation`, `social_log`) are off too, the v13g `reputation_rule` (default `all`) acts only through them, and the v13kd switch `trusted_nodist` (7.16) is off; their code is skipped by the guard `self.soc is None`, and with them off the outputs are identical to the frozen code (7.15). The v16 flags L1 `rails_cost_choice` and L4 `sea_priced_as_charged` are off (`lit.ADD4_DEFAULTS`); their parameter `rail_lay_mh_per_m` and the static choices `Static._l1_choice` and `Static._l4_sea_faces` are not used.
 9. **Numerical guards.** `sigmoid` returns 0 for arguments below -700 (line 117). Run signatures include code-version strings, so part files from older code are never reused (lines 36-55, 2044). The signature does not cover every input (7.0).
 10. **Relay geometry.** The hand-off position and the 300 flat-m minimum use the mu 0.3 cost, while the legs are costed at the site's own friction. The route geometry is the mu 0.3 path for every friction (7.1, item 5).
+11. **Stages with no work** (v16_final D3). The dress stage of single towers is a 0-man-hour owner task with no request, draw, trust change, walk or credit (7.7). The acceptance draws that such asks took from the asked communities' streams before v16_final are no longer made, so later draws of those streams shift.
+12. **One stone per site** (v16_final D11). A tower hauled from a sea face or from another land face keeps the density and hardness of the face-0 stone (7.2).
 
 ### 7.14 Random streams
 
 | Stream | Draws |
 |---|---|
 | `default_rng([seed, uid_int])` per site | residents (first uniform; with the ceiling, a dummy uniform keeps the stream aligned), then block masses (`code/alliance.py:325-356`) |
-| `default_rng([seed, uid_int, 7])` per community | imitation, exploration, tie-breaks of its own decisions; acceptance draws when it is asked (line 462) |
+| `default_rng([seed, uid_int, 7])` per community | imitation, exploration, tie-breaks of its own decisions; acceptance draws when it is asked (line 462; none for a stage with no work, 7.7) |
 | `default_rng([seed, 99991])` | start order (unused under P10), defectors (none) (lines 463-464, 487-490) |
 | `default_rng([seed, 4242])` | cohort permutation (`code/phasing.py:22-27`) |
-| `default_rng([seed, 31337, k])` | resident redraws under the ceiling (never used in the headline run) |
+| `default_rng([seed, 31337, k])` | resident redraws, only in a seed where the ceiling binds (7.3) |
 
 Seeds 1-100 (`seeds`, cfg:98; `code/model.py:parse_seeds`, lines 496-503). Every random stream is keyed by seed and site or role, so results do not depend on the number of ranks.
 
@@ -759,7 +783,7 @@ The v13 social switches, the v13g reputation rule (7.15) and the v13kd switch (7
 
 ### 7.15 Social mechanisms (v13; off in the headline)
 
-`_init_social`, `_bad`, `_social_gate`, `_partner_order`, `_imit_pool` (lines 1012-1088); calls in `AllianceModel.__init__` (lines 502-504), `charge` (lines 1160-1161), `request` (lines 1205-1206), `candidates` (lines 1276-1279), `choose` (lines 1314-1322) and `start_tower` (lines 1570-1572); output columns in `results` (lines 1886-1891, 1924-1926); signature (lines 2040-2043). v13g reputation rule: `reputation_rule`, `_rule_tag`, `_sig_sc` and the constants `REPUTATION_RULES`, `REPUTATION_RULE_VERSION` (lines 2146-2178, appended at the end of the file so that no earlier line moved); one-line calls in `_init_social` (line 1027), `_social_gate` (line 1057) and `signature` (lines 2005, 2041). Three opt-in scenario keys, each off unless set in the scenario, plus one rule key (`reputation_rule`) that acts only with `reputation`; none adds a numeric parameter. They are used only by the five v13 and the three v13g scenarios (Appendix B) and only with the v13 code.
+`_init_social`, `_bad`, `_social_gate`, `_partner_order`, `_imit_pool` (lines 1012-1088); calls in `AllianceModel.__init__` (lines 502-504), `charge` (lines 1160-1161), `request` (lines 1205-1206), `candidates` (lines 1276-1279), `choose` (lines 1314-1322) and `start_tower` (lines 1570-1572); output columns in `results` (lines 1886-1891, 1924-1926); signature (lines 2040-2043). v13g reputation rule: `reputation_rule`, `_rule_tag`, `_sig_sc` and the constants `REPUTATION_RULES`, `REPUTATION_RULE_VERSION` (lines 2146-2178, appended at the end of the file so that no earlier line moved); one-line calls in `_init_social` (line 1027), `_social_gate` (line 1057) and `signature` (lines 2005, 2041). Three opt-in scenario keys, each off unless set in the scenario, plus one rule key (`reputation_rule`) that acts only with `reputation`; none adds a numeric parameter. They are used only by the five v13 and the three v13g scenarios (Appendix B), with the v13 code and the codes that keep the switches (v15, v16_final; the v16_final queue reruns these cells).
 
 **Reputation** (`reputation: true`).
 - **Log.** Every decision of an asked community j on a request of i is logged in j's act log: a help as good, an unjustified refusal as bad.
@@ -793,7 +817,7 @@ The v13 social switches, the v13g reputation rule (7.15) and the v13kd switch (7
 
 ### 7.16 Trusted partners without distance penalty (v13kd; off in the headline)
 
-`TRUSTED_NODIST_VERSION`, `_init_kd`, `_kd_pair`, `_kd_cols` (lines 2183-2216, appended at the end of the file so that no earlier line moved); one-line calls in `SOCIAL_KEYS` (line 64), `_init_social` (line 1027), the acceptance logit of `request` (line 1201) and `results` (line 1891); signature through `_rule_tag` and `_sig_sc` (lines 2170-2180). One opt-in scenario switch, `trusted_nodist`, off unless set; it adds no numeric parameter and is used only by the two v13kd scenarios (Appendix B) and only with the v13 code.
+`TRUSTED_NODIST_VERSION`, `_init_kd`, `_kd_pair`, `_kd_cols` (lines 2183-2216, appended at the end of the file so that no earlier line moved); one-line calls in `SOCIAL_KEYS` (line 64), `_init_social` (line 1027), the acceptance logit of `request` (line 1201) and `results` (line 1891); signature through `_rule_tag` and `_sig_sc` (lines 2170-2180). One opt-in scenario switch, `trusted_nodist`, off unless set; it adds no numeric parameter and is used only by the two v13kd scenarios (Appendix B), with the v13 code and the codes that keep the switch (v15, v16_final).
 
 - **Rule.** In the acceptance logit of 7.7, the distance term beta3 d_ij / 1000 is set to 0 when requester i and asked community j form a **reciprocal dyad**: help has flowed in both directions between them so far in the run, `help_mh[(j, i)] > 0` and `help_mh[(i, j)] > 0` (`_kd_pair`). Every other pair keeps beta3 d_ij. `help_mh` counts man-hours actually charged, including walking, so a join-mode helper whose hands are capped to 0 (7.13) and a broker (reach > 1) count as having helped.
 - **Scope.** The rule acts only in the logistic branch of `request`. Tie-mode asks (`P_tie`), `accept_fixed` asks and defectors are as before. The help radius R and the candidate list (7.7) are unchanged: only the acceptance penalty changes, not who can be asked. The decision then passes through the social gate (7.15) as usual.
@@ -818,9 +842,9 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 
 | ID | Key (cfg line) | Value | Unit | Meaning as implemented (code) | Published range | Status | Citation | Acts? |
 |---|---|---|---|---|---|---|---|---|
-| P1 | `mr_work_party.residents_by_towers` (cfg:384) | [5,40], [40,110], [110,185], [185,260], [260,330], [330,400], [330,400] | persons | Residents ~ U[lo, hi] by TWR_N (`lit.draw_residents`; `alliance._population_ceiling`) | anchors 5-6 per household to about 400 per site | DERIVED | Webster 1991: 853-854; Webster 2015: 51; Webster & Webster 1998 (Duos about 70); Porcarzos about 400 (Webster 1991: 853); interpolation ours | yes |
+| P1 | `mr_work_party.residents_by_towers` (cfg:384) | [5,40], [40,110], [110,185], [185,260], [260,330], [330,400], [330,400] | persons | Residents ~ U[lo, hi], continuous, by TWR_N (`lit.draw_residents`; `alliance._population_ceiling`) | anchors 5-6 per household to about 400 per site | DERIVED | Webster 1991: 853-854; Webster 2015: 51; Webster & Webster 1998 (Duos about 70); Porcarzos about 400 (Webster 1991: 853); interpolation ours | yes |
 | P2 | `mr_work_party.adult_share` (cfg:385) | 0.4 | fraction | Builders = max(1, floor(0.4 r + 0.5)) (`lit.builders_of`) | 0.2-0.6 | DERIVED | Webster 1991: 854, Table 2 n. 4 (men = population/5), x 2 for adult women | yes |
-| P3 | `population_ceiling` (cfg:393) | 300,000 | persons | Ceiling on residents of the cohort building at once; redraw or scale (`alliance._population_ceiling`); never binding | 100,000-700,000 (PARAM_AUDIT P3) | SOURCED | Calò et al. 2008: 41 | yes (non-binding) |
+| P3 | `population_ceiling` (cfg:393) | 300,000 | persons | Ceiling on the residents of all communities of the run (v16 S3; before v16: of the cohort building at once); redraw or scale (`alliance._population_ceiling`) | 100,000-700,000 (PARAM_AUDIT P3) | SOURCED | Calò et al. 2008: 41 | yes (binding reported per seed, 7.3) |
 | P4 | `scenarios.household_size` (cfg:114) | 5 | persons | Households of non-cooperators (`model.Site`) | 5-6 | SOURCED | Webster 1991: 852-854; Webster 1996 | no |
 | T1 | phase fraction (`_P10`) | 0.1 | fraction of sites | 10 cohorts; next starts when all earlier are built (`phasing.split_name`, `phasing.cohorts`, `alliance.season_step`) | none | Authors' assumption (specified by the authors) | no literature sets cohorts; context Webster 1991: 853; Ialongo 2018: 29 | yes |
 | T2 | cohort membership | random per seed | - | `default_rng([seed, 4242]).permutation` (`phasing.cohorts`) | none | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes |
@@ -838,9 +862,9 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | B9 | `lit_scenarios.density_kg_m3.limestone/marble` | 2,600 | kg/m³ | Mass factor | 2,420-2,711 (comparative) | Authors' assumption (modelling agent's design choice, accepted by the authors) | Turner 2020: 276-279 (comparative) | yes |
 | B10 | `lit_scenarios.density_kg_m3.metamorphic` | 2,750 | kg/m³ | Mass factor | 2,600-2,800 | REPORTED-ONLY | textbook values, no page | yes |
 | B11 | `lit_scenarios.hardness` (cfg:183) | basalt 2.0, granite 2.0, limestone/marble 1.0, metamorphic 1.0 (others 1.0) | factor | Multiplies quarry and dress labour (`lit.stage_hours`) | dressing ratio 1.83 | Authors' assumption (modelling agent's design choice, accepted by the authors) | Hurst 1905: 382 via Boswinkel 2021: 120 (dressing, comparative) | yes |
-| Q1 | `lit_scenarios.quarry_ph_m3.scree` (cfg:147) | 2.0 | ph/m³ | Quarry rate off outcrop (`lit.stage_hours`) | - | SOURCED | Boswinkel 2021: 108, Table 7.2 | yes |
-| Q2 | `lit_scenarios.quarry_ph_m3.joints_low` | 11.1 | ph/m³ | Quarry rate on outcrop | - | SOURCED | Boswinkel 2021: 108 (0.09 m³/ph) | yes |
-| Q3 | quarry rule (cfg:225) | joints_low on outcrop, scree off | rule | `lit.resolve_site` | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | context: Webster 1991: 848; Lilliu & Zucca 2005: 41 | yes |
+| Q1 | `lit_scenarios.quarry_ph_m3.scree` (cfg:147) | 2.0 | ph/m³ | Quarry rate off outcrop, only with L2 off (`lit.stage_hours`, `lit.resolve_site`) | - | SOURCED | Boswinkel 2021: 108, Table 7.2 | no (L2 on in v16_final) |
+| Q2 | `lit_scenarios.quarry_ph_m3.joints_low` | 11.1 | ph/m³ | Quarry rate at every site under L2 (v16; before: on outcrop only) | - | SOURCED | Boswinkel 2021: 108 (0.09 m³/ph) | yes |
+| Q3 | quarry rule (cfg:225); `add4.bedrock_everywhere` (v16 L2, default true) | joints_low at every site (L2); joints_low on outcrop, scree off only with L2 off | rule | `lit.resolve_site` | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | context: Webster 1991: 848; Lilliu & Zucca 2005: 41 | yes |
 | Q4 | dress rule (cfg:227-cfg:228) | none at 1 tower; Webster at 2; fine at >= 3 | rule | `lit.resolve_site` | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | context: Contu 2002: 29-32; Lilliu & Zucca 2005 | yes |
 | Q5 | `lit_scenarios.webster_md_per_tower` (cfg:142) | quarry 500, dress 1,300, build 700 (transport 1,100 unused) | man-days/tower | Webster stage labour (`lit.stage_hours`) | - | SOURCED | Webster 1991: 852-853, Table 1 | dress and build only; quarry 500: no effect |
 | Q6 | `lit_scenarios.facade` (cfg:154) | 131.2 / 40.95 | ph/m³ | Facing increment 90.25 ph/m³ on fine-dressed sites (`lit.stage_hours`) | 95.7-166.7 / 6.7-75.2 | DERIVED | Boswinkel 2021: 144, Table 8.3 (midpoints) | yes |
@@ -859,8 +883,9 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | H2 | `lit_scenarios.f_person_kgf` (cfg:173) | 30 | kgf | Pull per person = 30/mu (`lit.transport`) | 20-46 | SOURCED | Richards & Whitby 1997: 237, 242; de Haan 2009: 6 | yes |
 | H3 | `transport.pull_kg_per_person` (cfg:73) | 100 | kg/person | Boat-leg crews and boat factor (`sea.params`); sea-table route choice | - | DERIVED | 30 kgf / 0.3 | yes (sea faces) |
 | H4 | `transport.return_walk_ms` (cfg:78) | 1.39 | m/s | Empty walk back; helper walks (`alliance.trip`, `_join_task`) | 1.31-1.47 | SOURCED | Tobler 1993: 3; de Haan 2009: 7 | yes |
-| H5 | `transport.load_unload_h` (cfg:79) | 0.25 | h per trip | Loading and unloading; half per relay leg | 0.25-0.33 | DERIVED | Boswinkel 2021: 116; de Haan 2009: 7 | yes |
-| H6 | `transport.min_haul_flatm` (cfg:80) | 100 (15 in the v15 configs, 7.5) | flat-m | Minimum haul of a whole route | up to 200 m | SOURCED | Boswinkel 2021: 116; Webster 1991: 852 | yes |
+| H5 | `transport.load_unload_h` (cfg:79) | 0.25 | h per trip | Loading and unloading per crew member; half per relay leg. Replaced on land faces by H5b under L3 | 0.25-0.33 | DERIVED | Boswinkel 2021: 116; de Haan 2009: 7 | no with L3 on (v16_final); yes in the two loading sensitivity configs (L3 off) |
+| H5b | `add4.load_ph_per_t` with `add4.load_per_tonne` true (v16 L3; `lit.ADD4_DEFAULTS`, no line in the configs) | 1.2 | person-hours per tonne | Loading and unloading per tonne of the tower moved, half per relay leg, on land faces (`AllianceModel._crew_trip_mh`, 7.5); v16 row, added after the parameter audit | - | Authors' assumption (specified by the authors) | value of the C3 haul profile (Boswinkel 2021 rates, Appendix B) | yes (v16_final runs) |
+| H6 | `transport.min_haul_flatm` (cfg:80) | 100 (15 in the v15 and v16_final configs, 7.5) | flat-m | Minimum haul of a whole route | up to 200 m | SOURCED | Boswinkel 2021: 116; Webster 1991: 852 | yes |
 | H7 | `REALISTIC.mixed.short.mu` (cfg:230) | 0.38 | - | Dry-ground sledge: crews 78.9 kg/person, mu 0.38 route costs | 0.25-0.5 | SOURCED | Boswinkel 2021: 114, 124 | yes |
 | H8 | `REALISTIC.mixed.long.mu` (cfg:231); `alliance.track_mu` (cfg:277) | 0.1 | - | Tallowed rails: crews 300 kg/person, mu 0.1 route costs (`track_mu`: tracks off) | - | SOURCED | Richards & Whitby 1997: 239 | yes |
 | H9 | `REALISTIC.mixed.long_min_haul_m` (cfg:229) | 1,000 | m | Rails where the mu 0.38 route exceeds it (`lit.mixed_haul`) | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes |
@@ -871,7 +896,7 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | H14 | `join_hands_per_block` (cfg:394) | quarry 4, dress 2, build 6 | hands per piece | Join cap (`_hands_cap`) | - | SOURCED | build: Hodges 1989 via Boswinkel 2021: 116, 124; de Haan 2009: 22; quarry: Richards & Whitby 1997: 238 (weak); dress: none | yes (non-binding) |
 | K1 | `stone_rule` (cfg:26); `allowed_stones` (cfg:27) | hybrid; 7 classes | rule | Recorded stone else 7 permitted classes (`preprocess.run_rule`) | - | Authors' assumption (specified by the authors) | Webster 2001: 122-123; Gallin 1989 via Webster 1991: 848 | yes (via cache) |
 | K2 | `alliance.k_quarries` (cfg:252) | 5 | faces | k-best faces per site (`tools/kbest_quarries.py`) | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes (via cache) |
-| K2b | `quarry.near_site_fixed_face_m` (v14 and v15 configs only; absent in `config_full_audited.yaml`) | 1,000 | m | Near-site rule: a site whose dry-ground route to its cheapest face is at most this length always uses that face (7.6); v14 row, added after the parameter audit | - | Authors' assumption (specified by the authors) | no source; same quantity as the rails threshold `long_min_haul_m` | yes (v14, v15 runs) |
+| K2b | `quarry.near_site_fixed_face_m` (v14, v15 and v16_final configs only; absent in `config_full_audited.yaml`) | 1,000 | m | Near-site rule: a site whose dry-ground route to its cheapest face is at most this length always uses that face (7.6); v14 row, added after the parameter audit | - | Authors' assumption (specified by the authors) | no source; same quantity as the rails threshold `long_min_haul_m` | yes (v14, v15, v16_final runs) |
 | K3 | `alliance.setup_mh` (cfg:278) | 200 | man-hours | Opening a face not yet used by the community | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source (plausibility: Webster 1991: 848; Boswinkel 2021: 122) | yes |
 | A1 | `alliance.R_m` (cfg:260) | 10,000 | m | Radius for requests, relays, imitation | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes |
 | A2 | `alliance.max_asks` (cfg:263) | 3 | candidates | Asks per task | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes |
@@ -896,7 +921,7 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | T-5 | `nodata_snap_radius_cells` (cfg:51) | 20 | cells (600 m) | Site snapping (`preprocess.py:106, 245`; `tools/kbest_quarries.py:135`) | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | technical (addendum) | no effect (no site snapped) |
 | T-6 | `unreachable_policy` (cfg:55) | local_min_haul | - | Local quarry for unreachable sites (`preprocess.py:143`; applied unconditionally in `run_rule`, lines 300-305) | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | technical (addendum) | no effect (no unreachable site) |
 
-**Count:** 76 rows: 70 audit rows, of which 69 act on the headline (P4 does not), plus the 6 addendum keys.
+**Count:** 76 rows: 70 audit rows, of which 69 act on the headline (P4 does not), plus the 6 addendum keys. Rows K2b (v14) and H5b (v16) were added after the audit and are not counted. In v16_final, Q1 and H5 do not act on the headline (L2, L3).
 
 ### A.2 Switches and derived constants of the headline (not parameter rows of the audit)
 
@@ -906,6 +931,7 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | `tracks`, `shared_quarry`, `defector_frac`, `track_cost_mh_per_m` | false, false, 0.0, 2.0 (cfg:280-281) | off; track cost acts only with tracks |
 | `imitation` | true (cfg:281) | enables A8 |
 | `tech_rules` | REALISTIC (cfg:392) | per-site rules (7.2) |
+| `add4` block (v16; absent in the v16_final configs, so the defaults `lit.ADD4_DEFAULTS` apply) | `bedrock_everywhere` true, `load_per_tonne` true, `rails_cost_choice` false, `sea_priced_as_charged` false, `rail_lay_mh_per_m` 2.0, `load_ph_per_t` 1.2 | L2 (7.2, Q3) and L3 (7.5, H5b) on; L1 and L4 off, so `rail_lay_mh_per_m` has no effect. The two loading sensitivity configs set `load_per_tonne` false |
 | `REALISTIC.density`, `REALISTIC.learning` | true (cfg:221) | S6 density and hardness; S8 |
 | `lit_scenarios.fine_min_towers` | 2 (cfg:156) | gate for fine facing; never binds (REALISTIC requires >= 3) |
 | `v11.webster_day_fix` | true (cfg:93) | enables T5 |
@@ -922,6 +948,8 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | derived: boat time | 0.27 h per km of sea route | 7.5 |
 
 ## Appendix B. Scenario families (delta descriptions against the headline)
+
+**v16_final.** The v16_final queue (`config/queues/queue_v16_final.tsv`, configs `config/v16_final/`) reruns every scenario of the v15 queue with the v16_final code, so each family below then carries the v16_final rules unless the row sets the quantity itself: the minimum haul of 15 m, the near-site rule, L2 and L3 (where they act: L2 on the per-site technique rules, L3 on land faces of the tech-rules transport), the relay candidates without the "nearer the quarry" filter, the ceiling on all communities, and the D3, D6 and D11 fixes. In the S21 levy rows, levied work booked in a season beyond the season's budget (days x share x party x hours) counts against the next season's budget (v16 S2; `census_v12.Census.season_start`); before v16 the used budget was reset to 0 at each season start.
 
 Each family changes the headline (or, for the earlier families, its own baseline) by the switch named. Origin labels and the literature behind each idea are taken from `SCENARIO_PROVENANCE_v2.csv` of the results package (column `idea_group_origin`; non-superseded rows; 486 scenario names). Quotations are not reproduced.
 
@@ -1017,6 +1045,7 @@ The model was developed by an AI research agent (the modelling agent) under the 
   - alliance checks: A0_verify equals webster, trust toy model, relay additivity, rank independence (`verify_alliance.py`);
   - sea, literature, scenario and pre-network checks;
   - reproducibility (`test_reproducibility.py`);
+  - v16 flags and fixes: each `add4` flag off = earlier rule, on = new rule, and S2, S3, L5, spread and signature checks (`test_add4_flags.py`); the D3, D6 and D11 fixes and the signature (`test_v16_final.py`);
   - identity tests whenever code changed.
 - **Audit trail.** Every parameter that acts on the headline was audited against the literature, with an evidence status and the action taken (PARAM_AUDIT.md, PARAM_AUDIT_ADDENDUM.md). A traceability matrix links each audited parameter to its configuration key, the code lines that read it and the queued scenarios that vary it (TRACEABILITY.md, PARAM_TRACE.csv); it also links each literature idea to its scenarios (IDEA_TRACE.csv). The audited values form the parameter set of the full audited run. The code of that run is frozen with checksums.
 
@@ -1051,11 +1080,12 @@ The code and configuration win in every case; this description follows them. "Do
 | D10 | Configuration comments: geometry "15 m, truncated cone 12 m -> 8 m" (cfg:157); transport comments "Value unchanged" (cfg:75, cfg:77) | Values 14 m, 12 -> 6.8 m and 0.27 m/s are what the code reads (TRACEABILITY.md also notes these stale comments) |
 | D11 | PARAM_TRACE.csv and TRACEABILITY.md: T5 (`webster_day_hours`) "acts on MR_P10" | Partly true. Under the REALISTIC rules quarrying is always `joints_low` or `scree`, so the 5-h quarry day (and the transport day) never enter the headline. The dress and build entries (8 h) are read by `lit.stage_hours` (`lit.md_hours`, lines 86-88; `lit.stage_hours`, lines 95, 103) and do act: "acts on MR_P10" is right for dress and build, and wrong only for the quarry and transport hours (as in A.1, row T5) |
 | D12 | PARAM_AUDIT Q5: Webster's 500 / 1,300 / 700 man-days act on MR_P10 | Only the dress (1,300) and build (700) man-days act; the quarry 500 md is replaced by the per-m³ quarry rule in every site |
-| D13 | Paper draft Table A3 and METHODS (S6): "density and hardness of the quarry stone" | `lit.mass_factor` and `lit.stage_hours` know only basalt, granite, limestone/marble and metamorphic. Acid volcanic (1,450 sites), andesite (517), schist (42), tuff (32) and trachyte (6), 2,047 sites in all, use Webster's 2,386 kg/m³ (mass factor 1) and hardness 1 |
-| D14 | Paper draft 3.5 and Table A3: "routes up to 1 km use sledges on dry ground and longer routes use tallowed rails"; the density of "the actual stone" | The friction rule and the quarry stone are fixed per site from its mu 0.38 cheapest-outcrop route (`lit.mixed_haul`), whichever of the 5 faces is chosen. Face routes are the mu 0.3 paths re-costed at the site's friction (`kbest_mu038.py`), not re-optimised |
+| D13 | Paper draft Table A3 and METHODS (S6): "density and hardness of the quarry stone" | `lit.mass_factor` and `lit.stage_hours` know only basalt, granite, limestone/marble and metamorphic. With the face-0 stone of v16_final (7.2), acid volcanic (1,451 sites), andesite (516), schist (42), tuff (34), trachyte (6) and other intrusive (1), 2,050 sites in all in the headline cache, use Webster's 2,386 kg/m³ (mass factor 1) and hardness 1 |
+| D14 | Paper draft 3.5 and Table A3: "routes up to 1 km use sledges on dry ground and longer routes use tallowed rails"; the density of "the actual stone" | The friction rule is fixed per site from its mu 0.38 cheapest-outcrop route (`lit.mixed_haul`), and the quarry stone (since v16_final D11) from the class of its face 0 in `sites_haul.csv` (`Static._face0_stone`); both hold whichever of the 5 faces is chosen. Face routes are the mu 0.3 paths re-costed at the site's friction (`kbest_mu038.py`), not re-optimised |
 | D15 | METHODS.md 9.1 and PARAM_AUDIT row 11a: relay hand-off "at f of the route's drag cost" | The hand-off move and the 300 flat-m minimum use the mu 0.3 cost (`Static.__init__`, lines 158-163; `start_tower`, line 1653). The legs are then costed at the site's own friction (mu 0.38 or 0.1) |
 | D16 | Paper draft (Tables A1-A3, Appendix A.1): drag 0.6 m/s, walk 1.4 m/s, workers = 0.5 x residents, jointed rock 11 ph/m³, and a different credit for the per-site building stone | Code and configuration: 0.27 m/s, 1.39 m/s, 0.4, 11.1 ph/m³; tower 14 m with top 6.8 m. The credit for the per-site building stone is Nurnet's data (Nurnet GeoPortal) |
 | D17 | `tools/v12_checks.py` (pattern checks, 1.3) and `tools/v12_summary.py`, `tools/family_summary.py` | They read the v11 run's outputs and use the v11 MOST_REALISTIC_P10 parts as the paired reference (paths written into the scripts). The V_duration note still says "work party = 0.5 x residents (3-20)". They have not yet been run against the full audited outputs |
+| D18 | PARAM_AUDIT rows Q1, Q3 and H5 and PARAM_TRACE.csv: the scree rate acts off the outcrop and `load_unload_h` acts on every trip of the headline | In the v16_final code with the v16_final configs, L2 makes every site quarry along joints, so the scree rate does not act, and L3 replaces the per-crew loading on land faces by 1.2 person-hours per tonne, so `load_unload_h` does not act (7.2, 7.5; Appendix A, rows Q1, Q3, H5, H5b). The audit describes the rules before v16 |
 
 ## Appendix E. References
 

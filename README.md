@@ -50,7 +50,7 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   (join mode prices each party at its own skill), D11 (the site's stone is the class of the face it hauls from). The
   run signature includes `CODE_VERSION` and the add4 settings (`code/CHANGES_V15B_OUTCROP.md`, `CHANGES_V16.md`,
   `CHANGES_V16_FINAL.md`, `code/METHODS.md`). The results in the paper are being regenerated with v16_final: this
-  code with the configs in `config/v16_final/`. The ODD describes the rules up to v15.
+  code with the configs in `config/v16_final/`. The ODD describes v16_final (ODD change log).
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
@@ -309,6 +309,8 @@ Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma 
 
 ## Changes
 
+- 2026-11-05 (ODD): `ODD/ODD.md` (and `ODD/ODD.pdf`) now describe the v16_final code and configs; the ODD has a
+  change log under its version line.
 - 2026-11-05 (v16_final): `code/` is now the v16_final code: the v15 code + the v15b on-outcrop fix (`preprocess.py`:
   the on-outcrop test uses the stone set a site actually quarries) + the addendum-4 flags in an `add4:` config block
   (L2 `bedrock_everywhere` and L3 `load_per_tonne` ON by default, L1 `rails_cost_choice` and L4
