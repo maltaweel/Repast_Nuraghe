@@ -289,7 +289,7 @@ alliance:
     A4_trust_track:    {requests: true, trust: true, tracks: true}
     A5_full:           {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true}
     A5_full_freerider: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2}
-    A5_full_freerider_V13repgpc: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2, reputation: true, partner_choice: true, reputation_rule: gentle}   # V13g A5FR_repg_pc: run ONLY with this config and code/ (= the run's code_v13/)
+    A5_full_freerider_V13repgpc: {requests: true, trust: true, specialisation: true, tracks: true, shared_quarry: true, defector_frac: 0.2, reputation: true, partner_choice: true, reputation_rule: gentle}   # V13g A5FR_repg_pc: run ONLY with this config and the v13 code (the run's code_v13/, CODE_PROVENANCE.md)
   verify_scenarios:
     A0_verify:         {b: 1.0, setup_mh: 0, imitation: false, fixed_actions: {quarry_face: 0}}
   sensitivity:        # on A5_full, 10 seeds each (full factorial)

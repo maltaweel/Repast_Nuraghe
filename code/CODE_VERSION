@@ -1,0 +1,2 @@
+code_v14_nearface 2026-11-05 (NEARFACE_VERSION 2026-11-05-nearface-1; CODE_VERSION string unchanged 2026-10-29-bugfix)
+base: full_audited/code (frozen audited v12, CODE_SHA256SUMS); changes: CHANGES_V14_NEARFACE.md

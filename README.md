@@ -29,11 +29,19 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   successful neighbours, and gains skill with experience (ODD sections 3-4). The 10 km help radius is the headline
   value; a sensitivity ran it at 5 and 15 km on the audited headline (`MOST_REALISTIC_AUDITED_LIT_R5_P10` /
   `_R15_P10`, `config/config_R5_audited.yaml` / `config_R15_audited.yaml`, ODD Appendix B).
+- **Quarry face choice and the near-site rule (v14).** Each site has up to 5 candidate quarry faces (the k-best
+  least-cost routes); at each tower it picks one by epsilon-greedy learning (exploration with epsilon = 0.1,
+  otherwise the face with the best learned value) or by imitating a cheaper neighbour. From 5 November 2026 the code
+  has a near-site rule (config key `quarry.near_site_fixed_face_m`, 1,000 m in the v14 configs `config/v14_nearface/`;
+  absent or 0 = off): a site whose dry-ground route to its nearest (cheapest) face is at most 1,000 m always quarries
+  from that face, with no exploration, value choice or imitation of the face (the other choices are unchanged).
+  Sites farther away keep the choice among their faces. With the key off the outputs are identical to the frozen
+  code. The results in the paper are being regenerated with this rule (ODD section 7.6; `code/CHANGES_V14_NEARFACE.md`).
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
   and island years (the time until the last tower is finished), over 100 seeds per scenario (ODD section 4.11).
-- **v13 social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), off by default and in the headline, used only by five v13 scenarios; with them off the outputs are identical to the frozen code (ODD section 7.15; `CODE_PROVENANCE.md`). A rule key `reputation_rule` (`all`, the default, or `gentle`: only defectors' and ungrateful refusals cost standing) is used by three v13g scenarios (`config/config_v13g_*.yaml`); with the default the outputs and signatures of the v13 runs are unchanged. A further switch `trusted_nodist` (no distance penalty in the acceptance of help between reciprocal partners, after Kasper & Borgerhoff Mulder 2015, Fig. 2) is used by two v13kd scenarios (`config/config_v13k_*.yaml`; ODD section 7.16); with it absent the outputs and signatures of every earlier run are unchanged.
+- **v13 social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), off by default and in the headline, used only by five v13 scenarios; with them off the outputs are identical to the frozen code (ODD section 7.15; `CODE_PROVENANCE.md`). A rule key `reputation_rule` (`all`, the default, or `gentle`: only defectors' and ungrateful refusals cost standing) is used by three v13g scenarios (`config/config_v13g_*.yaml`); with the default the outputs and signatures of the v13 runs are unchanged. A further switch `trusted_nodist` (no distance penalty in the acceptance of help between reciprocal partners, after Kasper & Borgerhoff Mulder 2015, Fig. 2) is used by two v13kd scenarios (`config/config_v13k_*.yaml`; ODD section 7.16); with it absent the outputs and signatures of every earlier run are unchanged. These switches are in the v13 code, which is `code/` of this repository before the v14 update (`CODE_PROVENANCE.md`); the current `code/` (v14) does not have them.
 - **Parameters.** No parameter is calibrated: every value has an audited source (author, year, page) or is
   declared an assumption (`param_audit/`).
 
@@ -94,19 +102,20 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
 ## Repository layout
 
 ```
-code/            the model and its tools: the code of the full audited run + the v13 social switches (CODE_PROVENANCE.md)
+code/            the model and its tools: the code of the full audited run + the v14 near-site face rule (CODE_PROVENANCE.md)
   model.py         entry point (baseline, cooperation, literature, alliance and pre-network scenarios)
   alliance.py      adaptive alliances / MOST_REALISTIC; lit.py, sea.py, phasing.py, pre_networks.py, census_v12.py
   preprocess.py    haul tables (least-cost quarry -> site); nbcommon.py config loader + Dijkstra
   tools/ tests/    derived-input builders, post hoc analyses, verification
   full_chain.sh    the serialized chain that ran the full audited queue
-config/          config_full_audited.yaml (+ 84 variants, tost_configs/), queues/, sea_expect/, check_sea_meta.py
+config/          config_full_audited.yaml (+ 84 variants, tost_configs/), v14_nearface/ (the v14 rerun configs), queues/,
+                 sea_expect/, check_sea_meta.py
 data/            data/nurnet/ (Nurnet's data, included); the other inputs are fetched (data/README.md; data/derived/README.md)
 notebooks/       01-05: setup, inputs (fetch_data.py), scenarios, analysis, audit; HOW_TO_USE.md; Jupyter or Colab
 param_audit/     parameter audit and traceability (public-safe copies)
 tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders; not in the frozen snapshot)
 outputs/         everything a run writes (NOT committed, except reference/ and summary/ for the audit)
-CODE_SHA256SUMS  checksums of the run's code snapshot;  CODE_PROVENANCE.md  what differs and why
+CODE_SHA256SUMS  checksums of the run's code snapshot (CODE_V13_/CODE_V14_SHA256SUMS: v13, v14);  CODE_PROVENANCE.md  what differs and why
 ```
 
 ## Requirements / Installation
@@ -215,6 +224,16 @@ cd $RUN && NURAGHE_RUN_DIR=$RUN PYTHON=$PYTHON CUTOFF="2099-12-31 23:59" \
 deadline; dropped entries are listed in `outputs/logs/dropped.tsv`). Progress lines go to `$RUN/FULL_NOTES.md`.
 The queue was estimated at about 34 hours of wall time on the 8 GB machine that ran it.
 
+### The v14 rerun (near-site rule)
+
+`config/queues/queue_v14.tsv` holds the entries of the full audited queue that the near-site rule affects (every
+entry with a quarry-face choice), each on its config in `config/v14_nearface/` (the audited config with
+`quarry.near_site_fixed_face_m: 1000`; `cache_dir`/`output_dir` point to `v14_nearface/outputs`, relative to the
+config). `code/v14_chain.sh` runs it like `full_chain.sh`. In the run folder above: copy `config/v14_nearface/*.yaml`
+to `$RUN/v14_nearface/configs/`, write the queue to `$RUN/v14_nearface/queue_v14.tsv` with the same `sed`, link
+`$RUN/code_v14_nearface` to `$REPO/code`, and give `$RUN/v14_nearface/outputs/cache*` the same inputs as the
+audited caches (links); its runs get their own signatures, so the audited outputs are not touched.
+
 ## Parameter audit and traceability
 
 - `param_audit/PARAM_AUDIT.md` (+ `PARAM_AUDIT_ADDENDUM.md`): every parameter that acts on the headline scenario
@@ -240,6 +259,14 @@ Sardegna 1:25,000, © Regione Autonoma della Sardegna / ARPAS, CC BY 4.0. DEM: C
 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA.
 Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma della Sardegna, PPR 2006 layer
 'Fiumi torrenti e altri corsi d'acqua' ('fiumitorrenti'), see provider. Details and links: `data/README.md`.
+
+## Changes
+
+- 2026-11-05 (v14): near-site face rule (`quarry.near_site_fixed_face_m`): a site whose dry-ground route to its
+  nearest face is at most 1,000 m always quarries from that face. `code/` is now the v14 code (frozen v12 code +
+  this rule in `alliance.py`; the v13 social switches are in the previous version of `code/`); v14 configs
+  `config/v14_nearface/`, queue `config/queues/queue_v14.tsv`, checksums `CODE_V14_SHA256SUMS`. The results in the
+  paper are being regenerated with this rule.
 
 ## Citation
 

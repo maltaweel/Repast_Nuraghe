@@ -1,6 +1,6 @@
 # Code provenance
 
-## The run snapshot (frozen v12 code) and the v13 code
+## The run snapshot (frozen v12 code), the v13 code and the v14 code
 
 The full audited run (2-4 November 2026; configuration `config/config_full_audited.yaml`, queues
 `config/queues/queue_full.tsv` and `queue_full_p23.tsv`) used ONE frozen copy of the code: every run started
@@ -30,18 +30,39 @@ hashed (gzip headers hold time stamps). All four scenarios are identical; combin
 | `P_D7_G20_kmesh4_trust` (pre-existing ties) | `44815b219875` | 18 | `75fb5d033e32a5ee` |
 | `MOST_REALISTIC_S20_lintels_3t0_P10` (census lintel path, which also calls `candidates` / `request`) | `803f9dd92a21` | 20 | `f962d1f48b491873` |
 
-`code/` in this repository is the v13 code (the superset), scrubbed for publication.
+**v14 (5 November 2026; the current `code/`).** The run's code folder `code_v14_nearface/` is a copy of the frozen
+code with one changed model file, `alliance.py`: the near-site face rule (config key `quarry.near_site_fixed_face_m`;
+`code/CHANGES_V14_NEARFACE.md`, `code/METHODS.md`, ODD 7.6). With the key absent, none or 0 the code path, the random
+draws and the run signatures are those of the frozen code (identity test on the headline, seeds 1, 2, 3, 17, 64,
+`A5_full_freerider` and `P_G20_system_kmesh4`, seeds 1-2: every part file identical in its decompressed
+content). The v14 configs (`config/v14_nearface/`, queue `config/queues/queue_v14.tsv`) are the audited
+configs with `near_site_fixed_face_m: 1000` and their `cache_dir`/`output_dir` moved to `v14_nearface/outputs`; the
+queue holds the audited entries the rule affects (every entry with a face choice), run with `code/v14_chain.sh` (in a
+run folder, link `code_v14_nearface` to this repository's `code/`). The results in the paper are being regenerated with
+this rule. `CODE_V14_SHA256SUMS` holds the v14 checksums of the same 107 files as `CODE_SHA256SUMS` (only the
+`alliance.py` line differs); `CHANGES_V14_NEARFACE.md`, `CODE_VERSION` and `v14_chain.sh` were added with the code and
+are not in the checksum files.
+
+**The v14 code does not carry the v13 switches.** It was built on the frozen code, not on `code_v13/`. The v13, v13g
+and v13kd configs and queues stay in `config/` as the record of those runs, but they need the v13 code: `code/` of this
+repository before the v14 update (`git log -- code/alliance.py`; that version also has the three v13 side-chain
+scripts). Run with the v14 code, their switches would have no effect.
+
+`code/` in this repository is the v14 code, scrubbed for publication.
 
 Check: `cd code && sha256sum -c ../CODE_SHA256SUMS`. Result for this repository: **46 OK** (byte-identical to the
 run), **56 FAILED** (scrubbed, listed below; `alliance.py` also carries the v13 switches), **5 missing** (excluded,
 listed below). Against the v13 checksums (`sha256sum -c ../CODE_V13_SHA256SUMS`): **46 OK (v13)**,
-**56 FAILED (v13)**, **5 missing (v13)**.
+**56 FAILED (v13)**, **5 missing (v13)**. Against the v14 checksums (`sha256sum -c ../CODE_V14_SHA256SUMS`):
+**46 OK (v14)**, **56 FAILED (v14)**, **5 missing (v14)**.
 
 **Line numbers.** The ODD (`ODD/ODD.md`) cites the v13 `alliance.py`. The tables of `param_audit/` were written
 on the frozen code and cite its line numbers (the v13 rows A10-A12 are marked "(v13)"). A frozen line n of
 `alliance.py` is v13 line n + k: k = 0 for n <= 55, 9 for 56-492, 12 for 493-999, 90 for 1000-1069, 92 for
 1070-1112, 94 for 1113-1182, 99 for 1183-1214, 100 for 1216-1218 (frozen line 1215 = v13 lines 1314-1315),
-104 for 1219-1465, 107 for 1466-1778, 113 for 1779-1810, 116 for 1811-1923, 120 for 1924-2024.
+104 for 1219-1465, 107 for 1466-1778, 113 for 1779-1810, 116 for 1811-1923, 120 for 1924-2024. The `alliance.py`
+in `code/` is now the v14 file: a frozen line n is v14 line n + k: k = 0 for n <= 55, 15 for 56-174, 22 for
+175-1211, 23 for 1212-1222, 25 for 1223-1232, 28 for 1233-1923, 32 for 1924-2023.
 
 ## What the scrub changed
 
@@ -67,22 +88,23 @@ Only comments, docstrings, prose and paths; no model logic, parameter value or r
 **How this was confirmed.** For every changed `.py` file the token stream without comments and docstrings was
 compared with the snapshot (Python `tokenize`/`ast`); for `.sh` and `.yaml` files the lines without their comment
 part. The only non-comment differences are the edits listed in the last column below. Model core files that are
-byte-identical to the run (frozen and v13 alike): `model.py`, `nbcommon.py`, `sea.py`, `census_v12.py`, `pre_networks.py`, `report.py`,
+byte-identical to the run (frozen, v13 and v14 alike): `model.py`, `nbcommon.py`, `sea.py`, `census_v12.py`, `pre_networks.py`, `report.py`,
 `report_alliance.py`, `memrun.py`, `tools/kbest_quarries.py`, `tools/kbest_mu038.py`, `tools/sea_routes.py`,
 `tools/build_cost_mu.py`, `tools/wl_inputs.py`, `tools/food_capacity.py`, `tools/haul_far.py` and all
 `tests/*.py` except `tests/verify_alliance_identity.py`. `lit.py`, `preprocess.py` and `phasing.py` differ
-in comments/docstrings only; `alliance.py` differs from the v13 copy in comments/docstrings only (and from the frozen
-copy by the v13 switches as well). The configs in `config/` were checked the same way: YAML-parsed,
+in comments/docstrings only; `alliance.py` differs from the v14 copy in comments/docstrings only (and from the frozen
+copy by the near-site rule as well). The configs in `config/` were checked the same way: YAML-parsed,
 each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`, `materiale.citation` and the
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (62; 222 lines in total)
+## Changed files (61; 219 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
-| `METHODS.md` | no | 39 | prose (names, message quotes/timestamps, stone-data citation) |
-| `alliance.py` | yes | 8 | comments/docstrings |
+| `CHANGES_V14_NEARFACE.md` | no | 2 | prose (names, message quotes/timestamps, stone-data citation) |
+| `METHODS.md` | no | 40 | prose (names, message quotes/timestamps, stone-data citation) |
+| `alliance.py` | yes | 5 | comments/docstrings |
 | `aud_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `config.ship.yaml` | yes | 1 | comments/docstrings |
 | `config.yaml` | yes | 20 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
@@ -139,9 +161,7 @@ README).
 | `tools/workforce_years.py` | yes | 2 | comments/docstrings |
 | `v11_chain.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `v12_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
-| `v13_side_chain.sh` | no | 3 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
-| `v13g_side_chain.sh` | no | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
-| `v13kd_side_chain.sh` | no | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
+| `v14_chain.sh` | no | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `wl_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 
 ## Excluded from the repository, and why
@@ -153,14 +173,14 @@ README).
 | `report/make_report.py` (+ two report notes) | PDF report builder that copies text verbatim from the excluded notes and literature reviews and credits internal agents; not needed to run the model |
 | `tools/components.py`, `tools/master_comparison.py` | post hoc checks that read a collaborator's private output files by name (and write that name into their outputs); not needed to run the model |
 | `gpu/` (`coop_kernel.py`, `coop_kernel_pr.py`, two `.diff` files) | GPU port that imports GPU modules not in the snapshot (a collaborator's code); not runnable here and not used by the full audited run |
-| `v11_to_v12.patch`, `__pycache__/` | development patch with internal notes; bytecode |
+| `v11_to_v12.patch`, `v12_to_v14_nearface.patch`, `__pycache__/` | development patches with internal notes (the v14 change is the diff of `alliance.py` between the frozen and the v14 code, described in `CHANGES_V14_NEARFACE.md`); bytecode |
 
 `run_all.sh` still names `tools/components.py`, `tools/master_comparison.py` and `report/make_report.py` in its last
 lines (step 8); those three calls fail in this repository. Nothing in `full_chain.sh` or the queues uses them.
 
 ## Not part of the snapshot
 
-Not in `CODE_SHA256SUMS` or `CODE_V13_SHA256SUMS`:
+Not in `CODE_SHA256SUMS`, `CODE_V13_SHA256SUMS` or `CODE_V14_SHA256SUMS`:
 - `tools_extra/build_slope.py` (the slope raster, see `data/derived/README.md`), `tools_extra/build_dem.py`,
   `tools_extra/build_lithology.py` and `tools_extra/build_rivers.py` (builders of the public input layers from their
   official downloads);

@@ -1,16 +1,16 @@
 ---
 title: "ODD protocol: an agentic agent-based model of nuraghe construction (headline scenario MOST_REALISTIC_AUDITED_LIT_P10)"
 author: "Anonymous authors (model and scenarios); description drafted by the modelling agent"
-date: "3 November 2026"
+date: "5 November 2026"
 ---
 
 # ODD protocol: an agentic agent-based model of nuraghe construction
 
 **Model.** Nuraghe-construction agent-based model (ABM) by the authors, written in Python on repast4py (Collier and Ozik, 2022) with MPI, numba, numpy, pandas and scipy.
 
-**Version described.** The code and configuration of the full audited run of 2 November 2026, with the v13 social switches, the v13g reputation rule (7.15) and the v13kd switch `trusted_nodist` (7.16).
+**Version described.** The code and configuration of the full audited run of 2 November 2026, with the v13 social switches, the v13g reputation rule (7.15) and the v13kd switch `trusted_nodist` (7.16), and the v14 near-site face rule of 5 November 2026 (7.6; `quarry.near_site_fixed_face_m`). The results in the paper are being regenerated with the near-site rule on (configs `config/v14_nearface/`).
 
-- Code: `code/` (the v13 code: the frozen code of the run plus three opt-in social switches in `alliance.py`, off by default, the v13g `reputation_rule` key, default `all`, and the v13kd switch `trusted_nodist`, off by default (7.16); with them off the outputs are identical to the frozen code, see 7.15 and `CODE_PROVENANCE.md`). Checksums: `CODE_SHA256SUMS` (frozen code, used by every run of the full audited queue) and `CODE_V13_SHA256SUMS` (v13). The repository copy differs from these only in comments and docstrings (`CODE_PROVENANCE.md`), so the line numbers below hold. Line numbers of `alliance.py` are those of the v13 file.
+- Code: `code/` (from 5 November 2026 the v14 code: the frozen code of the run plus the near-site face rule in `alliance.py`, key `quarry.near_site_fixed_face_m`, off when absent; with it off the outputs are identical to the frozen code, see 7.6 and `CODE_PROVENANCE.md`). The v13 code (the frozen code plus three opt-in social switches in `alliance.py`, off by default, the v13g `reputation_rule` key, default `all`, and the v13kd switch `trusted_nodist`, off by default; 7.15, 7.16) is `code/` of the repository before the v14 update; the v14 code does not carry these switches. Checksums: `CODE_SHA256SUMS` (frozen code, used by every run of the full audited queue), `CODE_V13_SHA256SUMS` (v13) and `CODE_V14_SHA256SUMS` (v14). The repository copy differs from these only in comments and docstrings (`CODE_PROVENANCE.md`). Line numbers of `alliance.py` are those of the v13 file; `CODE_PROVENANCE.md` converts them to the frozen and v14 files.
 - Configuration: `config/config_full_audited.yaml`, cited as `cfg:<line>`.
 - Cached derived inputs: `cache_dir` of the configuration (`cache/` below; rebuild instructions in `data/derived/README.md`).
 
@@ -270,7 +270,7 @@ write per-seed output files (4.11, 7.12)
 ### 4.3 Adaptation
 
 At the start of each tower a community chooses (`start_tower`, lines 1532-1546; `choose`, lines 1306-1346):
-- its quarry face (one of up to 5, or a sea face);
+- its quarry face (one of up to 5, or a sea face; with the v14 near-site rule on, a site within 1,000 m of its nearest face always uses that face, 7.6);
 - whether to ask for help with quarrying, dressing and building (each 0 or 1);
 - the relay fraction (0, 0.25, 0.5 or 0.75).
 
@@ -629,6 +629,8 @@ The initial state differs between seeds only through the residents, the blocks, 
 2. **Exploration.** For each remaining dimension, with probability `epsilon` = 0.1 (cfg:273) it picks a uniformly random value.
 3. **Exploitation.** Otherwise it picks the value with the highest Q. Untried values count as 0, and ties are broken uniformly at random.
 
+**Near-site rule (v14, 5 November 2026).** Config key `quarry.near_site_fixed_face_m` (`near_face_m`, `Static.near`, `choose`): absent, none or 0 = off (the steps above, unchanged); 1,000 m in the v14 configs (`config/v14_nearface/`), with which the results in the paper are being regenerated. A site is near when its dry-ground route to its cheapest face (face 0; `haul_m` of `cache/haul/sites_haul_mu0.38.csv`, the same quantity as the rails threshold `long_min_haul_m`) is at most the key; a site with no mu 0.38 row is not near. A near site always quarries from face 0: its face is never copied in step 1 (the other dimensions are, and the `p_imit` draw is made as before), and in steps 2-3 the face gets 0 with no epsilon, Q or tie-break draw (the draws are skipped, not drawn and discarded, so the community's stream moves on to the next dimension). Sites over the threshold keep the choice among their `k_quarries` faces (and the sea face). `fixed_actions` (A0_verify) still take precedence. The rule and its value enter the run signature only when it is on, so every run with it off keeps its signature (identity tested). *Rationale.* A community next to an outcrop has no reason to fetch stone from a farther one (specified by the authors).
+
 **Sea face.** If the chosen face is the sea face and the tower has payload-split values, those are used (lines 1556-1562).
 
 *Rationale.* Communities "search for the most optimal way to build" (aim specified by the authors). The update is the standard bandit form (Sutton & Barto 2018: 28, 32, 34). The rates are assumptions.
@@ -867,6 +869,7 @@ Citations are those found by the audit, shortened. † marks a page still to be 
 | H14 | `join_hands_per_block` (cfg:394) | quarry 4, dress 2, build 6 | hands per piece | Join cap (`_hands_cap`) | - | SOURCED | build: Hodges 1989 via Boswinkel 2021: 116, 124; de Haan 2009: 22; quarry: Richards & Whitby 1997: 238 (weak); dress: none | yes (non-binding) |
 | K1 | `stone_rule` (cfg:26); `allowed_stones` (cfg:27) | hybrid; 7 classes | rule | Recorded stone else 7 permitted classes (`preprocess.run_rule`) | - | Authors' assumption (specified by the authors) | Webster 2001: 122-123; Gallin 1989 via Webster 1991: 848 | yes (via cache) |
 | K2 | `alliance.k_quarries` (cfg:252) | 5 | faces | k-best faces per site (`tools/kbest_quarries.py`) | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes (via cache) |
+| K2b | `quarry.near_site_fixed_face_m` (v14 configs only; absent in `config_full_audited.yaml`) | 1,000 | m | Near-site rule: a site whose dry-ground route to its cheapest face is at most this length always uses that face (7.6); v14 row, added after the parameter audit | - | Authors' assumption (specified by the authors) | no source; same quantity as the rails threshold `long_min_haul_m` | yes (v14 runs) |
 | K3 | `alliance.setup_mh` (cfg:278) | 200 | man-hours | Opening a face not yet used by the community | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source (plausibility: Webster 1991: 848; Boswinkel 2021: 122) | yes |
 | A1 | `alliance.R_m` (cfg:260) | 10,000 | m | Radius for requests, relays, imitation | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes |
 | A2 | `alliance.max_asks` (cfg:263) | 3 | candidates | Asks per task | - | Authors' assumption (modelling agent's design choice, accepted by the authors) | no source | yes |
