@@ -201,7 +201,8 @@ class Census:
         if sc.get("clearance"):                              # S18: clearance stone first (scree rate, min_haul_flatm haul)
             rem = float(self.clear_budget[i])
             qt, mix = [], []
-            tmin = m.trip(0.0, 0.0, "whole")                 # min haul both ways (min_haul_flatm)
+            L3 = bool(getattr(m, "L3", False))               # v16 L3 on the clearance haul too (fix 6 Nov, docking F7)
+            tmin = m.trip(0.0, 0.0, "whole", float(m.tp["drag_speed_ms"]), 0.0) if L3 else m.trip(0.0, 0.0, "whole")
             for t in range(tw):
                 tn = float(m.towers[i][t][0])
                 s_t = 0.0 if tn <= 0 else min(1.0, max(0.0, rem / tn))
@@ -209,7 +210,7 @@ class Census:
                 self.clear_t[i] += s_t * tn
                 q0 = m.site_stage[i]["quarry"]
                 qt.append(q0 * (1.0 - s_t) + s_t * self.vol_tower * float(self.L["quarry_ph_m3"]["scree"]))
-                mix.append((1.0 - s_t, s_t * float(m.tower_tech[i][t][1]) * tmin))
+                mix.append((1.0 - s_t, s_t * float(m.tower_tech[i][t][1]) * tmin + (s_t * tn * m.lp if L3 else 0.0)))
             self.q_tower[i] = qt
         if sc.get("bichrome"):                               # S23: share b of the facing blocks from the contrast stone
             b = float(sc["bichrome"]["b"])
@@ -228,12 +229,15 @@ class Census:
                     ratio = min(3.0, max(1.0, f0["C"] / f0["L"])) if f0["L"] > 0 else 1.0
                     rails = Lc > float(self.L["list"]["REALISTIC"]["mixed"]["long_min_haul_m"])
                     pull_c = float(self.L["f_person_kgf"]) / (0.1 if rails else 0.38)
-                    trip = m.trip(Lc * ratio, Lc, "whole")
+                    L3 = bool(getattr(m, "L3", False))       # v16 L3 on the contrast haul too (fix 6 Nov, docking F5)
+                    trip = m.trip(Lc * ratio, Lc, "whole", float(m.tp["drag_speed_ms"]), 0.0) if L3 else \
+                        m.trip(Lc * ratio, Lc, "whole")
                     out = []
                     for t in range(tw):
                         crews = float(np.ceil(mp[tp_ == t] / pull_c).sum())
                         sh, ex = mix[t]
-                        out.append((sh - share, ex + share * crews * trip))
+                        ld = share * float(m.towers[i][t][0]) * m.lp if L3 else 0.0
+                        out.append((sh - share, ex + share * crews * trip + ld))
                     mix = out
                     self.contrast_m[i] = Lc
         if mix is not None:
@@ -301,6 +305,9 @@ class Census:
             C, L = float(mv[f0["a"]:f0["b"]].sum()), f0["L"]
         else:
             C, L = f0["C"], f0["L"]
+        if getattr(m, "L3", False):                          # v16 L3 on the lintel haul too (fix 6 Nov)
+            return float(self.lintel_crew[i]) * m.trip(C, L, "whole", float(m.tp["drag_speed_ms"]), 0.0) + \
+                float(self.lintel["kg"]) / 1000.0 * m.lp
         return float(self.lintel_crew[i]) * m.trip(C, L, "whole")
 
     def _lintel_helpers(self, i):

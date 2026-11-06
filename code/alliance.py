@@ -1016,6 +1016,8 @@ class AllianceModel:
                 base["mv"] = S.mv_c03 if o["moves"] == "c03" else self._wl("mv_" + o["moves"])
             if "load_ph_per_t" in o:                       # C3: lever loading per tonne replaces the crew's 0.25 h
                 base["load"], base["load_ph_t"] = 0.0, float(o["load_ph_per_t"])
+        if self.L3 and base["load_ph_t"] <= 0.0:          # v16 L3 also on the profile path (fix 6 Nov, GLM docking
+            base["load"], base["load_ph_t"] = 0.0, self.lp # F3/F4): rows without their own loading rate get per-tonne
         profs, split = [base], base["pull"]
         w = hp.get("wet")
         if w and rule == "short":                          # M3: sledge on wetted ground (rails are not wetted)
@@ -1628,6 +1630,10 @@ class AllianceModel:
                     if cn_.size == 0:
                         continue
                     n = 1
+                if n <= 0 and p["sel"] == "sledge" and p["load_ph_t"] > 0.0 and p["w"] > 0.0:
+                    tn = self.towers[o][t_o][0]           # M4 + L3: loading per tonne of the tower is booked on the sledge
+                    mh += p["w"] * tn * p["load_ph_t"] * (1.0 if part == "whole" else 0.5)   # profile even if every
+                    continue                              # piece is eligible for walking (fix 6 Nov)
                 if n <= 0 or p["w"] <= 0.0:
                     continue
                 if face["route"] < 0 or a == b:
