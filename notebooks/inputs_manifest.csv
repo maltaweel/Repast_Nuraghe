@@ -94,7 +94,7 @@ code,code/CHANGES_V16.md,7102,2ab401cb018bb2bc4ab50898d8a4bf6a45a4c151c23cd5c779
 code,code/CHANGES_V16_FINAL.md,5393,50be920671fd6ef886923b91dda4d7c1800420a59a880d3a9fc99c50aced315c,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/CODE_VERSION,654,87fc2e21b88340435c3766c31ddfe78a8a894db740fe1cc382aec51e3b245e29,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/METHODS.md,115050,7bb291740cea16ff666fa9f0df0477261262a8cebfb1a61e3a6f8a60e6304525,run;rebuild,repository code (CODE_PROVENANCE.md)
-code,code/alliance.py,157074,62f40d1791ce57e349409deeba26c84f248ec22617ed9fa4547fba5458e334b6,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/alliance.py,157077,8a3694362f0b4e4ce0e68d397ba3c6b7eaeceb2ab7776ae6b2c1c09b23b76d9f,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/aud_chain.sh,4219,d11260027aa54ef572c9893056e6d28d2d61313f44be79176cd1ee63e23aa71b,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/census_v12.py,30010,27745080d68b0a8177137b05025b9c439a20d776a1c249cba49bee9ae2c7b909,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/config.ship.yaml,12600,b785a1f64cd752869a608dd94b8ec211275e5471fdfc8e7c91b04369631a3759,run;rebuild,repository code (CODE_PROVENANCE.md)

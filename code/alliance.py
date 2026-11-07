@@ -1016,7 +1016,7 @@ class AllianceModel:
                 base["mv"] = S.mv_c03 if o["moves"] == "c03" else self._wl("mv_" + o["moves"])
             if "load_ph_per_t" in o:                       # C3: lever loading per tonne replaces the crew's 0.25 h
                 base["load"], base["load_ph_t"] = 0.0, float(o["load_ph_per_t"])
-        if self.L3 and base["load_ph_t"] <= 0.0:          # v16 L3 also on the profile path (fix 6 Nov, GLM docking
+        if self.L3 and base["load_ph_t"] <= 0.0:          # v16 L3 also on the profile path (fix 6 Nov, model docking
             base["load"], base["load_ph_t"] = 0.0, self.lp # F3/F4): rows without their own loading rate get per-tonne
         profs, split = [base], base["pull"]
         w = hp.get("wet")
@@ -1662,7 +1662,7 @@ class AllianceModel:
 
     def _load_t(self, o, t):
         """Tonnes of tower t of site o that are loaded on sledges (L3, C3, M4, sea legs): the tower's tonnes minus
-        the S17 rubble core, which goes by basket with no loading term (spec 14.7, addendum 8b; fix 7 Nov, Opus
+        the S17 rubble core, which goes by basket with no loading term (spec 14.7, addendum 8b; fix 7 Nov, model
         docking R013)."""
         tn = float(self.towers[o][t][0])
         if self.cz is not None and self.cz.fill_f > 0.0:
