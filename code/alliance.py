@@ -1631,7 +1631,7 @@ class AllianceModel:
                         continue
                     n = 1
                 if n <= 0 and p["sel"] == "sledge" and p["load_ph_t"] > 0.0 and p["w"] > 0.0:
-                    tn = self.towers[o][t_o][0]           # M4 + L3: loading per tonne of the tower is booked on the sledge
+                    tn = self._load_t(o, t_o)             # M4 + L3: loading per tonne of the tower is booked on the sledge
                     mh += p["w"] * tn * p["load_ph_t"] * (1.0 if part == "whole" else 0.5)   # profile even if every
                     continue                              # piece is eligible for walking (fix 6 Nov)
                 if n <= 0 or p["w"] <= 0.0:
@@ -1649,7 +1649,7 @@ class AllianceModel:
                     continue
                 mh += p["w"] * n * self.trip(C, L, part, p["speed"], p["load"])
                 if p["load_ph_t"] > 0.0:                  # C3: lever loading + unloading per tonne (half per relay leg)
-                    tn = self.towers[o][t_o][0]
+                    tn = self._load_t(o, t_o)
                     mh += p["w"] * tn * p["load_ph_t"] * (1.0 if part == "whole" else 0.5)
             return mh, 0
         if face["route"] < 0 or a == b:
@@ -1660,13 +1660,22 @@ class AllianceModel:
         L = face["L"] if (part == "whole" and a == face["a"] and b == face["b"]) else float(S.mv_len[a:b].sum())
         return self._crew_trip_mh(Ssite, C, L, part, o), 0
 
+    def _load_t(self, o, t):
+        """Tonnes of tower t of site o that are loaded on sledges (L3, C3, M4, sea legs): the tower's tonnes minus
+        the S17 rubble core, which goes by basket with no loading term (spec 14.7, addendum 8b; fix 7 Nov, Opus
+        docking R013)."""
+        tn = float(self.towers[o][t][0])
+        if self.cz is not None and self.cz.fill_f > 0.0:
+            tn -= self.cz.fill_tonnes(o)
+        return tn
+
     def _crew_trip_mh(self, crews, C, L, part, o):
         """Man-hours of a land trip (whole route or relay leg) for `crews` person-trips. v15b: crews x trip, the trip
         including load_unload_h per crew member (half per relay leg). v16 L3 (add4.load_per_tonne): crews x (drag +
         walk) + load_ph_per_t x tonnes of the tower (half per relay leg), independent of crew size and friction."""
         if not self.L3:
             return crews * self.trip(C, L, part)
-        tn = float(self.towers[o][int(self.tower_idx[o])][0])
+        tn = self._load_t(o, int(self.tower_idx[o]))
         return crews * self.trip(C, L, part, float(self.tp["drag_speed_ms"]), 0.0) + \
             tn * self.lp * (1.0 if part == "whole" else 0.5)
 
@@ -1698,7 +1707,7 @@ class AllianceModel:
             if rk and F["rails_cost_choice"]:
                 mh += F["rail_lay_mh_per_m"] * max(hm, fl) / self.tw_n[o]
         if self.L3:
-            mh += 2.0 * float(self.towers[o][t][0]) * self.lp
+            mh += 2.0 * self._load_t(o, t) * self.lp
         return mh + S03p * face["boat_h"] + nblk * face["hoist_ph"]
 
     def _sea_variant(self):
