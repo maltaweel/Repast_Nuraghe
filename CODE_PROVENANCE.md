@@ -97,7 +97,7 @@ listed below). Against the v13 checksums (`sha256sum -c ../CODE_V13_SHA256SUMS`)
 **61 FAILED (v13)**, **5 missing (v13)**. Against the v14 checksums (`sha256sum -c ../CODE_V14_SHA256SUMS`):
 **41 OK (v14)**, **61 FAILED (v14)**, **5 missing (v14)**. Against the v15 checksums
 (`sha256sum -c ../CODE_V15_SHA256SUMS`): **41 OK (v15)**, **61 FAILED (v15)**, **5 missing (v15)**. Against the
-v16_final checksums (`sha256sum -c ../CODE_V16_FINAL_SHA256SUMS`): **44 OK (v16_final)**, **60 FAILED (v16_final)**,
+v16_final checksums (`sha256sum -c ../CODE_V16_FINAL_SHA256SUMS`): **45 OK (v16_final)**, **59 FAILED (v16_final)**,
 **5 missing (v16_final)**.
 
 **Line numbers.** The ODD (`ODD/ODD.md`) cites the v13 `alliance.py`. The tables of `param_audit/` were written
