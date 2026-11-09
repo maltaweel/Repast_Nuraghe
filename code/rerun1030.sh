@@ -11,7 +11,7 @@
 # STEPS="g r h" (default all); STEPS="h" reruns only the post-processing.
 #
 # Wall-time estimate (min) from the 29 Oct night chain (output_new/logs/night_chain.log, same 6 ranks / 8 GB cgroup),
-# +~5% for the longer post-fix builds (subset: island seasons +1..+9%):
+# plus a margin for the longer post-fix builds:
 #   g  MR join P10 353 s, P20 744 s, P100 1,545 s; handover P10 ~360 s (29 Oct: rescued, merge only 34 s; per-seed
 #      cost = join), P20 397 s, P100 1,274 s; alone P10 141 s, P20 145 s, P100 157 s = 5,116 s ............... ~90
 #   r  Morris MR_P10: design 4 s + 60 runs x 1 seed, 6 parallel 281 s + analyse ~5 s ......................   ~5

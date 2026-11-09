@@ -3,9 +3,9 @@
 # from the FIXED merged code, into a NEW root RUN/output_1030b/ (old results stay in output/, output_new/, output_1030/).
 #   start (detached, only when told):  nohup bash merged/rerun1030b.sh > RUN/output_1030b_chain.out 2>&1 &
 #
-# What changes (measured, scratch/fix1030b): a site-run can change only if 0 < n_coop < max hh_n <= household_size (5).
-#   low:    982 of 716,700 delivered site-runs qualify (seeds 1-10: 82 qualify, 82 change) -> RERUN (100 seeds).
-#   mixed, mostly: 0 qualifying site-runs in all 100 delivered seeds -> provably unchanged. Step v reruns them anyway
+# What changes: a site-run can change only if 0 < n_coop < max hh_n <= household_size (5).
+#   low:    the site-runs that qualify -> RERUN (100 seeds).
+#   mixed, mostly: unchanged where no site-run qualifies (checked on the delivered seeds). Step v reruns them anyway
 #           (100 seeds, ~5 min) and asserts content identity with the delivered runs; their delivered outputs stand.
 #   none/full/high/patchwork, literature, S9, alliance, MOST_REALISTIC: unchanged (byte-identical on the subsets).
 # Derived products that read low (all rebuilt here; every non-low row is checked against the delivered table in step k):

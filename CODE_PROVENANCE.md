@@ -150,7 +150,7 @@ each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`,
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (72; 329 lines in total)
+## Changed files (72; 815 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
@@ -159,8 +159,8 @@ README).
 | `CHANGES_V15_HAUL15.md` | no | 3 | prose (names, message quotes/timestamps, stone-data citation) |
 | `CHANGES_V16.md` | no | 16 | prose (names, message quotes/timestamps, stone-data citation) |
 | `CHANGES_V16_FINAL.md` | no | 25 | prose (names, message quotes/timestamps, stone-data citation) |
-| `METHODS.md` | no | 44 | prose (names, message quotes/timestamps, stone-data citation) |
-| `alliance.py` | yes | 13 | comments/docstrings |
+| `METHODS.md` | no | 523 | methods-only public copy (github_repo_tools/public/METHODS.md): model results removed, values of the v16_final configs |
+| `alliance.py` | yes | 15 | comments/docstrings |
 | `aud_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `config.ship.yaml` | yes | 1 | comments/docstrings |
 | `config.yaml` | yes | 24 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
@@ -174,8 +174,8 @@ README).
 | `preprocess.py` | yes | 2 | comments/docstrings |
 | `report_alliance.py` | yes | 1 | comments/docstrings |
 | `requirements.txt` | no | 5 | Python line 3.10+ -> 3.12+; packages appended (imported by the code, missing from the run's list) |
-| `rerun1030.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
-| `rerun1030b.sh` | yes | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
+| `rerun1030.sh` | yes | 5 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
+| `rerun1030b.sh` | yes | 7 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `run_all.sh` | yes | 1 | comments/docstrings |
 | `run_subset_real.sh` | yes | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `run_subset_sea.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
@@ -190,7 +190,7 @@ README).
 | `tests/mr_join_subset_body.sh` | yes | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `tests/phase_subset.sh` | yes | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `tests/test_L2B_engine_scope.py` | no | 1 | functional path -> env variable |
-| `tests/test_add4_flags.py` | no | 2 | functional path -> env variable |
+| `tests/test_add4_flags.py` | no | 2 | comments/docstrings; functional path -> env variable |
 | `tests/test_v16_final.py` | no | 1 | functional path -> env variable |
 | `tests/v11_subset.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `tests/v12_item11.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
@@ -212,7 +212,7 @@ README).
 | `tools/phased_posthoc.py` | yes | 1 | comments/docstrings |
 | `tools/scenario_guide.py` | yes | 5 | output label text (names only) |
 | `tools/stone_rule.py` | yes | 2 | comments/docstrings |
-| `tools/v11_queue.py` | yes | 1 | comments/docstrings |
+| `tools/v11_queue.py` | yes | 2 | comments/docstrings |
 | `tools/v11_summary.py` | yes | 2 | functional path -> env variable; output label text (names only) |
 | `tools/v12_checks.py` | yes | 2 | functional path -> env variable |
 | `tools/v12_queue.py` | yes | 1 | comments/docstrings |
@@ -231,7 +231,7 @@ README).
 
 | Item | Why |
 |---|---|
-| all working-note `.md` files of the snapshot except `METHODS.md` and the `CHANGES_*.md` notes (bug reports, run notes, realism ratings, scenario plans, review notes, catalogue drafts, patch notes) | internal working notes with message quotes, timestamps and internal names. `METHODS.md` is kept, scrubbed; it still refers to some of these notes by name |
+| all working-note `.md` files of the snapshot except `METHODS.md` and the `CHANGES_*.md` notes (bug reports, run notes, realism ratings, scenario plans, review notes, catalogue drafts, patch notes) | internal working notes with message quotes, timestamps and internal names. `METHODS.md` is published as a methods-only version (no model results; since 9 Nov 2026 kept by hand outside the run folder), and it still refers to some of these notes by name |
 | `literature/` (two literature reviews, a scenario plan, a PDF of a published article) | verbatim passages of copyrighted works and a copyrighted PDF |
 | `report/make_report.py` (+ two report notes) | PDF report builder that copies text verbatim from the excluded notes and literature reviews and credits internal agents; not needed to run the model |
 | `tools/components.py`, `tools/master_comparison.py` | post hoc checks that read a collaborator's private output files by name (and write that name into their outputs); not needed to run the model |

@@ -15,6 +15,7 @@ date: "5 November 2026"
 - Cached derived inputs: `cache_dir` of the configuration (`cache/` below; rebuild instructions in `data/derived/README.md`).
 
 **Change log of this description.**
+- 9 November 2026: 7.8 rationale (no run count); Appendix D note on the revised public `code/METHODS.md` (methods only, no model results).
 - 7 November 2026 (v16_final, S17 fill loading fix): 7.5 (per-tonne loading on block tonnes only; the S17 rubble core is excluded).
 - 6 November 2026 (v16_final, L3 scope fix): 7.5 (L3 on every sledge haul: haul profiles without their own loading rate, S18 clearance, S23 contrast stone, S20 lintels).
 - 5 November 2026 (v16_final): version line; Guidance item 10; summary panels; 2.1, 2.7, 4.3, 4.6, 4.7, 4.9, 4.11, 4.12, 5.1, 5.2; 7.0 (run signature, code location); 7.1 (on-outcrop test); 7.2 (quarrying along joints everywhere, stone of face 0); 7.3 (ceiling on all communities, continuous residents); 7.4 (mass factor of the face-0 stone); 7.5 (loading per tonne); 7.6 (face prior at the charged cost); 7.7 (no-work stages, relay candidates, join priced per party); 7.9; 7.13; 7.14; 7.15 and 7.16 (codes that keep the switches); Appendix A (P1, P3, Q1-Q3, H5, H6, K2b, new row H5b, A.2 `add4` block); Appendix B (v16_final note, S21 levy); Appendix C (tests); Appendix D (D13, D14, D18).
@@ -716,7 +717,7 @@ At most `max_asks` = 3 (cfg:263) are asked, in turn.
 
 So a community spends its daily hours first on upstream stages, across its own and helped towers, in creation order. Downstream stages proceed in parallel, capped by the share done upstream. There is no idle accounting: labour is the task totals.
 
-*Rationale.* In the baseline model, builders were never idle (716,700 webster site-runs, module docstring). A tower's labour therefore equals transport plus stage labour, and its duration follows from capacity and the upstream cap.
+*Rationale.* In the baseline model, builders are never idle (the `webster` day kernel; `code/alliance.py` module docstring). A tower's labour therefore equals transport plus stage labour, and its duration follows from capacity and the upstream cap.
 
 ### 7.9 Skill and within-site learning
 
@@ -1066,7 +1067,7 @@ The model was developed by an AI research agent (the modelling agent) under the 
 
 ## Appendix D. Discrepancies between the code and older documents
 
-The code and configuration win in every case; this description follows them. "Docs" are `code/METHODS.md`, `param_audit/PARAM_AUDIT.md`, `param_audit/PARAM_AUDIT_ADDENDUM.md`, `param_audit/PARAM_TRACE.csv`, `param_audit/TRACEABILITY.md`, `AUDITED_LIT_SPEC.md` (results package), the paper draft (in preparation), and comments in the code and configuration.
+The code and configuration win in every case; this description follows them. On 9 November 2026 the public `code/METHODS.md` was replaced by a methods-only version (no model results) that follows the code for D1-D4, D13 and D15 and refers to this description for the headline model; the rows below keep the earlier wording of that file for the record. "Docs" are `code/METHODS.md`, `param_audit/PARAM_AUDIT.md`, `param_audit/PARAM_AUDIT_ADDENDUM.md`, `param_audit/PARAM_TRACE.csv`, `param_audit/TRACEABILITY.md`, `AUDITED_LIT_SPEC.md` (results package), the paper draft (in preparation), and comments in the code and configuration.
 
 | # | Document says | Code / configuration does |
 |---|---|---|

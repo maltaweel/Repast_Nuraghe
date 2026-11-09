@@ -8,8 +8,8 @@ season of season_days working days. The island is coupled (help, trust, tracks, 
 simulates the WHOLE island for its own seeds (MPI.COMM_SELF), as in the `high` scenario: results do not depend
 on the rank count.
 
-Labour model. Inside a community everyone cooperates exactly as in `webster`/`full`. In every one of the
-716,700 webster site-runs the builders were never idle, so a tower's labour is exactly
+Labour model. Inside a community everyone cooperates exactly as in `webster`/`full`. The builders of the
+webster day kernel are never idle, so a tower's labour is exactly
     transport (sum over blocks of crew x trip time)  +  quarry + dressing + walling + lifting (Webster stages)
 and its duration is that labour divided by the workforce. This module therefore represents each tower as a
 chain of stage TASKS (quarry -> dress -> [track] -> transport (relay leg 1 -> leg 2) -> build/lift), each with

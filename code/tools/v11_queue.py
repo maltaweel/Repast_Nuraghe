@@ -7,7 +7,7 @@
   4 the remaining 1 Nov S10-S14 and C1-C3 / M1-M4 variants, highest rating first
 Writes outputs/queue.tsv: prio, label, kind, est_s, ranks, config, args (model.py arguments after the config).
 Estimated wall times (s, 100 seeds) from the 29 Oct - 1 Nov chain logs (runs/2026-10-29-bugfix/output_new/logs,
-runs/2026-11-01-wider-lit/code/WIDER_LIT_1101.md); pull125 from the 300-site subset (about 2x the island days).
+runs/2026-11-01-wider-lit/code/WIDER_LIT_1101.md); pull125 estimated from a 300-site subset.
   python tools/v11_queue.py RANKED_CSV OUT_DIR"""
 import csv
 import os
