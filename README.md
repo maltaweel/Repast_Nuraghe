@@ -309,6 +309,14 @@ Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma 
 
 ## Changes
 
+- 2026-11-09 (default config): `code/config.yaml` now carries the values of the configuration the final v16_final
+  runs used (`config/v16_final/config_full_audited.yaml`) instead of the pre-audit defaults: the audited parameter
+  values (drag speed, return and helper walk speed, joints quarrying rate, facade rates, tower geometry, basalt and
+  granite density, adult share of the work party and the values that follow from them), minimum haul 15 m, the
+  near-site face rule (`quarry:` block) and the scenarios `MOST_REALISTIC_AUDITED_LIT`,
+  `MOST_REALISTIC_AUDITED_LIT_POPFROZEN` and `MOST_REALISTIC_POP_*`. Paths are unchanged. Omitted: the
+  single-change entries `MOST_REALISTIC_AUD_drag`, `_AUD_density`, `_AUD_geometry`, `_AUD_facade`, `_AUD_walk` and
+  `_AUD_joints` (each needs its own config copy, which is not published). No code change.
 - 2026-11-05 (ODD): `ODD/ODD.md` (and `ODD/ODD.pdf`) now describe the v16_final code and configs; the ODD has a
   change log under its version line.
 - 2026-11-05 (v16_final): `code/` is now the v16_final code: the v15 code + the v15b on-outcrop fix (`preprocess.py`:

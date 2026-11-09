@@ -1,6 +1,8 @@
 # Nuraghe build ABM - single configuration file.
 # All input paths are relative to data_dir. Change data_dir (one line) to move the inputs.
 # cache_dir / output_dir are relative to the folder holding this config file (or absolute).
+# Default values = the audited configuration of the final (v16_final) runs, config/v16_final/config_full_audited.yaml
+# (switch of 9 Nov 2026; the earlier pre-audit defaults are in the repository history). Paths are this file's own.
 
 data_dir: /ABSOLUTE/PATH/TO/data   # PLACEHOLDER: folder holding the inputs (layout: data/README.md)
 paths:
@@ -66,11 +68,11 @@ transport:
   pull_kg_per_person: 100       # ASSUMPTION (v12 relabel): press reports of the UCL 2016 sledge give ~10 people per ~1 t; the primary
                                 #   (Harris 2016, Public Archaeology 15: 148-156, AAM p. 1, 4) gives only "approximately half" of stone 93
                                 #   and a minimum crew of 10 (plus 14 slipway relayers), no tonnage. Value unchanged.
-  drag_speed_ms: 0.6            # ASSUMPTION (v12 relabel): sustained mean below the reported 1 m/s peak (Harris 2016, AAM p. 4);
+  drag_speed_ms: 0.27           # ASSUMPTION (v12 relabel): sustained mean below the reported 1 m/s peak (Harris 2016, AAM p. 4);
                                 #   press reports ~0.6 m/s ("10 feet every 5 seconds"). Value unchanged; 1.0 = sensitivity MR_P10_v12_drag10.
-  return_walk_ms: 1.4
+  return_walk_ms: 1.39
   load_unload_h: 0.25
-  min_haul_flatm: 100           # quarry face -> site when the site sits on the outcrop
+  min_haul_flatm: 15            # v15 (specified by the authors, SPEC_ADDENDUM_2026-11-05b_on_outcrop_haul.md): audited 100 -> 15
 other_mandays_per_tower: 2500   # Webster 1991: 852 Table 1: ~3,600 man-days/tower minus ~1,100 transport
                                 # (= quarry 500 + dressing 1,300 + walling 700; v11 converts each at its source day, see v11:)
 
@@ -107,7 +109,7 @@ scenarios:
   household_size: 5         # builders packed consecutively into households; the last may be smaller
   split_cost_mh: 1.0        # man-hours added to the quarry/build pool per split (cut) of a heavy block
   help_radius_m: 10000      # inter-site help: straight-line radius to look for an unfinished site
-  help_walk_ms: 1.4         # helpers walk there at this speed; the walk is charged to the helped site
+  help_walk_ms: 1.39        # helpers walk there at this speed; the walk is charged to the helped site
   coupled_max_ranks: 2      # memory guard: in the help scenario each rank holds the whole island (~1.7-1.9 GB)
   list:
     none:      {p_coop: 0.0}
@@ -137,18 +139,18 @@ lit_scenarios:
   lift_share_of_build: 0.5      # FREE (plan): half of Webster's building stage is lifting
   baseline_mu: 0.3
   # --- S1 procurement, person-hours per m3 of stone
-  quarry_ph_m3: {scree: 2.0, joints_low: 11.0, joints_high: 17.5}   # GEN 48, 45, 200 (Boswinkel 2021 Table 7.2)
+  quarry_ph_m3: {scree: 2.0, joints_low: 11.1, joints_high: 17.5}   # GEN 48, 45, 200 (Boswinkel 2021 Table 7.2)
   # --- S2 dressing
   # v11 citation fix (b): these are Boswinkel 2021's TOTAL construction costs per m3 (all stages: quarrying, transport,
   # dressing, assembly, ramps) of the conglomerate facades (96-167 ph/m3) and the cyclopean walls (6.7-75 ph/m3),
   # Table 8.3, p. 144 (midpoints) - NOT dressing rates. The model adds their difference (90.65 ph/m3) to the facing of
   # fine-dressed complexes as the EXTRA total cost of facade masonry over cyclopean masonry (value unchanged in v11).
   # Boswinkel's dressing rates proper (0.0162-0.0175 m3/ph = 57-62 ph/m3, pp. 120-121, Table 7.8) are the variant C3_dress.
-  facade: {facade_ph_m3_mid: 131.5, cyclopean_ph_m3_mid: 40.85}     # GEN 57, 199: Boswinkel 2021: 144, Table 8.3 totals
+  facade: {facade_ph_m3_mid: 131.2, cyclopean_ph_m3_mid: 40.95}     # GEN 57, 199: Boswinkel 2021: 144, Table 8.3 totals
   facing_thickness_m: 0.5       # FREE (plan)
   fine_min_towers: 2            # plan: complex nuraghi only; late-phase isodomic masonry (NUR 61)
   # --- S4 lifting; tower geometry is FREE (plan): 15 m, truncated cone 12 m -> 8 m, 0.9 m courses
-  geometry: {tower_height_m: 15.0, course_height_m: 0.9, base_diam_m: 12.0, top_diam_m: 8.0}
+  geometry: {tower_height_m: 14.0, course_height_m: 0.9, base_diam_m: 12.0, top_diam_m: 6.8}
   lever_ph_per_block_course: 0.37   # GEN 77, 204 (Hodges 1989 / de Haan 2009 via Boswinkel 2021: 116, 124)
   stair_lever_last_m: 1.0       # FREE (plan, Laner's internal stair): only the last metre per course is levered
   ramp:
@@ -172,7 +174,7 @@ lit_scenarios:
     men_per_team: 2             # plan: 1 drover + 1 helper per team (DeLaine: 1 driver per yoke, GEN 69)
     mu: 0.3                     # cost surface and friction kept at the baseline
   # --- S6 density and hardness (FREE: standard values; GEN 212 gives basalt ~2.9-3.0, limestone ~2.5)
-  density_kg_m3: {basalt: 2950, granite: 2650, limestone/marble: 2600, metamorphic: 2750}
+  density_kg_m3: {basalt: 3000, granite: 2700, limestone/marble: 2600, metamorphic: 2750}
   hardness: {basalt: 2.0, granite: 2.0, limestone/marble: 1.0, metamorphic: 1.0}   # FREE (Turner 2020: 71 critique, GEN 136)
   # --- S7 Webster's class totals (NUR 157-158, 181-183); TWR_N -> class mapping is FREE (plan)
   webster_classes:
@@ -375,7 +377,7 @@ sea:
 #   max_seasons 20000: small work parties alone under P10 can exceed the default 3,000-season safety stop.
 mr_work_party: &mr_work_party
   residents_by_towers: [[5, 40], [40, 110], [110, 185], [185, 260], [260, 330], [330, 400], [330, 400]]
-  adult_share: 0.5
+  adult_share: 0.4             # FULL AUDITED (specified by the authors): 0.5 -> 0.4 (Webster 1991: 854, Table 2 n. 4, x 2; AUDITED_LIT_SPEC #2)
 #   help_mode join (specified by the authors): a helper adds its work party's hands to the requester's stage (quarry, dress, relay
 #     leg 1, build/lift) instead of taking it over; duration = MH / (own + helper hands), hands capped per block
 #     (join_hands_per_block: FREE; transport: each block's own crew). MOST_REALISTIC_handover = the 11:30 behaviour.
@@ -419,11 +421,11 @@ alliance_gaps:   # merged into alliance_extra by alliance.scenario(); names end 
   MOST_REALISTIC_S10_all_crew50: {<<: *mr, phase_order: {rule: staged, staged_share: 1.0, addition_crew_factor: 0.5}}
   MOST_REALISTIC_S11_order:    {<<: *mr, phase_order: {rule: types_first, types: [*proto]}}
   MOST_REALISTIC_S11_low:      {<<: *mr, phase_order: {rule: types_first, types: [*proto]},
-                                type_cost: {*proto : {volume: 0.835, height: 0.333}}}
+                                type_cost: {*proto : {volume: 0.835, height: 0.357}}}   # FULL AUDITED: 5/14 (absolute 5 m kept)
   MOST_REALISTIC_S11_mid:      {<<: *mr, phase_order: {rule: types_first, types: [*proto]},
-                                type_cost: {*proto : {volume: 2.084, height: 0.467}}}
+                                type_cost: {*proto : {volume: 2.084, height: 0.5}}}     # FULL AUDITED: 7/14 (absolute 7 m kept)
   MOST_REALISTIC_S11_high:     {<<: *mr, phase_order: {rule: types_first, types: [*proto]},
-                                type_cost: {*proto : {volume: 3.508, height: 0.667}}}
+                                type_cost: {*proto : {volume: 3.508, height: 0.714}}}   # FULL AUDITED: 10/14 (absolute 10 m kept)
   MOST_REALISTIC_S12_low:      {<<: *mr, food_cap: {catchment_file: food/site_food_r1000.csv, arable_share: *food_arable,
                                 cropped_share: 0.333, net_yield_kg_ha: 240, pasture_kg_ha: 0, surplus_share: 0.1,
                                 ration_kg: 1.2, min_hands: 1}}
@@ -520,6 +522,30 @@ cz_carts: &cz_carts {min_towers: 2, payload_t: 5.0, men_per_wagon: 6, loaded_ms:
 #   S24: 1.67 km/h loaded, 2.5 km/h empty, 12 oxen per 5 t (Boswinkel 2021: 114-118, App. 4 p. 210); one driver per yoke
 #   (DeLaine via GEN 69); loading 1.2 ph/t (Boswinkel, as C3_load)
 alliance_census:
+# --- 2 Nov 2026 population family (param_audit/POPULATION_SCENARIOS.md): MOST_REALISTIC + ONE population override.
+# Run each as NAME_P10. Sources and status: param_audit/POPULATION.md.
+  MOST_REALISTIC_POP_lilliu30:
+    {<<: *mr, builders_rule: {residents_by_towers: [[30,30],[30,30],[30,30],[30,30],[30,30],[30,30],[30,30]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_webster_household:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,6],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_webster_density:
+    {<<: *mr, builders_rule: {residents_by_towers: [[34,40],[34,40],[34,40],[34,40],[34,40],[34,40],[34,40]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_calo_6km2:
+    {<<: *mr, builders_rule: {residents_by_towers: [[2.5,19.9],[19.9,54.8],[54.8,92.2],[92.2,129.6],[129.6,164.5],[164.5,199.4],[164.5,199.4]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_ugas_high:
+    {<<: *mr, population_ceiling: null, builders_rule: {residents_by_towers: [[9.5,75.9],[75.9,208.6],[208.6,350.9],[350.9,493.2],[493.2,625.9],[625.9,758.7],[625.9,758.7]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_ugas400:
+    {<<: *mr, population_ceiling: null, builders_rule: {residents_by_towers: [[6.9,55.2],[55.2,151.7],[151.7,255.2],[255.2,358.7],[358.7,455.2],[455.2,551.8],[455.2,551.8]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_ugas700:
+    {<<: *mr, population_ceiling: null, builders_rule: {residents_by_towers: [[12.1,96.6],[96.6,265.5],[265.5,446.6],[446.6,627.7],[627.7,796.6],[796.6,965.6],[796.6,965.6]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_anchored:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[70,320],[80,350],[85,375],[90,400],[90,400],[90,400]], adult_share: 0.5}}
+  MOST_REALISTIC_POP_adult04:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}}
+  MOST_REALISTIC_POP_men_only:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.2}}
+  MOST_REALISTIC_POP_adult06:
+    {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.6}}
   MOST_REALISTIC_S4_graded_rate:   {<<: *mr, lift_graded: {mode: rate}}
   MOST_REALISTIC_S4_graded_order:  {<<: *mr, lift_graded: {mode: order}}
   MOST_REALISTIC_S20_lintels_1t5:  {<<: *mr, lintel: {<<: *cz_lintel, kg: 1500}}    # Webster 2001: 21; Murru 2018: 229
@@ -535,7 +561,7 @@ alliance_census:
   MOST_REALISTIC_S22_demog_r035:   {<<: *mr, population_ceiling: null, demog: {r: 0.0035, span_seasons: 550}}  # Webster 1991: 853
   MOST_REALISTIC_S22_demog_r042:   {<<: *mr, population_ceiling: null, demog: {r: 0.0042, span_seasons: 400}}  # Ialongo 2018: 29
   MOST_REALISTIC_S4d_spiral_7m5:   {<<: *mr, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
-  MOST_REALISTIC_S4d_spiral_full:  {<<: *mr, lift_ramp: {kind: spiral, h_m: 15.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_S4d_spiral_full:  {<<: *mr, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
   MOST_REALISTIC_S4e_laner_h3:     {<<: *mr, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}   # Laner 1999: 30
   MOST_REALISTIC_S4e_laner_h4:     {<<: *mr, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_S16_mud_m05:      {<<: *mr, mortar: {m: 0.05}}                      # m: ASSUMPTION
@@ -566,20 +592,33 @@ alliance_census:
   MOST_REALISTIC_X_nurtime_lever_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: lever}
   MOST_REALISTIC_X_nurtime_ramp_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: ramp}
   MOST_REALISTIC_X_nurtime_spiral7m5_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
-  MOST_REALISTIC_X_nurtime_spiralfull_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 15.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_spiralfull_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
   MOST_REALISTIC_X_nurtime_laner3_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_X_nurtime_laner4_c10: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 10, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 10, max: 10}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_X_nurtime_stair_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair}
   MOST_REALISTIC_X_nurtime_lever_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: lever}
   MOST_REALISTIC_X_nurtime_ramp_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: ramp}
   MOST_REALISTIC_X_nurtime_spiral7m5_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
-  MOST_REALISTIC_X_nurtime_spiralfull_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 15.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_spiralfull_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
   MOST_REALISTIC_X_nurtime_laner3_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_X_nurtime_laner4_c20: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 20, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 20, max: 20}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_X_nurtime_stair_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair}
   MOST_REALISTIC_X_nurtime_lever_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: lever}
   MOST_REALISTIC_X_nurtime_ramp_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: ramp}
   MOST_REALISTIC_X_nurtime_spiral7m5_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 7.5, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
-  MOST_REALISTIC_X_nurtime_spiralfull_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 15.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
+  MOST_REALISTIC_X_nurtime_spiralfull_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
   MOST_REALISTIC_X_nurtime_laner3_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_X_nurtime_laner4_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
+# --- 2 Nov 2026 audited parameter checks (param_audit/AUDITED_LIT_SPEC.md): single-change runs and the combined run.
+# Entries marked [config copy] are identical to MOST_REALISTIC in this file; run them ONLY with the named config copy.
+# MOST_REALISTIC_AUD_* (single-change entries, each needing its own config copy) are not in this file:
+# their config copies are not published. Every audited value is already set in this file.
+  MOST_REALISTIC_AUDITED_LIT:   {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}}   # [config copy config_v12_audited.yaml]
+
+# --- FULL AUDITED companion (specified by the authors): AUDITED_LIT with residents FIXED at the midpoint of each MR tower-class
+# range (U[m, m] = m; lit.draw_residents still makes its one uniform draw, so block draws are unchanged), adult_share 0.4.
+  MOST_REALISTIC_AUDITED_LIT_POPFROZEN: {<<: *mr, builders_rule: {residents_by_towers: [[22.5,22.5],[75,75],[147.5,147.5],[222.5,222.5],[295,295],[365,365],[365,365]], adult_share: 0.4}}
+
+# --- v14 near-site face rule (specified by the authors; SPEC_ADDENDUM_2026-11-05_near_face.md). none / 0 = v12 behaviour.
+quarry:
+  near_site_fixed_face_m: 1000

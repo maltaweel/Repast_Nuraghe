@@ -98,7 +98,7 @@ code,code/alliance.py,157077,8a3694362f0b4e4ce0e68d397ba3c6b7eaeceb2ab7776ae6b2c
 code,code/aud_chain.sh,4219,d11260027aa54ef572c9893056e6d28d2d61313f44be79176cd1ee63e23aa71b,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/census_v12.py,30010,27745080d68b0a8177137b05025b9c439a20d776a1c249cba49bee9ae2c7b909,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/config.ship.yaml,12600,b785a1f64cd752869a608dd94b8ec211275e5471fdfc8e7c91b04369631a3759,run;rebuild,repository code (CODE_PROVENANCE.md)
-code,code/config.yaml,50248,2d90910bdc6d9f6fdaf05f4dc3f3d2d52ef96a076d7e1cf650a4528fa5ea1ac5,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/config.yaml,54255,f73aad6794acface506cd8d18cf6de9e58084c1ea6a4e0a4599322ebc65548b0,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/config_smallcrew_test.yaml,24590,601a1d0bc2ba98f58756d0e66e57b703bf6bdedee43f4c8da7385c104584c393,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/full_chain.sh,4650,26d29e51945a8a5060fc6c7c5a1636c23d6859314fbe56b904f8a0018bb6c304,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/gaps_chain.sh,2782,dba3c83dda16962c0b82c3f251c8367c4aa2fb0f0b26f1bc2612df3cd21c570d,run;rebuild,repository code (CODE_PROVENANCE.md)

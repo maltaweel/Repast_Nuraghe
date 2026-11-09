@@ -150,7 +150,7 @@ each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`,
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (71; 324 lines in total)
+## Changed files (71; 328 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
@@ -163,7 +163,7 @@ README).
 | `alliance.py` | yes | 13 | comments/docstrings |
 | `aud_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `config.ship.yaml` | yes | 1 | comments/docstrings |
-| `config.yaml` | yes | 20 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
+| `config.yaml` | yes | 24 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
 | `config_smallcrew_test.yaml` | yes | 15 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
 | `full_chain.sh` | no | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `gaps_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
