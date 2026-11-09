@@ -9,7 +9,8 @@ the v15b code against the model specification.
 ## 1. add4 defaults (lit.ADD4_DEFAULTS)
 L2 `bedrock_everywhere` and L3 `load_per_tonne` default ON (kept after the test of CHANGES_V16.md). L1
 `rails_cost_choice` and L4 `sea_priced_as_charged` default OFF. All four flags remain; a row switches any of them with its own
-top-level `add4:` block. L2 also acts in model.py `--lit REALISTIC` rows (lit.resolve_site).
+top-level `add4:` block. L2 also acted in model.py `--lit REALISTIC` rows (lit.resolve_site) until 9 Nov: a bug,
+fixed in section 7 (season engine only; addendum 4 of the specification, lines 41-42).
 
 ## 2. D3: no dressing work = no dress task traffic (reference bug)
 PM:20 "Dressing: none for 1 tower". Before, a 1-tower tower's 0-MH dress stage still gave a dress skill credit, could
@@ -64,3 +65,22 @@ and the no-work rule (D3).
   - D11: an alignment test, and real tables 7,167/7,167 with 27 tonnes sites.
   - Signature: CODE_VERSION and add4 in both signature functions.
 - `tests/test_add4_flags.py`: 13 tests, all pass, after updating them for the new defaults.
+
+## 7. Fix of 9 Nov 2026: addendum-4 L2 out of engine B (reference bug)
+- **Bug:** addendum 4 of the specification, scope clarification (lines 41-42): L2 and L3 apply to the season-based
+  community engine only; day-based engine-B rows (SCENARIOS section 19) keep their own quarry rule (SC:881: joints_low
+  on the outcrop, else scree) and load_unload_h. `lit.resolve_site` applied L2 whenever `add4.bedrock_everywhere` was
+  on, and model.py (Site, engine B) called it for the REALISTIC rows, so their off-outcrop sites were quarried as
+  joints_low.
+- **Fix:** `lit.resolve_site(cfg, lit, rec, engine_b=False)`; L2 is skipped when `engine_b=True`. model.py:214 passes
+  `engine_b=True`. alliance.py unchanged (its call keeps the default, L2 on). CODE_VERSION not changed; the affected
+  rows were rerun with --fresh.
+- **L3 check:** engine B does not apply L3 anywhere: model.py:287 prices the trip with `tp["load_unload_h"]`; no
+  `load_per_tonne` / `load_ph_per_t` is read in model.py, sea.py or the lit.py helpers it calls (they appear in lit.py
+  only in ADD4_DEFAULTS / add4()); the only add4 use in model.py is the run-signature hash (model.py:576).
+- **Rows affected:** only REALISTIC and REALISTIC_oxen, the two engine-B rows with a `mixed:` block (checked over every
+  non-alliance row of the v16_final queue).
+- **Tests:** new tests/test_L2B_engine_scope.py (4 tests: resolve_site scope; alliance call keeps L2; a real engine-B
+  `model.Site` off the outcrop gets quarry_off_outcrop and load_unload_h, REALISTIC and REALISTIC_oxen; season engine
+  still gets quarry_on_outcrop). tests/test_add4_flags.py: the fake model got `cz` and `_load_t` (stale since the 7 Nov
+  fill-loading fix; test_L3_loading and test_L4 failed before this change too), assertions unchanged.

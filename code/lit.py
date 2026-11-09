@@ -248,14 +248,16 @@ def mixed_haul(cfg, lit, load, use_long=None):
     return h
 
 
-def resolve_site(cfg, lit, rec):
-    """Single-rule scenario dict for one site of a mixed scenario."""
+def resolve_site(cfg, lit, rec, engine_b=False):
+    """Single-rule scenario dict for one site of a mixed scenario.
+    engine_b=True (model.py, day-based engine-B rows, SCENARIOS section 19): addendum-4 L2 is NOT applied, the row
+    keeps its own quarry rule (addendum 4 of the specification, scope clarification, lines 41-42; fix 9 Nov 2026)."""
     m = lit["mixed"]
     tw = int(rec["TWR_N"])
     d = {k: v for k, v in lit.items() if k != "mixed"}
     d.update(m[rec["lit_haul_rule"]])                                     # mu, haul (+ oxen in a variant)
     d["quarry"] = m["quarry_on_outcrop"] if bool(rec["on_outcrop"]) else m["quarry_off_outcrop"]
-    if add4(cfg)["bedrock_everywhere"]:                                  # v16 L2: bedrock along joints everywhere
+    if add4(cfg)["bedrock_everywhere"] and not engine_b:                 # v16 L2: bedrock along joints everywhere
         d["quarry"] = m["quarry_on_outcrop"]
     if tw <= int(m["dress_none_max_towers"]):
         d["dress"] = "none"

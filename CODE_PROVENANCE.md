@@ -97,7 +97,7 @@ listed below). Against the v13 checksums (`sha256sum -c ../CODE_V13_SHA256SUMS`)
 **61 FAILED (v13)**, **5 missing (v13)**. Against the v14 checksums (`sha256sum -c ../CODE_V14_SHA256SUMS`):
 **41 OK (v14)**, **61 FAILED (v14)**, **5 missing (v14)**. Against the v15 checksums
 (`sha256sum -c ../CODE_V15_SHA256SUMS`): **41 OK (v15)**, **61 FAILED (v15)**, **5 missing (v15)**. Against the
-v16_final checksums (`sha256sum -c ../CODE_V16_FINAL_SHA256SUMS`): **45 OK (v16_final)**, **59 FAILED (v16_final)**,
+v16_final checksums (`sha256sum -c ../CODE_V16_FINAL_SHA256SUMS`): **45 OK (v16_final)**, **60 FAILED (v16_final)**,
 **5 missing (v16_final)**.
 
 **Line numbers.** The ODD (`ODD/ODD.md`) cites the v13 `alliance.py`. The tables of `param_audit/` were written
@@ -150,7 +150,7 @@ each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`,
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (71; 328 lines in total)
+## Changed files (72; 329 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
@@ -189,6 +189,7 @@ README).
 | `tests/mr_join_subset.sh` | yes | 1 | functional path -> env variable |
 | `tests/mr_join_subset_body.sh` | yes | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `tests/phase_subset.sh` | yes | 2 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
+| `tests/test_L2B_engine_scope.py` | no | 1 | functional path -> env variable |
 | `tests/test_add4_flags.py` | no | 2 | functional path -> env variable |
 | `tests/test_v16_final.py` | no | 1 | functional path -> env variable |
 | `tests/v11_subset.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |

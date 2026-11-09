@@ -211,7 +211,7 @@ class Site(core.Agent):
         s = P["stone"]
         litp = sc.get("lit")                                       # literature scenario (or None)
         if litp is not None and litp.get("mixed"):                 # REALISTIC: this site's own rules
-            litp = lit.resolve_site(P, litp, rec)
+            litp = lit.resolve_site(P, litp, rec, engine_b=True)  # no add4 L2 in engine B (add.4:41-42)
         if litp is None:
             target = s["tonnes_per_tower"] * 1000.0 * tw
             mf = 1.0
@@ -570,7 +570,8 @@ def run_signature(cfg, haul, sc):
         h.update(haul["quarry_stone"].to_csv(index=False).encode())
         if sc["lit"].get("mixed"):     # per-site rule inputs of a mixed scenario
             h.update(haul[["on_outcrop", "lit_haul_rule", "lit_type"]].to_csv(index=False).encode())
-    # code_v16_final: the code version and the effective add4 settings (L2 acts in lit.resolve_site) are always hashed,
+    # code_v16_final: the code version and the effective add4 settings (L2 acts in lit.resolve_site, season engine only
+    # since the fix of 9 Nov 2026) are always hashed,
     # so part files written by older code (or under other add4 settings) are never reused
     h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
     h.update(lit.CODE_VERSION.encode())

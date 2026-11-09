@@ -157,6 +157,8 @@ def _fake_model(cfg, L3, tn=1350.0):
     m.tp = cfg["transport"]; m.L3 = L3; m.lp = 1.2
     m.towers = [[(tn, 0, 0)]]; m.tower_idx = np.array([0])
     m.trip = lambda C, L, part, v=None, ld=None: alliance.AllianceModel.trip(m, C, L, part, v, ld)
+    m.cz = None                                            # 2026-11-09: fake updated for alliance._load_t (fix 7 Nov,
+    m._load_t = lambda o, t: alliance.AllianceModel._load_t(m, o, t)   # S17 fill tonnes); no S17 fill here
     return m
 
 
