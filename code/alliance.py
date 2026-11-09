@@ -1334,8 +1334,19 @@ class AllianceModel:
         self.active_tasks.append(t)
         return t
 
-    def charge(self, owner, perf, mh, stage, walk=0.0):
-        """Labour mh (incl. walk) by perf, spent on owner's nuraghe."""
+    def _lift_share(self, i):
+        """Lift share of owner i's current build stage (Webster island-wide, the site's own under tech rules, or the
+        S10 / S13 per-tower share). code_v17: used to split the build stage into build (discounted) and lift
+        (undiscounted, SP-22) at pricing time; before code_v17 only the accounting used it."""
+        ls = self.lift_share if self.S.tech is None else self.site_lift_share[i]
+        if self.unit_ls:                                  # S10 / S13 per-tower lift share
+            ls = self.unit_ls.get((i, int(self.tower_idx[i])), ls)
+        return ls
+
+    def charge(self, owner, perf, mh, stage, walk=0.0, lift=None):
+        """Labour mh (incl. walk) by perf, spent on owner's nuraghe. code_v17: lift = the lift man-hours inside mh
+        (build stage, booked to mh_lift exactly; the rest of mh - walk to mh_build). lift=None (no build work, e.g.
+        broker walks): the old split of mh - walk by the lift share."""
         A = self.acc
         A["mh_total"][owner] += mh
         A["mh_walk"][owner] += walk
@@ -1353,10 +1364,10 @@ class AllianceModel:
             if self.soc is not None and mh > 0.0:              # v13: help ties (imitation along ties, logging)
                 self.soc["adj"][perf].add(owner); self.soc["adj"][owner].add(perf)
         w = mh - walk
-        if stage == "build":
-            ls = self.lift_share if self.S.tech is None else self.site_lift_share[owner]
-            if self.unit_ls:                                  # S10 / S13 per-tower lift share (accounting only)
-                ls = self.unit_ls.get((owner, int(self.tower_idx[owner])), ls)
+        if stage == "build" and lift is not None:          # code_v17 SP-22: lift priced apart, booked exactly
+            A["mh_build"][owner] += w - lift; A["mh_lift"][owner] += lift
+        elif stage == "build":
+            ls = self._lift_share(owner)
             A["mh_build"][owner] += w * (1.0 - ls); A["mh_lift"][owner] += w * ls
         elif stage in ("leg1", "transport"):
             A["mh_transport"][owner] += w
@@ -1746,24 +1757,38 @@ class AllianceModel:
             h_eff = max(0.0, min(h_eff, float(self.food_cap[i]) - float(self.B[i])))
         return h_eff / (float(self.B[i]) + h_eff) if h_eff > 0 else 0.0
 
-    def _join_task(self, i, helper, stage, mh, loc, up, final, nblk, parts=None):
+    def _join_task(self, i, helper, stage, mh, loc, up, final, nblk, parts=None, lifts=(None, None)):
         """Owner part (owner) + helper part (helper, + its walk), both downstream of `up`; the next task waits for
         both (t_up2). Returns the owner part's id. parts=None: the stage's man-hours mh split by the hands share f
-        (relay leg 1); parts=(f, owner mh, helper mh): already priced per party (code_v16_final D6, skill stages)."""
+        (relay leg 1); parts=(f, owner mh, helper mh): already priced per party (code_v16_final D6, skill stages).
+        lifts (code_v17, build stage): the lift man-hours inside the owner's / helper's part (booked to mh_lift)."""
         if parts is None:
             f = self._join_split(i, helper, stage, nblk)
             mo, mhp = mh * (1.0 - f), mh * f
         else:
             f, mo, mhp = parts
         to = self.add_task(i, mo, stage, up, final)
-        self.charge(i, i, mo, stage)
+        self.charge(i, i, mo, stage, lift=lifts[0])
         if f > 0:
             walk = self.B[helper] * self.wdist(helper, loc, i if stage == "build" else None) / \
                 self.tp["return_walk_ms"] / 3600.0
             th = self.add_task(helper, mhp + walk, stage, up, final)
-            self.charge(i, helper, mhp + walk, stage, walk)
+            self.charge(i, helper, mhp + walk, stage, walk, lift=lifts[1])
             self.join_part[to] = th
         return to
+
+    def _build_lift(self, i, xlift=0.0):
+        """code_v17, SP-22 ruling (9 Nov; spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate:
+        the learning factor (PM:23) and skill (PM:173) apply to quarrying, dressing and building only, never to lift."
+        Until code_v16_final the build skill stage was build + lift, all of it x min(skill, (1 - rate)^t) (and x the
+        helper's skill); the report split it by the lift share only afterwards. Now the current tower's build stage
+        (before skill) is split by its lift share into build (still discounted) and lift (stair, lever, ramps incl.
+        the 14.3 earth ramp, spiral, lift_override, graded: whatever stage_hours / census put in st['lift']) plus
+        xlift (lever / stair lift of the extra sea-payload pieces, all lift; was inside the discounted stage and split
+        by the share in the report). -> (build base, lift)."""
+        b = self._stage(i, "build")
+        ls = self._lift_share(i)
+        return b * (1.0 - ls), b * ls + xlift
 
     def _owner_skill(self, i, stage, t_i):
         """Owner's factor on its own skill-stage work: its A3 skill, or under tech rules the larger discount of that
@@ -1773,13 +1798,28 @@ class AllianceModel:
             sk = min(sk, (1.0 - self.s8_rate) ** t_i)
         return sk
 
-    def _perform_join(self, i, helper, stage, loc, up, final, base, extra, t_i, nblk, cur, credit=True):
+    def _handover_mh(self, i, p, stage, base, extra, t_s8, lift=0.0):
+        """Handover pricing of one stage of owner i's tower performed by p (code_v17: moved out of perform(),
+        unchanged except lift). base x skill(p) (owner: the larger discount of A3 skill and S8 learning, never both;
+        MOST_REALISTIC_NOTES.md "learning") + extra (not discounted) + lift.
+        code_v17, SP-22 ruling (specified by the authors, 9 Nov 2026: no discount on lift, long-term
+        rates; spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate: the learning factor
+        (PM:23) and skill (PM:173) apply to quarrying, dressing and building only, never to lift." So lift is added
+        at factor 1, whoever performs it."""
+        sk = self.skill(p, stage) if base is not None else 1.0
+        if base is not None and self.S.tech is not None and p == i and self.s8_rate > 0:
+            sk = min(sk, (1.0 - self.s8_rate) ** t_s8)   # S8 within-site learning vs A3 skill: the larger discount
+        return (base * sk if base is not None else 0.0) + extra + lift
+
+    def _perform_join(self, i, helper, stage, loc, up, final, base, extra, t_i, nblk, cur, credit=True, lift=0.0):
         """Join mode for a skill stage. code_v16_final D6 (PM:23 "A helper uses its own skill"): each party's share of
         the stage is priced at that party's own factor: the owner's share (1 - f) at _owner_skill (min of A3 skill and
         S8), the helper's share f at the helper's A3 skill (was: the main performer's factor for the whole stage).
         `extra` (setup, cuts, soil) is not skill-discounted and is split by f as before. The learning credit is
         unchanged: the main performer (the party contributing more hands, f > 0.5 = helper) gets it (specialisation
-        rule as in handover)."""
+        rule as in handover).
+        code_v17 (SP-22 ruling): `lift` (build stage only) is priced at the undiscounted rate, like `extra`, and split
+        by f; each party's lift part is booked to mh_lift."""
         f = self._join_split(i, helper, stage, nblk)
         p = helper if f > 0.5 else i
         if base is not None:
@@ -1787,7 +1827,11 @@ class AllianceModel:
             mhp = base * f * self.skill(helper, stage) + extra * f
         else:
             mo, mhp = extra * (1.0 - f), extra * f
-        t = self._join_task(i, helper, stage, mo + mhp, loc, up, final, nblk, parts=(f, mo, mhp))
+        lifts = (None, None)
+        if stage == "build":                              # code_v17 SP-22: lift undiscounted, never x skill / S8
+            lifts = (lift * (1.0 - f), lift * f)
+            mo, mhp = mo + lifts[0], mhp + lifts[1]
+        t = self._join_task(i, helper, stage, mo + mhp, loc, up, final, nblk, parts=(f, mo, mhp), lifts=lifts)
         if credit and base is not None and stage in SKILL_STAGES and (p == i or self.sc.get("specialisation", False)):
             self.cum[p, SKILL_STAGES.index(stage)] += 1.0
         cur.setdefault("join_share", {})[stage] = f
@@ -1859,9 +1903,10 @@ class AllianceModel:
 
         join = sc.get("help_mode") == "join"              # MOST_REALISTIC: helpers add hands, they do not take over
 
-        def perform(stage, want_help, loc, up, final=False, base=None, extra=0.0, credit=True):
-            """Create the task; returns task id. base: labour before skill (for skill stages)."""
-            if base is not None and base <= 0.0 and extra <= 0.0:   # code_v16_final D3: no work in this stage
+        def perform(stage, want_help, loc, up, final=False, base=None, extra=0.0, credit=True, lift=0.0):
+            """Create the task; returns task id. base: labour before skill (for skill stages). lift (code_v17, build
+            stage): lift man-hours, priced at the undiscounted rate (SP-22), booked to mh_lift."""
+            if base is not None and base <= 0.0 and extra <= 0.0 and lift <= 0.0:   # code_v16_final D3: no work
                 return self._no_work_task(i, stage, up, final)
             helper = -1
             if self.cz is not None and self.cz.levy is not None:   # v12 S21: a seat levies a community of its canton
@@ -1870,7 +1915,8 @@ class AllianceModel:
                     assert join, "levy needs help_mode join"
                     self.cz.levy_cur = helper
                     g0 = self.acc["mh_given"][helper]
-                    t = self._perform_join(i, helper, stage, loc, up, final, base, extra, t_s8, nblk, cur, credit)
+                    t = self._perform_join(i, helper, stage, loc, up, final, base, extra, t_s8, nblk, cur, credit,
+                                           lift=lift)
                     self.cz.levy_used(i, helper, self.acc["mh_given"][helper] - g0)
                     self.cz.levy_cur = -1
                     cur["helpers"][stage] = helper
@@ -1880,18 +1926,15 @@ class AllianceModel:
                 self.charge_brokers(i, stage)
                 cur["helpers"][stage] = helper
             if helper >= 0 and join:
-                return self._perform_join(i, helper, stage, loc, up, final, base, extra, t_s8, nblk, cur, credit)
+                return self._perform_join(i, helper, stage, loc, up, final, base, extra, t_s8, nblk, cur, credit,
+                                          lift=lift)
             p = i if helper < 0 else helper
-            sk = self.skill(p, stage) if base is not None else 1.0
-            if base is not None and S.tech is not None and p == i and self.s8_rate > 0:
-                sk = min(sk, (1.0 - self.s8_rate) ** t_s8)   # S8 within-site learning vs A3 skill: the larger discount
-            #   (never both: see MOST_REALISTIC_NOTES.md "learning")
-            mh = (base * sk if base is not None else 0.0) + extra
+            mh = self._handover_mh(i, p, stage, base, extra, t_s8, lift)
             walk = 0.0
             if p != i:
                 walk = self.B[p] * self.wdist(p, loc, i if stage == "build" else None) / walk_ms / 3600.0
             t = self.add_task(p, mh + walk, stage, up, final)
-            self.charge(i, p, mh + walk, stage, walk)
+            self.charge(i, p, mh + walk, stage, walk, lift=lift if stage == "build" else None)
             if credit and base is not None and stage in SKILL_STAGES and (p == i or sc.get("specialisation", False)):
                 self.cum[p, SKILL_STAGES.index(stage)] += 1.0
             return t
@@ -1994,16 +2037,18 @@ class AllianceModel:
         if self.masons and self.m_need[i] and (self.n_real is None or t_i < self.n_real[i]):
             # M2: the upper courses / vault (vault_share of the build stage) wait for a master mason; lower part now,
             # the vault as a second build task once a master has arrived (help asked again, no second skill credit)
-            bb = self._stage(i, "build") + sea_x["xlift"]
+            bb, lb = self._build_lift(i, sea_x["xlift"])   # code_v17 SP-22: build (discounted) | lift (undiscounted)
             v = float(self.masons["vault_share"])
             want_b = strat.get("req_build", 0) == 1
             loc_b = (S.xy[i, 0], S.xy[i, 1])
-            tb = perform("build", want_b, loc_b, ttr, final=True, base=(1.0 - v) * bb)
+            tb = perform("build", want_b, loc_b, ttr, final=True, base=(1.0 - v) * bb, lift=(1.0 - v) * lb)
             cur["mphase"] = "lower"
-            cur["vault_fn"] = lambda: perform("build", want_b, loc_b, -1, final=True, base=v * bb, credit=False)
+            cur["vault_fn"] = lambda: perform("build", want_b, loc_b, -1, final=True, base=v * bb, credit=False,
+                                              lift=v * lb)
         else:
+            bb, lb = self._build_lift(i, sea_x["xlift"])   # code_v17 SP-22: build (discounted) | lift (undiscounted)
             tb = perform("build", strat.get("req_build", 0) == 1, (S.xy[i, 0], S.xy[i, 1]), ttr, final=True,
-                         base=self._stage(i, "build") + sea_x["xlift"])   # xlift: lever/stair lift of the extra sea pieces
+                         base=bb, lift=lb)
         cur["final_task"] = tb
         cur["mh"] = self.acc["mh_total"][i] - mh0             # every charge of this tower is made here (S14 repairs)
         self.current[i] = cur

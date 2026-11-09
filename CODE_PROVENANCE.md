@@ -1,6 +1,6 @@
 # Code provenance
 
-## The run snapshot (frozen v12 code), the v13, v14, v15 and v16_final code
+## The run snapshot (frozen v12 code), the v13, v14, v15, v16_final and v17 code
 
 The full audited run (2-4 November 2026; configuration `config/config_full_audited.yaml`, queues
 `config/queues/queue_full.tsv` and `queue_full_p23.tsv`) used ONE frozen copy of the code: every run started
@@ -64,7 +64,7 @@ record. `CODE_V15_SHA256SUMS` holds the v15 checksums of the same 107 files as `
 (only the `alliance.py` line differs); `CHANGES_V14_NEARFACE.md`, `CHANGES_V15_HAUL15.md`, `CODE_VERSION`, the three v13
 side-chain scripts and `v15_chain.sh` (kept in the run's `v15_haul15/` folder) are not in the checksum files.
 
-**v16_final (5 November 2026; the current `code/`).** The run's code folder `code_v16_final/` is the v15 code with
+**v16_final (5 November 2026; `code/` until the v17 update).** The run's code folder `code_v16_final/` is the v15 code with
 three successive changes (the intermediate folders were not published on their own): v15b, the on-outcrop test of
 `preprocess.py` uses the stone set a site actually quarries (`code/CHANGES_V15B_OUTCROP.md`; prepared tables rebuilt);
 v16_flags, the addendum-4 rules L1-L4 behind flags in a top-level `add4:` config block, the island-wide 95th
@@ -89,7 +89,23 @@ v15b / v15c copies of `config_full_audited.yaml`, which equal `config/v15_haul15
 `CODE_SHA256SUMS` plus the two new tests; the `CHANGES_*.md` notes, `CODE_VERSION`, the three v13 side-chain scripts and
 `v16f_chain.sh` (kept in the run's `v16_final/` folder) are not in the checksum files.
 
-`code/` in this repository is the v16_final code, scrubbed for publication.
+**v17 (9 November 2026; the current `code/`).** The run's code folder `code_v17/` is the v16_final code with lift
+priced at the undiscounted rate (the authors' ruling of 9 November 2026, spec addendum k, cited as SP-22 in the code
+comments): "Lift (all lift rules) is priced at the undiscounted rate: the learning factor and skill apply to
+quarrying, dressing and building only, never to lift." Changed files against v16_final: `alliance.py` (the build stage
+of a tower is split by its lift share into a discounted build part and an undiscounted lift part: `_lift_share`,
+`_build_lift`, `_handover_mh`, and a `lift` argument in `perform`, `_perform_join`, `_join_task` and `charge`, which
+books the lift part to `mh_lift` exactly), `lit.py` (`stage_hours`: the S8 learning factor of engine B no longer
+scales lifting; `CODE_VERSION` `2026-11-09-v17`, so every run signature differs from v16_final),
+`tests/test_v16_final.py` (expected version, `lift` argument of the fake `charge`); new test `tests/test_v17_lift.py`
+(9 tests on fake models, no simulation). The test file checks that it runs from a folder named `code_v17` (the run's
+layout); in this repository run it from a copy of `code/` named `code_v17`. Skill credits, value-table priors, the
+task chain and the help logic are unchanged (ODD 7.7, 7.9, 7.12). The configs are unchanged: the v17 code runs the
+v16_final configs (`config/v16_final/`). `CODE_V17_SHA256SUMS` holds the v17 checksums of the same files as
+`CODE_V16_FINAL_SHA256SUMS` plus `tests/test_v17_lift.py`; working-note copies (`.bak`) in the run folder are not
+published.
+
+`code/` in this repository is the v17 code, scrubbed for publication.
 
 Check: `cd code && sha256sum -c ../CODE_SHA256SUMS`. Result for this repository: **41 OK** (byte-identical to the
 run), **61 FAILED** (scrubbed, listed below, or changed since the frozen code by v13-v16_final), **5 missing** (excluded,
@@ -98,7 +114,8 @@ listed below). Against the v13 checksums (`sha256sum -c ../CODE_V13_SHA256SUMS`)
 **41 OK (v14)**, **61 FAILED (v14)**, **5 missing (v14)**. Against the v15 checksums
 (`sha256sum -c ../CODE_V15_SHA256SUMS`): **41 OK (v15)**, **61 FAILED (v15)**, **5 missing (v15)**. Against the
 v16_final checksums (`sha256sum -c ../CODE_V16_FINAL_SHA256SUMS`): **45 OK (v16_final)**, **60 FAILED (v16_final)**,
-**5 missing (v16_final)**.
+**5 missing (v16_final)**. Against the v17 checksums (`sha256sum -c ../CODE_V17_SHA256SUMS`): **45 OK (v17)**,
+**61 FAILED (v17)**, **5 missing (v17)**.
 
 **Line numbers.** The ODD (`ODD/ODD.md`) cites the v13 `alliance.py`. The tables of `param_audit/` were written
 on the frozen code and cite its line numbers (the v13 rows A10-A12 are marked "(v13)"). A frozen line n of
@@ -113,7 +130,10 @@ line n + k: k = 0 for n <= 35, 2 for 37-64, 25 for 65-183, 32 for 184-210, 44 fo
 253-416, 184 for 417-445, 187 for 446-523, 188 for 524-577, 190 for 582-592, 191 for 594-1310, 192 for 1311-1326, 194
 for 1327-1336, 197 for 1337-1409, 201 for 1412-1453, 242 for 1455-1493, 247 for 1498-1505, 268 for 1521-1551, 269 for
 1552-1569, 271 for 1570-1577, 273 for 1578-1649, 279 for 1664-1674, 281 for 1675-1687, 282 for 1688-1923, 283 for
-1924-2043, 294 for 2044-2081, 298 for 2082-2216 (v13 lines not covered were changed or removed).
+1924-2043, 294 for 2044-2081, 298 for 2082-2216 (v13 lines not covered were changed or removed). The `alliance.py` in
+`code/` is now the v17 file: a v16_final line n is v17 line n + k: k = 0 for n <= 1336, 11 for 1339-1751, 12 for
+1753-1766, 25 for 1767-1775, 38 for 1777-1781, 40 for 1783-1789, 44 for 1791-1861, 45 for 1865-1872, 46 for
+1874-1882, 43 for 1890-2002, 45 for 2007-2529 (v16_final lines not covered were changed).
 
 ## What the scrub changed
 
@@ -139,18 +159,19 @@ Only comments, docstrings, prose and paths; no model logic, parameter value or r
 **How this was confirmed.** For every changed `.py` file the token stream without comments and docstrings was
 compared with the snapshot (Python `tokenize`/`ast`); for `.sh` and `.yaml` files the lines without their comment
 part. The only non-comment differences are the edits listed in the last column below. Model core files that are
-byte-identical to the run's v16_final copy: `model.py`, `nbcommon.py`, `sea.py`, `census_v12.py`, `pre_networks.py`,
+byte-identical to the run's v17 copy: `model.py`, `nbcommon.py`, `sea.py`, `census_v12.py`, `pre_networks.py`,
 `report.py`, `memrun.py`, `tools/kbest_quarries.py`, `tools/kbest_mu038.py`, `tools/sea_routes.py`,
 `tools/build_cost_mu.py`, `tools/wl_inputs.py`, `tools/food_capacity.py`, `tools/haul_far.py` and all
-`tests/*.py` except `tests/verify_alliance_identity.py`, `tests/test_add4_flags.py` and `tests/test_v16_final.py`.
-`alliance.py`, `lit.py`, `preprocess.py`, `phasing.py`, `report_alliance.py` and those three tests differ from the
-v16_final copy in comments/docstrings only (the model files differ from the frozen copy by the v13-v16_final changes
+`tests/*.py` except `tests/verify_alliance_identity.py`, `tests/test_add4_flags.py`, `tests/test_v16_final.py`,
+`tests/test_L2B_engine_scope.py` and `tests/test_v17_lift.py`. `alliance.py`, `lit.py`, `preprocess.py`, `phasing.py`,
+`report_alliance.py` and those five tests differ from the v17 copy in comments/docstrings and the listed paths only
+(the model files differ from the frozen copy by the v13-v17 changes
 described above). The configs in `config/` were checked the same way: YAML-parsed,
 each equals its run copy apart from `data_dir`, `paths.sites`, `materiale.file`, `materiale.citation` and the
 relative form of `cache_dir`/`output_dir` (which resolve to the same folders in the run-folder layout of the
 README).
 
-## Changed files (72; 815 lines in total)
+## Changed files (73; 825 lines in total)
 
 | File | In CODE_SHA256SUMS | Lines changed | What changed |
 |---|---|---|---|
@@ -159,15 +180,15 @@ README).
 | `CHANGES_V15_HAUL15.md` | no | 3 | prose (names, message quotes/timestamps, stone-data citation) |
 | `CHANGES_V16.md` | no | 16 | prose (names, message quotes/timestamps, stone-data citation) |
 | `CHANGES_V16_FINAL.md` | no | 25 | prose (names, message quotes/timestamps, stone-data citation) |
-| `METHODS.md` | no | 523 | methods-only public copy (github_repo_tools/public/METHODS.md): model results removed, values of the v16_final configs |
-| `alliance.py` | yes | 15 | comments/docstrings |
+| `METHODS.md` | no | 527 | methods-only public copy (github_repo_tools/public/METHODS.md): model results removed, values of the v16_final configs |
+| `alliance.py` | yes | 17 | comments/docstrings |
 | `aud_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `config.ship.yaml` | yes | 1 | comments/docstrings |
 | `config.yaml` | yes | 24 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
 | `config_smallcrew_test.yaml` | yes | 15 | comments/docstrings; data_dir -> placeholder; materiale.citation string |
 | `full_chain.sh` | no | 4 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `gaps_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
-| `lit.py` | yes | 5 | comments/docstrings |
+| `lit.py` | yes | 7 | comments/docstrings |
 | `night_chain.sh` | yes | 8 | comments/docstrings; functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `phasing.py` | yes | 1 | comments/docstrings |
 | `pop_chain.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
@@ -192,6 +213,7 @@ README).
 | `tests/test_L2B_engine_scope.py` | no | 1 | functional path -> env variable |
 | `tests/test_add4_flags.py` | no | 2 | comments/docstrings; functional path -> env variable |
 | `tests/test_v16_final.py` | no | 1 | functional path -> env variable |
+| `tests/test_v17_lift.py` | no | 2 | comments/docstrings; functional path -> env variable |
 | `tests/v11_subset.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `tests/v12_item11.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
 | `tests/v12_subset.sh` | yes | 3 | functional path -> env variable; interpreter -> ${PYTHON:-python3} |
@@ -243,7 +265,8 @@ lines (step 8); those three calls fail in this repository. Nothing in `full_chai
 
 ## Not part of the snapshot
 
-Not in `CODE_SHA256SUMS`, `CODE_V13_SHA256SUMS`, `CODE_V14_SHA256SUMS`, `CODE_V15_SHA256SUMS` or `CODE_V16_FINAL_SHA256SUMS`:
+Not in `CODE_SHA256SUMS`, `CODE_V13_SHA256SUMS`, `CODE_V14_SHA256SUMS`, `CODE_V15_SHA256SUMS`, `CODE_V16_FINAL_SHA256SUMS` or
+`CODE_V17_SHA256SUMS`:
 - `tools_extra/build_slope.py` (the slope raster, see `data/derived/README.md`), `tools_extra/build_dem.py`,
   `tools_extra/build_lithology.py` and `tools_extra/build_rivers.py` (builders of the public input layers from their
   official downloads);

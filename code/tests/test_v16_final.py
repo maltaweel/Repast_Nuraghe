@@ -54,7 +54,7 @@ def _fake(f=0.3, sk=None, s8_rate=0.15, tech=True):
         m.tasks.append((perf, total, stage, up, final))
         return len(m.tasks) - 1
 
-    def charge(owner, perf, mh, stage, walk=0.0):
+    def charge(owner, perf, mh, stage, walk=0.0, lift=None):     # code_v17: lift kwarg (build stage)
         m.charges.append((owner, perf, mh, stage, walk))
     m.add_task, m.charge = add_task, charge
     for n in ("_owner_skill", "_join_task", "_perform_join", "_no_work_task"):
@@ -215,7 +215,7 @@ def test_signature_code_version_and_add4():
     sc = alliance.scenario(cfg, "MOST_REALISTIC_AUDITED_LIT_P10")
     sc = {k: v for k, v in sc.items() if k != "sea_kn"}        # no sea table read in this unit test
     haul = pd.DataFrame({"UID": ["a"], "TWR_N": [1], "haul_flatm": [1.0], "haul_m": [1.0]})
-    assert alliance.CODE_VERSION == lit.CODE_VERSION == "2026-11-05-v16_final"
+    assert alliance.CODE_VERSION == lit.CODE_VERSION == "2026-11-09-v17"     # code_v17 (was 2026-11-05-v16_final)
     s0 = alliance.signature(cfg, sc, haul)
     old = alliance.CODE_VERSION
     try:

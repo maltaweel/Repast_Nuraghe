@@ -133,9 +133,13 @@ def stage_hours(cfg, lit, tw, stone, n_blocks):
         c = L["geometry"]["course_height_m"]
         lift = n_blocks * (1.0 - w[0]) * L["lever_ph_per_block_course"] * (L["stair_lever_last_m"] / c)
     # S8 learning: tower i (0-based) costs (1 - rate)^i of the first one
+    # code_v17, SP-22 ruling (specified by the authors, 9 Nov 2026: no discount on lift, long-term rates;
+    # spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate: the learning factor (PM:23) and
+    # skill (PM:173) apply to quarrying, dressing and building only, never to lift." (was: lift * f as well; engine B,
+    # model.py S8 rows; the season engine calls this with learning=False and applies S8 per tower itself)
     if lit.get("learning") and tw > 1:
         f = sum((1.0 - L["learning_rate"]) ** i for i in range(tw)) / tw
-        q, dr, build, lift = q * f, dr * f, build * f, lift * f
+        q, dr, build = q * f, dr * f, build * f
     return {"quarry": q, "dress": dr, "build": build, "lift": lift}
 
 
@@ -175,7 +179,7 @@ ADD4_DEFAULTS = {"rails_cost_choice": False, "bedrock_everywhere": True, "load_p
 
 # Code version of every result-changing code path (code_v16_final). Hashed into EVERY run signature (alliance.signature,
 # model.run_signature) together with the effective add4 settings, so part files written by older code are never reused.
-CODE_VERSION = "2026-11-05-v16_final"
+CODE_VERSION = "2026-11-09-v17"      # code_v17 (9 Nov): SP-22 lift undiscounted (spec addendum k, ODD 7.9); was 2026-11-05-v16_final
 
 
 def add4(cfg):

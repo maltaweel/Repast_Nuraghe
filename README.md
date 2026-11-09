@@ -41,7 +41,7 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   haul of a site that sits on its outcrop, and the floor of every whole route (drag and walk back; relay legs have
   no minimum). It is a config value only (no code change; the sea tables, which apply it, are rebuilt per config;
   ODD section 7.5; `code/CHANGES_V15_HAUL15.md`). The v16_final configs keep it.
-- **v16_final (5 November 2026, the current `code/`).** The on-outcrop test uses the stone set a site actually
+- **v16_final (5 November 2026; `code/` until 9 November 2026).** The on-outcrop test uses the stone set a site actually
   quarries (v15b). Four rules sit behind flags in a top-level `add4:` config block: L2 `bedrock_everywhere` (every
   site quarries at the bedrock rate) and L3 `load_per_tonne` (loading per tonne) are ON by default, L1
   `rails_cost_choice` and L4 `sea_priced_as_charged` OFF. The summary output adds the island-wide 95th percentile of
@@ -49,8 +49,13 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   removed; three fixes: D3 (a stage with no work creates no help request, walk, trust change or skill credit), D6
   (join mode prices each party at its own skill), D11 (the site's stone is the class of the face it hauls from). The
   run signature includes `CODE_VERSION` and the add4 settings (`code/CHANGES_V15B_OUTCROP.md`, `CHANGES_V16.md`,
-  `CHANGES_V16_FINAL.md`, `code/METHODS.md`). The results in the paper are being regenerated with v16_final: this
-  code with the configs in `config/v16_final/`. The ODD describes v16_final (ODD change log).
+  `CHANGES_V16_FINAL.md`, `code/METHODS.md`).
+- **v17 (9 November 2026, the current `code/`).** The v16_final code with lift priced at the undiscounted rate (spec
+  addendum k): lift, by every lift rule, is never discounted; the learning factor (1 - 0.15)^t and skill apply to
+  quarrying, dressing and building only (ODD sections 7.7, 7.9, 7.12; `CODE_PROVENANCE.md`; new test
+  `code/tests/test_v17_lift.py`; `CODE_VERSION` `2026-11-09-v17`, checksums `CODE_V17_SHA256SUMS`). No config
+  changed. The results in the paper are being regenerated with v17: this code with the configs in
+  `config/v16_final/`. The ODD describes v17 (ODD change log).
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
@@ -117,7 +122,7 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
 
 ```
 code/            the model and its tools: the code of the full audited run + the v13 social switches + the near-site face
-                 rule + the v15b / v16 changes (v16_final; CODE_PROVENANCE.md)
+                 rule + the v15b / v16 changes + the v17 lift rule (v17; CODE_PROVENANCE.md)
   model.py         entry point (baseline, cooperation, literature, alliance and pre-network scenarios)
   alliance.py      adaptive alliances / MOST_REALISTIC; lit.py, sea.py, phasing.py, pre_networks.py, census_v12.py
   preprocess.py    haul tables (least-cost quarry -> site); nbcommon.py config loader + Dijkstra
@@ -131,7 +136,7 @@ notebooks/       01-05: setup, inputs (fetch_data.py), scenarios, analysis, audi
 param_audit/     parameter audit and traceability (public-safe copies)
 tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders; not in the frozen snapshot)
 outputs/         everything a run writes (NOT committed, except reference/ and summary/ for the audit)
-CODE_SHA256SUMS  checksums of the run's code snapshot (CODE_V13_/V14_/V15_/V16_FINAL_SHA256SUMS: v13, v14, v15, v16_final);  CODE_PROVENANCE.md  what differs and why
+CODE_SHA256SUMS  checksums of the run's code snapshot (CODE_V13_/V14_/V15_/V16_FINAL_/V17_SHA256SUMS: v13, v14, v15, v16_final, v17);  CODE_PROVENANCE.md  what differs and why
 ```
 
 ## Requirements / Installation
@@ -240,7 +245,7 @@ cd $RUN && NURAGHE_RUN_DIR=$RUN PYTHON=$PYTHON CUTOFF="2099-12-31 23:59" \
 deadline; dropped entries are listed in `outputs/logs/dropped.tsv`). Progress lines go to `$RUN/FULL_NOTES.md`.
 The queue was estimated at about 34 hours of wall time on the 8 GB machine that ran it.
 
-### The v16_final run (the current code, every scenario)
+### The v16_final run configs (run with the current code, every scenario)
 
 `config/queues/queue_v16_final.tsv` holds the 432 model entries of the v15 queue, in the same order, each on its
 config in `config/v16_final/` (the v15 config of the same name; `output_dir` points to `v16_final/outputs` and
@@ -254,7 +259,9 @@ of that cache except `runs/` into `$RUN/v16_final/outputs/caches/<config name>/`
 `code/v16f_chain.sh` runs the queue like `full_chain.sh`: copy `config/v16_final/*.yaml` to `$RUN/v16_final/configs/`,
 write the queue to `$RUN/v16_final/queue_v16_final.tsv` with the same `sed`, link `$RUN/code_v16_final` to
 `$REPO/code`, and start `bash code/v16f_chain.sh` from `$RUN` with `NURAGHE_RUN_DIR=$RUN`. The run signature
-includes `CODE_VERSION` and the effective add4 settings, so no part file of an earlier version is reused.
+includes `CODE_VERSION` and the effective add4 settings, so no part file of an earlier version is reused. Run with
+the current `code/` (v17), this queue gives the v17 results (signature `CODE_VERSION` `2026-11-09-v17`); the v16_final
+code itself is `code/` before the v17 update (git history).
 
 ### The v15 rerun (superseded, kept as a record)
 
@@ -309,6 +316,12 @@ Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma 
 
 ## Changes
 
+- 2026-11-09 (v17): `code/` is now the v17 code: the v16_final code with lift (all lift rules) priced at the
+  undiscounted rate, spec addendum k; the learning factor (1 - 0.15)^t and skill apply to quarrying, dressing and
+  building only (`alliance.py`: build stage split into a discounted build part and an undiscounted lift part, booked
+  exactly to `mh_lift`; `lit.py`: engine-B S8 learning no longer scales lifting; `CODE_VERSION` `2026-11-09-v17`; new
+  test `tests/test_v17_lift.py`). Checksums `CODE_V17_SHA256SUMS`; `CODE_PROVENANCE.md`, `code/METHODS.md` and the
+  ODD (`ODD/ODD.md`, `ODD/ODD.pdf`; change log) updated. No config changed; the v16_final configs and queue are used.
 - 2026-11-09 (default config): `code/config.yaml` now carries the values of the configuration the final v16_final
   runs used (`config/v16_final/config_full_audited.yaml`) instead of the pre-audit defaults: the audited parameter
   values (drag speed, return and helper walk speed, joints quarrying rate, facade rates, tower geometry, basalt and
