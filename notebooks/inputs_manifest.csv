@@ -146,7 +146,7 @@ code,code/tests/test_add4_flags.py,16885,d2f6b4d4d98270bd8079954431da743e6e1f815
 code,code/tests/test_dijkstra.py,5273,c2be1a6bc0d4f51feab045e82066382167571ee882b850756d7482f155e2580e,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/test_reproducibility.py,3687,e8effb5ee71edae7a88231a69f211457171c5a86bbba5ee25fc697747824b1eb,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/test_v16_final.py,12531,8e44986f553df6777097ad5c044f395fd344898ab7d84fda0bb69c6c47bf3790,run;rebuild,repository code (CODE_PROVENANCE.md)
-code,code/tests/test_v17_lift.py,9238,3056bb296747f0ccc82a6bdf50f7a457dde88c103e3ec85646b67c2fa602d7b5,run;rebuild,repository code (CODE_PROVENANCE.md)
+code,code/tests/test_v17_lift.py,9354,f1de6badf33168522c6266fab6cd9fc59346d574900ec3d82ded06def462b2b6,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/v11_subset.sh,3136,30f869145f43ca987838e39d1d98ed75012d8966814ff23db9df8aedc2e69817,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/v12_item11.sh,2662,3e60c8971862fe2869b7f60a2a941a4fc8b8d3a9d75b3c7e7a7cd95c5654bc40,run;rebuild,repository code (CODE_PROVENANCE.md)
 code,code/tests/v12_subset.sh,1643,61fe5c3b5413bbc2f268b8e1c3f8ea625e75d92f7ef0a3bef9c1cacd277ecc30,run;rebuild,repository code (CODE_PROVENANCE.md)

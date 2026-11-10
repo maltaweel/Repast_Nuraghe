@@ -21,7 +21,8 @@ import lit  # noqa: E402
 from nbcommon import load_config  # noqa: E402
 
 assert os.path.dirname(os.path.abspath(alliance.__file__)) == os.path.dirname(HERE), alliance.__file__   # code_v17
-assert os.path.basename(os.path.dirname(HERE)) == "code_v17"
+import lit as _lit_v17_check
+assert _lit_v17_check.CODE_VERSION == "2026-11-09-v17", _lit_v17_check.CODE_VERSION   # version check, independent of the folder name (repo: code/)
 FA = os.path.join(os.environ.get("NURAGHE_PROJECT", "."), "runs/2026-11-02-v12-census/full_audited")
 CFG = FA + "/v16_final/configs/config_full_audited.yaml"
 AM = alliance.AllianceModel
