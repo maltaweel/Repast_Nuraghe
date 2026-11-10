@@ -38,6 +38,9 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
    (a package changed version after it was imported): Runtime > Restart session, then run all again.
 4. 02 downloads the public inputs into `DATA_DIR` on your Drive (about 400 MB) and copies the Nurnet files there; the
    next notebooks reuse them.
+5. **Derived inputs (first time only):** the prebuilt pack (`DERIVED_URL`) is not public yet, so in the config cell of
+   02 also set `REBUILD_DERIVED = True` (about 30-45 min; see [Derived inputs](#derived-inputs)). Without them 02
+   stops at section 5 with "derived input(s) missing in DERIVED_DIR". Later runs reuse `DERIVED_DIR` on Drive.
 
 Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `demo` and `quick` presets, the audit, the demo
 sensitivity designs and the derived-input rebuild; the `full` preset (7,167 sites, 100 seeds per scenario) takes

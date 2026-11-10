@@ -303,6 +303,14 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
     cdir = os.path.join(work_dir, "cache")
     if cache == "prebuilt":
         src = LAYOUT["cache"]
+        miss = [r["path"] for r in read_manifest(package_dir) if r["group"] == "derived"
+                and not os.path.isfile(os.path.join(src, r["path"].split("/", 1)[1]))]
+        if miss:
+            raise PreflightError(
+                f"{len(miss)} derived input(s) missing in DERIVED_DIR = {src} (e.g. {miss[0]}). Get them first: "
+                "02_inputs.ipynb section 0b with REBUILD_DERIVED = True (about 30-45 min; the prebuilt pack DERIVED_URL "
+                "is not public yet), or set DERIVED_DIR to a folder that holds them (HOW_TO_USE.md, Derived inputs). "
+                "On Colab keep DERIVED_DIR on Google Drive so that every notebook sees it.")
         for dp, dn, fn in os.walk(src):
             rel = os.path.relpath(dp, src)
             if rel.split(os.sep)[0] in ("cost_mu", "runs"):   # cost_mu: 657 MB, only for rebuilding: linked, not

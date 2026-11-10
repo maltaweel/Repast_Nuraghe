@@ -20,8 +20,9 @@ The folders are set at the top of each notebook's config cell (`REPO_DIR`, `DATA
 `quarry.near_site_fixed_face_m: 1000` and `transport.min_haul_flatm: 15`); all outputs are cleared, and the
 notebooks hold no model results (every number is computed when they run; the results of the full runs are a
 separate data input). All six were executed end to end at demo size (03 preset `demo`, 05 with a 30-site subset,
-06 `SIZE = "demo"`) with the v17 code on Linux (Python 3.13.5, the pinned packages, 2 MPI ranks); not yet on Colab
-itself.
+06 `SIZE = "demo"`) with the v17 code on Linux (Python 3.13.5, the pinned packages, 2 MPI ranks), and again in a
+Colab-like clean room (10 Nov 2026: fresh clone of this repository from `/content`, Python 3.12, only the packages the
+notebooks install themselves, a Drive-like folder shared by the six notebooks); not yet on Colab itself.
 
 ## How to audit in Colab (quick start)
 
@@ -29,7 +30,8 @@ itself.
 2. In the config cell of each: `MOUNT_DRIVE = True` and the same Drive folders (each Colab notebook has its own
    runtime): `DATA_DIR = "/content/drive/MyDrive/Repast_Nuraghe/data"`, `DERIVED_DIR =
    "/content/drive/MyDrive/Repast_Nuraghe/data/derived/cache"`, `OUTPUTS_DIR = "/content/drive/MyDrive/Repast_Nuraghe/outputs"`.
-3. Runtime > Run all. The setup cell clones the repository and installs OpenMPI and the pinned packages.
+3. Runtime > Run all. The setup cell clones the repository and installs OpenMPI and the pinned packages. In 02 also set
+   `REBUILD_DERIVED = True` the first time (the derived inputs, about 30-45 min; the prebuilt pack is not public yet).
 4. 05_audit prints PASS / FAIL / NOT YET AVAILABLE per step: (a) code checksums vs `CODE_V17_SHA256SUMS`, (b) inputs
    vs `inputs_manifest.csv`, (c) `config/v16_final/config_full_audited.yaml` vs `param_audit/PARAM_TRACE.csv`, (d) a
    rerun of the headline scenario on 300 sites, seeds 1-3, vs the fingerprint in `outputs/reference/` (placeholder),
