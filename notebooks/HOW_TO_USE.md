@@ -1,14 +1,21 @@
 # How to use the notebooks and link the data
 
-Five notebooks reproduce and audit the model, in this order:
+Six notebooks reproduce and audit the model, in this order. They run the v17 code (`code/`, `CODE_VERSION`
+2026-11-09-v17: lift, every lift rule, priced at the undiscounted rate; the learning factor and skill act on
+quarrying, dressing and building only; ODD 7.9) with the configuration of the v17 runs,
+`config/v16_final/config_full_audited.yaml` (the audited `config/config_full_audited.yaml` with
+`quarry.near_site_fixed_face_m: 1000` and `transport.min_haul_flatm: 15`). The notebooks contain no model results:
+every number they show is computed when you run them; the results of the full runs are a separate data input (the
+results package).
 
 | # | notebook | what it does | expected result |
 |---|---|---|---|
-| 1 | `01_setup.ipynb` | installs OpenMPI and the pinned Python packages, checks the versions, runs a 2-rank MPI smoke test, imports the model code | `pinned packages: 33; mismatches: 0`, `rank 0 of 2` / `rank 1 of 2`, `model code imports OK` |
+| 1 | `01_setup.ipynb` | installs OpenMPI and the pinned Python packages, checks the versions, runs a 2-rank MPI smoke test, imports the model code, checks the code version and runs the v17 lift unit tests | `pinned packages: 35; mismatches: 0`, `rank 0 of 2` / `rank 1 of 2`, `model code imports OK`, `code version 2026-11-09-v17`, `9 tests passed` |
 | 2 | `02_inputs.ipynb` | gets every input (section 0: `fetch_data.py`), checks it against `inputs_manifest.csv`, sets the stone rule, gets the derived inputs (pack or rebuild), writes the work folder | a fetch table with `0 failed/differing`; `derived inputs ...: 68 of 68 present`; `work folder ready` |
-| 3 | `03_scenarios.ipynb` | runs scenarios with `code/model.py` (repast4py + MPI): presets `quick` (300 sites, seeds 1-3), `full`, `custom` | island totals per scenario |
+| 3 | `03_scenarios.ipynb` | runs scenarios with `code/model.py` (repast4py + MPI), including the headline `MOST_REALISTIC_AUDITED_LIT_P10`: presets `demo` (30 sites, seed 1, about a minute), `quick` (300 sites, seeds 1-3), `full`, `custom` | island totals per scenario |
 | 4 | `04_analysis_report.ipynb` | tables per tower class, maps of man-hours, centrality of the help networks, network need | tables and maps |
-| 5 | `05_audit.ipynb` | the step-by-step audit: (a) code vs the run's checksums, (b) inputs vs the manifest, (c) configuration vs the parameter trace, (d) a fixed rerun vs a shipped fingerprint, (e) the headline numbers from the shipped per-seed tables | (a)-(c) PASS; (d), (e) NOT YET AVAILABLE until the fingerprint and the tables are shipped, then PASS |
+| 5 | `05_audit.ipynb` | the step-by-step audit: (a) code vs the run's v17 checksums (`CODE_V17_SHA256SUMS`), (b) inputs vs the manifest, (c) configuration vs the parameter trace (one documented change since the audit: minimum haul 100 -> 15 m), (d) a fixed rerun vs a fingerprint, (e) the headline numbers from the per-seed tables of the results | (a)-(c) PASS; (d), (e) NOT YET AVAILABLE until the fingerprint and the tables are supplied, then PASS |
+| 6 | `06_sensitivity.ipynb` | the sensitivity steps at demo size: the A5 alliance grid (27 cells + A0_alone, `sensitivity.csv`), a Morris screen and a Sobol design / analysis of the headline (`notebooks/sensitivity.py`, SALib); regenerates the full designs (Morris 330 evaluations, Sobol 14,336) for comparison with the design files of the results package | a 27-row `sensitivity.csv`, mu* per factor and output, S1 / ST per factor and output (demo values: they only show that the chain works) |
 
 Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in-jupyter-on-your-own-machine) -
 [Software requirements](#software-requirements) - [Getting the data](#getting-the-data) -
@@ -17,7 +24,7 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
 
 ## Run in Google Colab
 
-1. Open the notebooks from the links in [README.md](README.md#open-in-google-colab) (01 to 05, in order).
+1. Open the notebooks from the links in [README.md](README.md#open-in-google-colab) (01 to 06, in order).
 2. In the **config cell** of every notebook (the only cell you edit) set the same Drive folders, because each
    Colab notebook runs in its own runtime (a file written by 02 in `/content` is not visible to 03):
    ```python
@@ -32,8 +39,9 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
 4. 02 downloads the public inputs into `DATA_DIR` on your Drive (about 400 MB) and copies the Nurnet files there; the
    next notebooks reuse them.
 
-Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `quick` preset, the audit and the derived-input rebuild;
-the `full` preset (7,167 sites, 100 seeds per scenario) takes hours per scenario there.
+Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `demo` and `quick` presets, the audit, the demo
+sensitivity designs and the derived-input rebuild; the `full` preset (7,167 sites, 100 seeds per scenario) takes
+hours per scenario there, and the full Sobol design (43,008 whole-island runs) is not a Colab job.
 
 ## Run in Jupyter on your own machine
 
@@ -45,7 +53,7 @@ CC=mpicc CXX=mpicxx python -m pip install -r notebooks/requirements-colab.txt ju
 jupyter notebook notebooks/
 ```
 
-Open 01 to 05 in order. With the defaults (`"auto"`) the notebooks use `data/` for the raw inputs,
+Open 01 to 06 in order. With the defaults (`"auto"`) the notebooks use `data/` for the raw inputs,
 `data/derived/cache/` for the derived inputs and `outputs/` for everything they write. Headless:
 `jupyter nbconvert --to notebook --execute notebooks/02_inputs.ipynb` (environment variables `NB_DATA_DIR`,
 `NB_DERIVED_DIR`, `NB_OUTPUTS_DIR`, ... override the config cell; see the config cell of each notebook).
@@ -68,6 +76,7 @@ environment):
 | pyogrio | >= 0.7; tested 0.13.0 | |
 | rasterio | >= 1.3; tested 1.5.2 | |
 | pyyaml | >= 6.0; tested 6.0.3 | |
+| SALib | 1.6.0 (multiprocess 0.70.19) | Morris and Sobol designs and indices (06_sensitivity) |
 | also pinned in `requirements-colab.txt` | scipy 1.18.1, matplotlib 3.11.2, networkx 3.7, reportlab 5.1.0, cython 3.3.0 and their dependencies | used by the analysis tools and the notebooks |
 
 - **GDAL**: no system installation needed; the pip wheels of rasterio and pyogrio include GDAL (the environment of the
@@ -171,7 +180,7 @@ DL=$D/_downloads; mkdir -p $DL $D/sites $D/stone $D/geology $D/dem $D/costsurfac
    python tools_extra/build_dem.py $DL/dem_tiles $D/dem/sardinia_dem_GLO30_25832.tif --mask region $DL/region/limiteAmministrRegionale_CTR.shp
    ```
    (tile SHA-256 values: `DEM_TILES` in `notebooks/fetch_data.py`.)
-4. **Drag cost and slope** (from the DEM; `CFG` = a copy of `config/config_full_audited.yaml` with `data_dir:` set
+4. **Drag cost and slope** (from the DEM; `CFG` = a copy of `config/v16_final/config_full_audited.yaml` with `data_dir:` set
    to the absolute path of `DATA_DIR`):
    ```bash
    (cd code && python tools/build_cost_mu.py CFG 0.3 $D/costsurface/sardinia_drag_cost_8dir_mu03_25832_int.tif)
@@ -244,11 +253,11 @@ The model runs read cached derived inputs (haul tables, k-best quarry routes, se
 rasters per friction; 68 files, listed in `notebooks/inputs_manifest.csv`, group `derived`, and explained in
 `data/derived/README.md`). Two ways to get them into `DERIVED_DIR`:
 
-1. **Prebuilt pack** of the full audited run: `DERIVED_URL` in 02 (or `python notebooks/fetch_data.py --derived-url
+1. **Prebuilt pack** of the v17 runs: `DERIVED_URL` in 02 (or `python notebooks/fetch_data.py --derived-url
    URL`). Placeholder: the pack is part of the results package, which is not public yet (DOI pending).
 2. **Rebuild** from the raw inputs: `REBUILD_DERIVED = True` in 02, or
    `python notebooks/fetch_data.py --rebuild-derived [--stone-rule hybrid|stones7]`. It runs the commands of
-   `data/derived/README.md` in order. Times and peak memory from the project's logs (8 GB machine): cost rasters per
+   `data/derived/README.md` in order, with the configuration of the v17 runs. Times and peak memory from the project's logs (8 GB machine): cost rasters per
    friction ~0.85 GB each; base haul table 14 s (stones7) / 249 s (hybrid), 1.7-2.4 GB; each further haul table about
    12 s with stones7 (up to ~4 min with hybrid); k-best routes 95 s, 1.9 GB; wider-literature inputs 13 s, 2.2 GB; sea
    tables 192 s, 1.1 GB; bichrome distances 15 s; food catchments not timed. **Total about 30-45 min with hybrid,
@@ -265,4 +274,8 @@ The full audited run reused derived inputs built by earlier runs of the project 
 - *PREFLIGHT FAILED ... MISSING*: run 02, section 0 (`FETCH = True`), or link the file by hand (above).
 - *WRONG ... SHA-256 differs*: a truncated download or another version; delete the file and fetch it again. Files
   rebuilt by `fetch_data.py` are reported as *REBUILT* (not an error).
-- *Out of memory* during a run: fewer MPI ranks (`RANKS`), or the `quick` preset.
+- *Out of memory* during a run: fewer MPI ranks (`RANKS`), or the `demo` / `quick` preset.
+- *code version ... expected 2026-11-09-v17*: `code/` is not the v17 code; check out the repository again. Part
+  files of other code versions are never reused (the code version is part of every run signature).
+- *stone_rule = stones7 needs the stones7 derived-input cache* (06): set `STONES7_CACHE`, or leave it unset (the
+  factor is then fixed at hybrid).

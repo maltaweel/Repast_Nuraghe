@@ -85,20 +85,21 @@ flowchart TD
 
 | Model description | Replicate the results |
 |---|---|
-| [ODD/ODD.md](ODD/ODD.md) (PDF: [ODD/ODD.pdf](ODD/ODD.pdf)): the ODD protocol of the full audited model | [notebooks/](notebooks/): start with [notebooks/HOW_TO_USE.md](notebooks/HOW_TO_USE.md), then run `01_setup`, `02_inputs`, `03_scenarios`, `04_analysis_report`, `05_audit` in order, in Jupyter or Google Colab |
+| [ODD/ODD.md](ODD/ODD.md) (PDF: [ODD/ODD.pdf](ODD/ODD.pdf)): the ODD protocol of the full audited model | [notebooks/](notebooks/): start with [notebooks/HOW_TO_USE.md](notebooks/HOW_TO_USE.md), then run `01_setup`, `02_inputs`, `03_scenarios`, `04_analysis_report`, `05_audit`, `06_sensitivity` in order, in Jupyter or Google Colab (v17 code, configuration `config/v16_final/config_full_audited.yaml`) |
 
 Parameter audit and traceability: [param_audit/](param_audit/) (below).
 
 ### Replicate the results: quick start in Colab
 
-1. Open [notebooks/README.md](notebooks/README.md) and use the "Open in Colab" links, 01 to 05 in order.
+1. Open [notebooks/README.md](notebooks/README.md) and use the "Open in Colab" links, 01 to 06 in order.
 2. In the config cell of each notebook set `MOUNT_DRIVE = True` and the same Google Drive folders for `DATA_DIR`,
    `DERIVED_DIR` and `OUTPUTS_DIR` (each Colab notebook runs in its own runtime; values in
    [HOW_TO_USE.md](notebooks/HOW_TO_USE.md#run-in-google-colab)).
 3. Run all cells. 01 installs OpenMPI and the pinned packages; 02 copies the Nurnet files from `data/nurnet/`,
    downloads every public input from its official source (`notebooks/fetch_data.py`) and gets the derived inputs;
    03 and 04 run and analyse scenarios; 05 is the step-by-step audit (code checksums, inputs, configuration, a fixed
-   rerun, the headline numbers), each step with its expected result.
+   rerun, the headline numbers), each step with its expected result; 06 runs the sensitivity steps (A5 grid, Morris,
+   Sobol) at demo size.
 
 The Nurnet files (site list and per-site building stone) are included in `data/nurnet/`; for the latest version and
 source information contact Nurnet at nurnet.presidente@gmail.com.
@@ -132,7 +133,7 @@ config/          config_full_audited.yaml (+ 84 variants, tost_configs/), v16_fi
                  v15_haul15/, v14_nearface/ (the superseded v15 and v14 rerun configs, kept as a record), queues/,
                  sea_expect/, check_sea_meta.py
 data/            data/nurnet/ (Nurnet's data, included); the other inputs are fetched (data/README.md; data/derived/README.md)
-notebooks/       01-05: setup, inputs (fetch_data.py), scenarios, analysis, audit; HOW_TO_USE.md; Jupyter or Colab
+notebooks/       01-06: setup, inputs (fetch_data.py), scenarios, analysis, audit, sensitivity; HOW_TO_USE.md; Jupyter or Colab
 param_audit/     parameter audit and traceability (public-safe copies)
 tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders; not in the frozen snapshot)
 outputs/         everything a run writes (NOT committed, except reference/ and summary/ for the audit)
@@ -152,7 +153,7 @@ On Python 3.10-3.11 the model runs and results agree except for last-digit diffe
 | numpy / numba / pandas | >= 1.24 / >= 0.58 / >= 2.0; tested 2.5.4 / 0.68.0 / 3.0.6 |
 | geopandas / pyogrio / rasterio | >= 0.14 / >= 0.7 / >= 1.3; tested 1.2.0 / 0.13.0 / 1.5.2 (the wheels include GDAL, tested 3.12.2; no system GDAL needed) |
 | pyyaml | >= 6.0; tested 6.0.3 |
-| also pinned for the tools and notebooks | scipy 1.18.1, shapely 2.2.0, pyproj 3.8.0, matplotlib 3.11.2, networkx 3.7, reportlab 5.1.0 and dependencies (33 pins) |
+| also pinned for the tools and notebooks | scipy 1.18.1, shapely 2.2.0, pyproj 3.8.0, matplotlib 3.11.2, networkx 3.7, reportlab 5.1.0, SALib 1.6.0 and dependencies (35 pins) |
 
 1. Install MPI (above).
 2. Install the Python packages; repast4py and mpi4py compile against MPI:

@@ -218,10 +218,15 @@ def unzip(zp, dest):
         z.extractall(dest)
 
 
+# The configuration of the v17 runs (the v17 code runs the v16_final configs; = config/config_full_audited.yaml +
+# quarry.near_site_fixed_face_m 1000 + transport.min_haul_flatm 15, which the sea tables apply). Same as repro.RUN_CONFIG.
+RUN_CONFIG = os.path.join("config", "v16_final", "config_full_audited.yaml")
+
+
 def write_config(data_dir, cache_dir, out, stone_rule=None):
-    """A copy of config/config_full_audited.yaml with data_dir / cache_dir (/ stone_rule) set (same rule as repro.py)."""
+    """A copy of RUN_CONFIG with data_dir / cache_dir (/ stone_rule) set (same rule as repro.py)."""
     lines, seen = [], set()
-    with open(os.path.join(REPO, "config", "config_full_audited.yaml")) as f:
+    with open(os.path.join(REPO, RUN_CONFIG)) as f:
         for ln in f:
             if ln.startswith("data_dir:") and "data_dir" not in seen:
                 ln = f"data_dir: {os.path.abspath(data_dir)}\n"; seen.add("data_dir")

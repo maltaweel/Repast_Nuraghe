@@ -1,19 +1,26 @@
-"""Helpers shared by the nuraghe-build-abm notebooks (01-05) in this repository.
+"""Helpers shared by the nuraghe-build-abm notebooks (01-06) in this repository.
 
-Everything a notebook does that is longer than a few lines lives here, so the notebooks stay readable.
-Standard library + pandas only. Adapted from the 31 Oct 2026 (code v8) reproducibility package to the repository
-layout; the folders are set once by set_layout() (the notebooks' config cell does it):
+Everything a notebook does that is longer than a few lines lives here, so the notebooks stay readable (the
+sensitivity steps of 06 are in sensitivity.py). Standard library + pandas only. The folders are set once by
+set_layout() (the notebooks' config cell does it).
+
+Model code and configuration: code/ is the v17 code (CODE_VERSION 2026-11-09-v17: lift, every lift rule, priced at
+the undiscounted rate; the learning factor and skill act on quarrying, dressing and building only; ODD 7.9,
+CODE_PROVENANCE.md). The v17 code runs the v16_final configuration, config/v16_final/config_full_audited.yaml
+(RUN_CONFIG; = config/config_full_audited.yaml + quarry.near_site_fixed_face_m 1000 + transport.min_haul_flatm 15).
 
     REPO_DIR/
-        code/                    the model code (frozen snapshot of the full audited run; see CODE_PROVENANCE.md)
-        config/                  config_full_audited.yaml (+ variants, queues)
+        code/                    the model code (v17; see CODE_PROVENANCE.md, CODE_V17_SHA256SUMS)
+        config/                  v16_final/config_full_audited.yaml (the configuration of the v17 runs; RUN_CONFIG),
+                                 config_full_audited.yaml (the audited base before v15) + variants, queues
         data/                    raw inputs, in the layout the configs expect under data_dir (data/README.md)
             sites/, stone/           copies of Nurnet's data from data/nurnet/ (made by fetch_data.py)
         data/nurnet/             Nurnet's data, included: site list + per-site building stone (data/nurnet/README.txt)
         data/derived/cache/      cached derived inputs (haul tables, k-best quarry routes, sea routes, ...;
                                  data/derived/README.md), downloaded from the results package or rebuilt
         outputs/                 everything the notebooks write (work copy, runs, optional reference/)
-        notebooks/               01_setup ... 05_audit, repro.py, fetch_data.py, requirements-colab.txt, inputs_manifest.csv
+        notebooks/               01_setup ... 06_sensitivity, repro.py, sensitivity.py, fetch_data.py,
+                                 requirements-colab.txt, inputs_manifest.csv
     WORK_DIR/                    fast local disk: code copy, cache copy, config.yaml, outputs (default REPO_DIR/outputs/work)
 """
 import csv
@@ -34,11 +41,17 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 from fetch_data import NURNET_NOTE  # noqa: E402  (the note on how to request the Nurnet files)
 
+# --------------------------------------------------------------------------- code version + configuration
+CODE_VERSION = "2026-11-09-v17"                       # lit.CODE_VERSION of code/ (part of every run signature)
+CODE_SUMS = "CODE_V17_SHA256SUMS"                     # checksums of the run's v17 code folder (05_audit, step a)
+RUN_CONFIG = os.path.join("config", "v16_final", "config_full_audited.yaml")   # the configuration of the v17 runs
+HEADLINE = "MOST_REALISTIC_AUDITED_LIT_P10"           # the headline scenario (alliance family)
+
 # --------------------------------------------------------------------------- folder layout (set_layout)
 LAYOUT = {
     "data": os.path.join(REPO, "data"),                                   # raw inputs (= data_dir of the config)
     "cache": os.path.join(REPO, "data", "derived", "cache"),             # cached derived inputs (prebuilt cache)
-    "config": os.path.join(REPO, "config", "config_full_audited.yaml"),  # base configuration
+    "config": os.path.join(REPO, RUN_CONFIG),                            # base configuration (v17 runs)
     "reference": os.path.join(REPO, "outputs", "reference"),             # optional reference result (not in the repo)
 }
 
@@ -49,7 +62,7 @@ def set_layout(repo=None, data=None, cache=None, config=None, reference=None):
     if repo not in (None, "auto"):
         REPO = os.path.abspath(repo)
     defaults = {"data": os.path.join(REPO, "data"), "cache": os.path.join(REPO, "data", "derived", "cache"),
-                "config": os.path.join(REPO, "config", "config_full_audited.yaml"),
+                "config": os.path.join(REPO, RUN_CONFIG),
                 "reference": os.path.join(REPO, "outputs", "reference")}
     for k, v in (("data", data), ("cache", cache), ("config", config), ("reference", reference)):
         LAYOUT[k] = os.path.abspath(v) if v not in (None, "auto") else defaults[k]
@@ -78,14 +91,15 @@ SA_COLUMNS = ["codice", "sa_materiale"]          # codice = Nurnet UID (e.g. NID
 
 # --------------------------------------------------------------------------- the reference subset
 # 300 sites (code/sites300_real.txt), seeds 1-3, 4 scenarios. A reference fingerprint (reference_sha256.csv) must be
-# made with the SAME code and cache (write_fingerprint); none is shipped in the repository (see notebooks/README.md).
+# made with the SAME code (v17), configuration (RUN_CONFIG) and cache (write_fingerprint); none is shipped in the
+# repository (see notebooks/README.md).
 REF_SEEDS = "1-3"
 REF_SITES_FILE = "sites300_real.txt"
 REF_RUNS = [  # (name, model.py arguments after config.yaml)
     ("baseline", []),
     ("webster", ["--lit", "webster"]),
     ("A5_full", ["--alliance", "A5_full"]),
-    ("MOST_REALISTIC_P10", ["--alliance", "MOST_REALISTIC_P10"]),
+    (HEADLINE, ["--alliance", HEADLINE]),
 ]
 
 
@@ -236,12 +250,42 @@ def _check_code(package_dir):
                              ". Check out code/ again; do not edit it (copy it elsewhere to experiment).")
 
 
+def check_code_version(code_dir):
+    """lit.CODE_VERSION of CODE_DIR (read from the source, nothing imported) must be CODE_VERSION (v17)."""
+    import re
+    m = re.search(r'^CODE_VERSION = "([^"]+)"', open(os.path.join(code_dir, "lit.py"), encoding="utf-8").read(), re.M)
+    got = m.group(1) if m else None
+    if got != CODE_VERSION:
+        raise PreflightError(f"{code_dir}/lit.py has CODE_VERSION {got!r}; these notebooks expect {CODE_VERSION!r} (v17)")
+    return got
+
+
+def run_lift_tests(package_dir, scratch, python=sys.executable):
+    """The unit tests of the v17 lift rule (code/tests/test_v17_lift.py: 9 tests on fake models, no simulation).
+    The test reads the configuration from the run-folder layout under $NURAGHE_PROJECT; SCRATCH gets that layout
+    with a copy of RUN_CONFIG. Runs from a copy of code/ (nothing is written into the repository)."""
+    lay = os.path.join(scratch, "layout")
+    cdir = os.path.join(lay, "runs", "2026-11-02-v12-census", "full_audited", "v16_final", "configs")
+    os.makedirs(cdir, exist_ok=True)
+    shutil.copy2(os.path.join(package_dir, RUN_CONFIG), os.path.join(cdir, "config_full_audited.yaml"))
+    code = os.path.join(scratch, "code")
+    shutil.rmtree(code, ignore_errors=True)
+    shutil.copytree(os.path.join(package_dir, "code"), code)
+    env = dict(_env(), NURAGHE_PROJECT=lay, NUMBA_CACHE_DIR=os.path.join(scratch, "numba_cache"), OMPI_MCA_btl="self")
+    r = subprocess.run([python, os.path.join("tests", "test_v17_lift.py")], cwd=code, env=env,
+                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    print("\n".join(ln for ln in r.stdout.splitlines() if ln.startswith(("PASS", "FAIL", "Traceback", "Assertion"))
+                    or "tests passed" in ln or "Error" in ln))
+    return r.returncode == 0 and "9 tests passed" in r.stdout
+
+
 def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="prebuilt", fresh_code=True,
                  check_code=True):
     """Copy code/ (verified) and the prebuilt cache to WORK_DIR, write WORK_DIR/config.yaml. Returns its path.
 
     cache: 'prebuilt' (copy the derived-input cache LAYOUT['cache'], without cost_mu/) or 'empty' (rebuild in 02).
-    The config is LAYOUT['config'] (default config/config_full_audited.yaml) with only four lines changed:
+    The config is LAYOUT['config'] (default RUN_CONFIG = config/v16_final/config_full_audited.yaml, the configuration
+    of the v17 runs) with only four lines changed:
     data_dir, cache_dir, output_dir, stone_rule
     (materiale.file stays relative to data_dir). No model parameter is touched. It is written to WORK_DIR/config.yaml
     and over the work copy WORK_DIR/code/config.yaml (never over the repository's code/).
@@ -249,6 +293,7 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
     """
     if check_code:
         _check_code(package_dir)
+    check_code_version(os.path.join(package_dir, "code"))
     os.makedirs(work_dir, exist_ok=True)
     code = os.path.join(work_dir, "code")
     if fresh_code and os.path.isdir(code):
@@ -260,8 +305,8 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
         src = LAYOUT["cache"]
         for dp, dn, fn in os.walk(src):
             rel = os.path.relpath(dp, src)
-            if rel.split(os.sep)[0] == "cost_mu":         # 657 MB, only for rebuilding: linked, not copied
-                continue
+            if rel.split(os.sep)[0] in ("cost_mu", "runs"):   # cost_mu: 657 MB, only for rebuilding: linked, not
+                continue                                     # copied; runs/: part files of earlier runs, not inputs
             os.makedirs(os.path.join(cdir, rel), exist_ok=True)
             for f in fn:
                 d = os.path.join(cdir, rel, f)
@@ -291,8 +336,8 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
     for p in (cfg, os.path.join(code, "config.yaml")):
         with open(p, "w") as f:
             f.writelines(lines)
-    print(f"work folder ready: {work_dir}\n  config {cfg}\n  data_dir {inputs}\n  cache {cdir} ({cache})\n"
-          f"  stone_rule {stone_rule}")
+    print(f"work folder ready: {work_dir}\n  config {cfg} (from {os.path.relpath(LAYOUT['config'], REPO)})\n"
+          f"  code version {CODE_VERSION}\n  data_dir {inputs}\n  cache {cdir} ({cache})\n  stone_rule {stone_rule}")
     return cfg
 
 
@@ -604,22 +649,22 @@ def island_table(base):
 
 
 # --------------------------------------------------------------------------- audit (05_audit.ipynb)
-AUDIT_SCENARIO = "MOST_REALISTIC_AUDITED_LIT_P10"      # the headline scenario of the full audited run
+AUDIT_SCENARIO = HEADLINE                              # the headline scenario (v17 runs)
 AUDIT_SITES_FILE = "sites300_real.txt"                  # 300 sites (code/sites300_real.txt)
 AUDIT_SEEDS = "1-3"
 AUDIT_REF = "reference_audit_sha256.csv"                # under OUTPUTS_DIR/reference/ (shipped with the results)
 
 
-def _provenance_lists(repo):
-    """From CODE_PROVENANCE.md: files expected to FAIL the run checksums (scrubbed, 'In CODE_SHA256SUMS' = yes) and
-    the excluded items (expected to be missing)."""
+def _provenance_lists(repo, all_listed=False):
+    """From CODE_PROVENANCE.md: files expected to FAIL the run checksums (scrubbed: 'In CODE_SHA256SUMS' = yes, or
+    every file of the 'Changed files' table with all_listed=True) and the excluded items (expected to be missing)."""
     import re
     txt = open(os.path.join(repo, "CODE_PROVENANCE.md"), encoding="utf-8").read()
     changed, excluded = set(), []
     part = txt.split("## Changed files", 1)[-1].split("\n## ", 1)[0]
     for ln in part.splitlines():
         m = re.match(r"\|\s*`([^`]+)`\s*\|\s*(yes|no)\s*\|", ln)
-        if m and m.group(2) == "yes":
+        if m and (all_listed or m.group(2) == "yes"):
             changed.add(m.group(1))
     part = txt.split("## Excluded from the repository", 1)[-1].split("\n## ", 1)[0]
     for ln in part.splitlines():
@@ -629,16 +674,17 @@ def _provenance_lists(repo):
     return changed, excluded
 
 
-def code_audit(repo):
-    """Step (a): code/ against CODE_SHA256SUMS (the checksums of the run's frozen snapshot) and CODE_PROVENANCE.md.
+def code_audit(repo, sums=CODE_SUMS):
+    """Step (a): code/ against SUMS (default CODE_V17_SHA256SUMS: the checksums of the run's v17 code folder) and
+    CODE_PROVENANCE.md.
 
-    Every file listed in CODE_SHA256SUMS must be either byte-identical (OK), or scrubbed and listed as changed in
-    CODE_PROVENANCE.md (FAILED, expected), or excluded and listed there (missing, expected). Anything else is an
-    unexplained difference. Returns (table, unexplained)."""
+    Every file listed in SUMS must be either byte-identical (OK), or scrubbed and listed in the 'Changed files' table
+    of CODE_PROVENANCE.md (FAILED, expected: comments, docstrings, paths), or excluded and listed there (missing,
+    expected). Anything else is an unexplained difference. Returns (table, unexplained)."""
     import pandas as pd
-    changed, excluded = _provenance_lists(repo)
+    changed, excluded = _provenance_lists(repo, all_listed=True)
     rows = []
-    for ln in open(os.path.join(repo, "CODE_SHA256SUMS")):
+    for ln in open(os.path.join(repo, sums)):
         ln = ln.strip()
         if not ln:
             continue
@@ -657,12 +703,39 @@ def code_audit(repo):
     t = pd.DataFrame(rows)
     print(t.groupby(["result", "why"]).size().rename("files").to_string())
     bad = t[~t.explained]
-    print(f"\n{len(t)} files in CODE_SHA256SUMS; unexplained differences: {len(bad)}")
+    print(f"\n{len(t)} files in {sums}; unexplained differences: {len(bad)}")
     return t, bad
 
 
+def _flat(d, pre=""):
+    out = {}
+    for k, v in (d or {}).items():
+        if isinstance(v, dict):
+            out.update(_flat(v, f"{pre}{k}."))
+        else:
+            out[f"{pre}{k}"] = v
+    return out
+
+
+def config_changes(repo, config=None):
+    """Model keys whose value differs between config/config_full_audited.yaml (the audited base, the configuration
+    that param_audit/ was written on) and CONFIG (default RUN_CONFIG): {key: (audited base value, value now)}.
+    Paths (data_dir, paths.*, materiale.file/citation) are not model keys and are skipped."""
+    import yaml
+    a = _flat(yaml.safe_load(open(os.path.join(repo, "config", "config_full_audited.yaml"))))
+    b = _flat(yaml.safe_load(open(config or os.path.join(repo, RUN_CONFIG))))
+    skip = ("data_dir", "paths.", "materiale.file", "materiale.citation")
+    return {k: (a.get(k, "(absent)"), b.get(k, "(absent)")) for k in sorted(set(a) | set(b))
+            if not k.startswith(skip) and a.get(k, "(absent)") != b.get(k, "(absent)")}
+
+
 def config_audit(repo, config=None, base=AUDIT_SCENARIO):
-    """Step (c): every value of param_audit/PARAM_TRACE.csv against the configuration.
+    """Step (c): every value of param_audit/PARAM_TRACE.csv against the configuration (default RUN_CONFIG).
+
+    PARAM_TRACE.csv holds the values of config/config_full_audited.yaml (the audited base). A value that differs only
+    because the key was changed on purpose from that base to RUN_CONFIG (config_changes(): v15
+    transport.min_haul_flatm 100 -> 15 m and quarry.near_site_fixed_face_m 1000; CODE_PROVENANCE.md) is reported as
+    'changed since the audit (documented)', not as a difference.
 
     'MR:<key>' paths are read from the resolved headline scenario dict (the frozen code's alliance.scenario()),
     other paths from the YAML; several paths separated by ';' give a list. Values are compared as the JSON text
@@ -670,9 +743,9 @@ def config_audit(repo, config=None, base=AUDIT_SCENARIO):
     import json
     import pandas as pd
     import yaml
-    cfg = yaml.safe_load(open(config or os.path.join(repo, "config", "config_full_audited.yaml")))
+    cfg = yaml.safe_load(open(config or os.path.join(repo, RUN_CONFIG)))
     sys.path.insert(0, os.path.join(repo, "code"))
-    import alliance                                       # frozen code: resolves the scenario dict
+    import alliance                                       # the published (v17) code resolves the scenario dict
     mr = alliance.scenario(cfg, base)
 
     def get(path):
@@ -687,6 +760,7 @@ def config_audit(repo, config=None, base=AUDIT_SCENARIO):
         s = json.dumps(v, ensure_ascii=False) if not isinstance(v, str) else v
         return s if len(s) <= n else s[: n - 3] + "..."
 
+    delta = config_changes(repo, config)
     rows = []
     with open(os.path.join(repo, "param_audit", "PARAM_TRACE.csv"), newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
@@ -697,20 +771,32 @@ def config_audit(repo, config=None, base=AUDIT_SCENARIO):
                 continue
             vals = [get(x.strip()) for x in p.split(";")]
             s = short(vals[0] if len(vals) == 1 else vals)
-            rows.append({"id": r["id"], "config_path": p, "config": s, "trace": r["value_in_config_full_audited"],
-                         "same": s == r["value_in_config_full_audited"],
+            tr = r["value_in_config_full_audited"]
+            same = s == tr or (s == "(absent)" and tr.startswith("(absent"))   # '(absent = off)': key not set
+            keys = [x.strip().removeprefix("MR:") for x in p.split(";")]
+            why = ""
+            if not same and keys and all(k in delta for k in keys) and \
+                    short(delta[keys[0]][0] if len(keys) == 1 else [delta[k][0] for k in keys]) == tr:
+                same, why = True, f"changed since the audit (documented): {tr} -> {s}"
+            rows.append({"id": r["id"], "config_path": p, "config": s, "trace": tr, "same": same, "note": why,
                          "audited = config (trace)": r["value_matches_audit"]})
     t = pd.DataFrame(rows)
     n = t.same.notna().sum()
-    print(f"{len(t)} audited parameters; {n} config keys checked: {int((t.same == True).sum())} equal, "  # noqa: E712
-          f"{int((t.same == False).sum())} differ; {len(t) - n} code-level rows (not config keys); "  # noqa: E712
+    nd = int((t.note.fillna("") != "").sum())
+    print(f"{len(t)} audited parameters; {n} config keys checked: {int((t.same == True).sum()) - nd} equal, "  # noqa: E712
+          f"{nd} changed since the audit (documented), {int((t.same == False).sum())} differ; "  # noqa: E712
+          f"{len(t) - n} code-level rows (not config keys); "
           f"PARAM_TRACE 'value_matches_audit' = yes for {int((t['audited = config (trace)'] == 'yes').sum())}")
+    print(f"configuration {os.path.relpath(config or os.path.join(repo, RUN_CONFIG), repo)} vs the audited base "
+          f"config/config_full_audited.yaml: {len(delta)} model key(s) changed: "
+          + "; ".join(f"{k} {a} -> {b}" for k, (a, b) in delta.items()))
     return t
 
 
 def run_audit_subset(work_dir, dest, ranks=2, lock=None, scenario=AUDIT_SCENARIO, sites_file=AUDIT_SITES_FILE,
                      seeds=AUDIT_SEEDS):
-    """Step (d): the headline scenario on the fixed 300-site subset, seeds 1-3, from scratch, into DEST/{out,parts}."""
+    """Step (d): the headline scenario on the fixed 300-site subset, seeds 1-3, from scratch, into DEST/{out,parts}.
+    sites_file may also be an int N (the first N sites: a quick demo, not comparable with the shipped fingerprint)."""
     out, parts = os.path.join(dest, "out"), os.path.join(dest, "parts")
     shutil.rmtree(dest, ignore_errors=True)
     os.makedirs(dest, exist_ok=True)
@@ -722,20 +808,28 @@ def run_audit_subset(work_dir, dest, ranks=2, lock=None, scenario=AUDIT_SCENARIO
 
 SUMMARY_PER_SEED = "per_seed_full_audited.csv"    # label, seed, island_MH, years, site_years_mean, transport_share, tonnes
 SUMMARY_TABLE = "summary_full_audited.csv"        # label, n_seeds, years_mean/min/max, mh_M_mean/min/max, ...
-SEASON_DAYS = 90.0
+SEASON_DAYS = 90.0                                # alliance.season_days of RUN_CONFIG (working days per season)
 
 
-def per_seed_from_parts(parts_dir, label):
-    """Per-seed island totals from alliance part files seed_NNNN.sites.csv.gz (the rule of tools/v12_summary.py):
-    island MH = sum of mh_total over the sites; island years = (max finish_day + 1) / 90."""
+def per_seed_from_parts(parts_dir, label, season_days=SEASON_DAYS):
+    """Per-seed island totals from alliance part files seed_NNNN.sites.csv.gz (the rule of the project's summaries,
+    also used by the sensitivity runs, sensitivity.py): island MH = sum of mh_total over the sites; island years =
+    (max finish_day + 1) / season_days; per-site years = days / season_days."""
     import pandas as pd
     rows = []
     for f in sorted(glob.glob(os.path.join(parts_dir, "seed_*.sites.csv.gz"))):
         s = pd.read_csv(f)
         rows.append({"label": label, "seed": int(os.path.basename(f)[5:9]), "island_MH": s.mh_total.sum(),
-                     "years": (s.finish_day.max() + 1) / SEASON_DAYS, "site_years_mean": (s.days / SEASON_DAYS).mean(),
+                     "years": (s.finish_day.max() + 1) / season_days, "site_years_mean": (s.days / season_days).mean(),
                      "transport_share": s.mh_transport.sum() / s.mh_total.sum(), "tonnes": s.tonnes.sum()})
     return pd.DataFrame(rows)
+
+
+def summarise_per_seed(ps):
+    """The summary row of a per-seed table (the columns of SUMMARY_TABLE)."""
+    return {"n_seeds": len(ps), "years_mean": ps.years.mean(), "years_min": ps.years.min(), "years_max": ps.years.max(),
+            "mh_M_mean": ps.island_MH.mean() / 1e6, "mh_M_min": ps.island_MH.min() / 1e6,
+            "mh_M_max": ps.island_MH.max() / 1e6}
 
 
 def headline_from_summaries(summary_dir, label=AUDIT_SCENARIO, parts_dir=None, rtol=1e-6):
@@ -743,16 +837,20 @@ def headline_from_summaries(summary_dir, label=AUDIT_SCENARIO, parts_dir=None, r
     files are at hand, the per-seed table recomputed from them), compared with the shipped summary table."""
     import pandas as pd
     ps_path, sm_path = os.path.join(summary_dir, SUMMARY_PER_SEED), os.path.join(summary_dir, SUMMARY_TABLE)
-    for p in (ps_path, sm_path):
-        if not os.path.isfile(p):
-            print(f"NOT YET AVAILABLE: {p} (shipped with the results package; see outputs/summary/README.md)")
-            return None
+    missing = [p for p in (ps_path, sm_path) if not os.path.isfile(p)]
+    if missing:
+        for p in missing:
+            print(f"NOT YET AVAILABLE: {p} (a data input from the results package, not in the repository; see "
+                  "outputs/summary/README.md)")
+        if parts_dir:
+            pp = per_seed_from_parts(parts_dir, label)
+            print(f"recomputed from {len(pp)} part files in {parts_dir} (nothing to compare with):")
+            print({k: round(float(v), 4) for k, v in summarise_per_seed(pp).items()})
+        return None
     ps = pd.read_csv(ps_path)
     ps = ps[ps.label == label].sort_values("seed")
     sm = pd.read_csv(sm_path).set_index("label")
-    re_ = {"n_seeds": len(ps), "years_mean": ps.years.mean(), "years_min": ps.years.min(), "years_max": ps.years.max(),
-           "mh_M_mean": ps.island_MH.mean() / 1e6, "mh_M_min": ps.island_MH.min() / 1e6,
-           "mh_M_max": ps.island_MH.max() / 1e6}
+    re_ = summarise_per_seed(ps)
     rows = []
     for k, v in re_.items():
         sv = sm.loc[label, k] if k in sm.columns else float("nan")
@@ -768,3 +866,44 @@ def headline_from_summaries(summary_dir, label=AUDIT_SCENARIO, parts_dir=None, r
           f"island man-hours {re_['mh_M_mean']:.1f} M (min {re_['mh_M_min']:.1f}, max {re_['mh_M_max']:.1f}) over "
           f"{re_['n_seeds']} seeds")
     return t
+
+
+# --------------------------------------------------------------------------- A5 alliance sensitivity grid (06)
+def a5_sensitivity_names(work_dir):
+    """The cells of the A5 sensitivity grid (alliance.sensitivity in the config): SENS_R<R_m>_b<b>_t<track cost>,
+    each = alliance.sensitivity.base (A5_full) with R_m, b and track_cost_mh_per_m set (alliance.scenario)."""
+    import yaml
+    G = yaml.safe_load(open(os.path.join(work_dir, "config.yaml")))["alliance"]["sensitivity"]
+    return [f"SENS_R{int(R)}_b{b}_t{t}" for R in G["R_m"] for b in G["b"] for t in G["track_cost_mh_per_m"]], G
+
+
+def run_a5_sensitivity(work_dir, results_dir, label, sites_sel, seeds, ranks=2, resume=True, lock=None):
+    """The A5 grid (model.py --alliance sensitivity) and its reference A0_alone, in the layout that
+    report_alliance.sensitivity reads: RESULTS_DIR/LABEL/scenarios_alliance/{A0_alone, sensitivity/<cell>}/."""
+    base, parts = run_dirs(results_dir, label)
+    root = os.path.join(base, "scenarios_alliance")
+    common = sites(work_dir, sites_sel) + ["--seeds", seeds, "--no-shapefile", "--parts-dir", parts] + \
+        ([] if resume else ["--fresh"])
+    log = os.path.join(base, "run.log")
+    mpirun(work_dir, ranks, common + ["--out", root, "--alliance", "A0_alone"], log=log, lock=lock)
+    mpirun(work_dir, ranks, common + ["--out", os.path.join(root, "sensitivity"), "--alliance", "sensitivity"],
+           log=log, lock=lock)
+    return root
+
+
+def a5_sensitivity_table(work_dir, results_dir, label, lock=None):
+    """sensitivity.csv of the runs of run_a5_sensitivity, written by the code's own report_alliance.sensitivity
+    (island man-hours per cell, % vs A0_alone, shares, alliances), into .../scenarios_alliance/sensitivity/."""
+    import pandas as pd
+    base, _ = run_dirs(results_dir, label)
+    cfg = os.path.join(base, "config_a5_sensitivity.yaml")
+    lines = []
+    for ln in open(os.path.join(work_dir, "config.yaml")):
+        if ln.startswith("  output_dir:"):
+            ln = f"  output_dir: {os.path.abspath(base)}\n"     # report_alliance reads OUTPUT_DIR/scenarios_alliance
+        lines.append(ln)
+    with open(cfg, "w") as f:
+        f.writelines(lines)
+    py(work_dir, ["-c", "import sys, alliance, report_alliance as r; c = r.load_config(sys.argv[1]); "
+                  "r.sensitivity(c, alliance.sensitivity_names(c))", cfg], lock=lock)
+    return pd.read_csv(os.path.join(base, "scenarios_alliance", "sensitivity", "sensitivity.csv"))
