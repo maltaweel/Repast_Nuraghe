@@ -1,0 +1,118 @@
+{
+ "problem": {
+  "num_vars": 11,
+  "names": [
+   "pull_kg_per_person",
+   "drag_speed_ms",
+   "other_mandays_per_tower",
+   "block_median_kg",
+   "builders_mult",
+   "tonnes_per_tower",
+   "block_sigma",
+   "load_unload_h",
+   "hours_per_day",
+   "min_haul_flatm",
+   "household_size"
+  ],
+  "bounds": [
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ]
+  ]
+ },
+ "N": 512,
+ "k": 11,
+ "calc_second_order": false,
+ "sampler": "SALib 1.6.0 sobol.sample (Saltelli), scramble=True",
+ "sample_seed": 20261110,
+ "rows": 6656,
+ "scenarios": [
+  "none",
+  "mixed",
+  "full"
+ ],
+ "n_evals": 19968,
+ "seed_rule": "seed = base_row + 1 (one seed per evaluation; same seed in every scenario)",
+ "code": "code/ (CODE_VERSION 2026-11-09-v17)",
+ "config": "config/v16_final/config_full_audited.yaml",
+ "code_version": "2026-11-09-v17",
+ "outputs_28oct": [
+  "island_total_mh",
+  "island_transport_mh",
+  "median_site_total_mh_TWR1",
+  "median_site_total_mh_TWR2",
+  "median_site_total_mh_TWR3",
+  "median_site_total_mh_TWR4",
+  "median_site_total_mh_TWR5",
+  "median_site_total_mh_TWR6",
+  "median_site_total_mh_TWR7"
+ ],
+ "outputs": [
+  "island_total_mh",
+  "island_transport_mh",
+  "median_site_total_mh_TWR1",
+  "median_site_total_mh_TWR2",
+  "median_site_total_mh_TWR3",
+  "median_site_total_mh_TWR4",
+  "median_site_total_mh_TWR5",
+  "median_site_total_mh_TWR6",
+  "median_site_total_mh_TWR7",
+  "island_days_max",
+  "island_days_p95",
+  "median_site_days_TWR1",
+  "median_site_days_TWR2",
+  "median_site_days_TWR3",
+  "median_site_days_TWR4",
+  "median_site_days_TWR5",
+  "median_site_days_TWR6",
+  "median_site_days_TWR7",
+  "n_splits",
+  "n_blocks"
+ ],
+ "level_mapping": {
+  "unif": "lo + u (hi - lo)",
+  "logunif": "exp(ln lo + u (ln hi - ln lo))",
+  "int": "lo + floor(u (hi - lo + 1)) (equal-probability bins)"
+ }
+}

@@ -1,0 +1,12 @@
+file,bytes,rows,sha256,source,exported
+a5_alliance/cells.csv,42134,28,f10da6d00fe3c6beba03b00006f6c03dbbb5be4f1fed19cb644458737063d280,runs/2026-11-02-v12-census/full_audited/v17/outputs/scenarios_alliance/<cell>/stats.json + island_by_seed.csv,2026-11-11
+a5_alliance/design.csv,1441,28,ceeec19913130860814efd45cd03b258351ffa0cf85d3f0cab1a7f9ade767b04,runs/2026-11-02-v12-census/full_audited/v17/outputs/scenarios_alliance/sensitivity/SENS_* (cell names; config alliance.sensitivity),2026-11-11
+a5_alliance/island_by_seed.csv,469341,2800,e5ffd3b9bc803e22c9c33b79edf5bb34b194624bb1bbae6bec4058dd6a8c062b,runs/2026-11-02-v12-census/full_audited/v17/outputs/scenarios_alliance/<cell>/island_by_seed.csv,2026-11-11
+a5_alliance/sensitivity.csv,4274,27,c8a733c8111b50fc1924bab0bb915d4ace65941dfbfdcbb05ac77562df6f16b8,runs/2026-11-02-v12-census/full_audited/v17/outputs/scenarios_alliance/sensitivity/sensitivity.csv,2026-11-11
+a5_alliance/strategy_by_season.csv,127235,532,c343b8e813ec91e5ea060b55ac659659f41f7cae5b2e307167c60724d7700b26,runs/2026-11-02-v12-census/full_audited/v17/outputs/scenarios_alliance/<cell>/strategy_by_season.csv,2026-11-11
+coop_sobol/design.csv.gz,398804,6656,6d6cc6e38cd4d0f0fe3dabd03517e805e52937a3cb60749b979bb86c2242a838,runs/2026-11-10-coopsobol-v17/design.csv,2026-11-11
+coop_sobol/factors.csv,3075,11,d64975282e60b5492ad61aafdf8e1c48c1348caf6b60afac10ba0668964541e0,runs/2026-11-10-coopsobol-v17/factors.csv,2026-11-11
+coop_sobol/problem.json,2068,,e0fbdb892f4783fe793355b6683ae34a0f45c89d6a664483beb709d28c4fa846,runs/2026-11-10-coopsobol-v17/problem.json,2026-11-11
+sobol2/design.csv.gz,759709,14336,3467bcb148076b2519252496930c650b71523bacd9a8e4a6b367e9c2a04577cc,runs/2026-11-10-sobol2-v17/design.csv,2026-11-11
+sobol2/factors.csv,4387,26,39cf3153c755bc31bae5468f8b6e32e1fe4b5ee0d6c71c36b45dbef476002cd7,runs/2026-11-10-sobol2-v17/factors.csv,2026-11-11
+sobol2/problem.json,2114,,39ea0bd587aa50258c159e4922dfa005d6227ef3c1a29ef92225ca4ba8c9a085,runs/2026-11-10-sobol2-v17/problem.json,2026-11-11

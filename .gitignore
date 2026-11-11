@@ -1,5 +1,6 @@
 # Data and outputs are not committed (see data/README.md, data/derived/README.md), except Nurnet's data in data/nurnet/
-# and the audit files outputs/reference/, outputs/summary/ (notebooks/05_audit.ipynb)
+# and the audit files outputs/reference/, outputs/summary/ (notebooks/05_audit.ipynb), and the sensitivity tables
+# outputs/sensitivity/ (island level only; see its README)
 data/*
 !data/README.md
 !data/lithology_STONE_classes.csv
@@ -18,6 +19,7 @@ outputs/summary/*
 !outputs/summary/README.md
 !outputs/summary/per_seed_full_audited.csv
 !outputs/summary/summary_full_audited.csv
+!outputs/sensitivity/
 # Python / Jupyter
 __pycache__/
 *.pyc

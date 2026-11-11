@@ -1,0 +1,170 @@
+{
+ "problem": {
+  "num_vars": 26,
+  "names": [
+   "season_days",
+   "n_phases",
+   "stone_rule",
+   "hardness_hard",
+   "dress_rule",
+   "help_mode",
+   "max_asks",
+   "long_min_haul_m",
+   "specialisation",
+   "bedrock_everywhere",
+   "beta0",
+   "lift_share_of_build",
+   "split_cost_mh",
+   "p_imit",
+   "beta3",
+   "trust0",
+   "lift_rule",
+   "beta1",
+   "beta2",
+   "stair_lever_last_m",
+   "rho_limestone",
+   "learning_rate",
+   "near_site_fixed_face_m",
+   "min_haul_flatm",
+   "R_m",
+   "lift_learning"
+  ],
+  "bounds": [
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ]
+  ]
+ },
+ "N": 512,
+ "k": 26,
+ "calc_second_order": false,
+ "sampler": "SALib 1.6.0 sobol.sample (Saltelli), scramble=True",
+ "sample_seed": 20261110,
+ "n_evals": 14336,
+ "seeds_per_eval": [
+  1,
+  2,
+  3
+ ],
+ "scenario": "MOST_REALISTIC_AUDITED_LIT_P10",
+ "code": "code/ (CODE_VERSION 2026-11-09-v17) + the config flag sobol.lift_learning (code variant code_v17s; flag off = code v17 exactly)",
+ "config": "config/v16_final/config_full_audited.yaml",
+ "code_version": "2026-11-09-v17",
+ "fixed_at_headline": [
+  "relay_fractions",
+  "delta_up",
+  "setup_mh",
+  "alpha",
+  "relay_min_flatm",
+  "block_min_kg",
+  "transfer_h",
+  "delta_down",
+  "alliance_threshold (A5)"
+ ],
+ "level_mapping": {
+  "unif": "lo + u (hi - lo)",
+  "int": "lo + floor(u (hi - lo + 1)) (equal-probability bins)",
+  "binary": "u < 0.5 -> levels[0] (headline), else levels[1]"
+ }
+}

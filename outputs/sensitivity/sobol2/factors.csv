@@ -1,0 +1,27 @@
+name,row,kind,key,why,src,lo,hi,headline,levels
+season_days,T3,unif,cfg.alliance.season_days,"communal-labour alternatives in lit_alternatives.csv: 40 (Erasmus via Webster 1991: 853) to 120 (Turner 2020: 80); 220-328 = professional labour, excluded",Morris factors.csv,40.0,120.0,90.0,
+n_phases,T1,int,sc.phase_frac = 1 / n_phases (phasing needs 1/k),+/-50% of 10 cohorts (P10); 5 cohorts = the project's P20 variant,Morris factors.csv,5.0,15.0,10,
+stone_rule,K1,binary,"cfg.stone_rule + cfg.paths.cache_dir (prebuilt alt_stones7 cache, read-only)","PI rule hybrid (recorded stone, else nearest of 7) vs stones7 (nearest of 7 only; the ALT_stones7 row)",Morris factors.csv,,,hybrid,"[""hybrid"", ""stones7""]"
+hardness_hard,B11,unif,cfg.lit_scenarios.hardness.basalt = .granite (others stay 1.0),+/-50% of 2.0; 1.0 = no hard-stone penalty (physical floor); Hurst 1905 dressing ratio 1.83 inside,Morris factors.csv,1.0,3.0,2.0,
+dress_rule,Q4,binary,cfg.lit_scenarios.list.REALISTIC.mixed.dress_none_max_towers / dress_fine_min_towers,"rule (none 1 tower, Webster 2, fine >= 3) vs no rule (Webster dressing at every site: none_max 0, fine_min 99)",Morris factors.csv,,,by_towers,"[""by_towers"", ""webster_all""]"
+help_mode,A9,binary,sc.help_mode,join (headline) vs handover (the MOST_REALISTIC_handover rule: the helper takes the task over),Morris factors.csv,,,join,"[""join"", ""handover""]"
+max_asks,A2,int,cfg.alliance.max_asks,+/-50% of 3 rounded outward to integers (1 = ask one candidate),Morris factors.csv,1.0,5.0,3,
+long_min_haul_m,H9,unif,cfg.lit_scenarios.list.REALISTIC.mixed.long_min_haul_m,"+/-50% of 1,000 m (no source)",Morris factors.csv,500.0,1500.0,1000.0,
+specialisation,A9,binary,sc.specialisation,A3 skill specialisation on (headline) vs off,Morris factors.csv,,,True,"[true, false]"
+bedrock_everywhere,Q3,binary,cfg.add4.bedrock_everywhere,"PI rule L2 on (headline) vs off (v15b rule: off-outcrop sites collect scree, 2.0 ph/m3)",Morris factors.csv,,,True,"[true, false]"
+beta0,A4,unif,cfg.alliance.beta0,"value 0, so +/-50% is void: +/-1 logit unit (acceptance at trust 0 from 0.27 to 0.73), same width as beta1 x trust0",Morris factors.csv,-1.0,1.0,0.0,
+lift_share_of_build,G6,unif,cfg.lit_scenarios.lift_share_of_build,+/-50% of 0.5 (no source),Morris factors.csv,0.25,0.75,0.5,
+split_cost_mh,H13,unif,cfg.scenarios.split_cost_mh,0 = the project's alt_split0 row; 2 = symmetric (no per-split source),Morris factors.csv,0.0,2.0,1.0,
+p_imit,A8,unif,cfg.alliance.p_imit,+/-50%,Morris factors.csv,0.15,0.45,0.3,
+beta3,A4,unif,cfg.alliance.beta3,+/-50%,Morris factors.csv,0.1,0.3,0.2,
+trust0,A3,unif,cfg.alliance.trust0,+/-50%,Morris factors.csv,0.25,0.75,0.5,
+lift_rule,G8,binary,cfg.lit_scenarios.list.REALISTIC.mixed.lift_by_type,"rule (lever for corridor nuraghi, stair otherwise) vs no rule (stair everywhere: lift_by_type {})",Morris factors.csv,,,by_type,"[""by_type"", ""stair_all""]"
+beta1,A4,unif,cfg.alliance.beta1,+/-50%,Morris factors.csv,1.0,3.0,2.0,
+beta2,A4,unif,cfg.alliance.beta2,+/-50%,Morris factors.csv,0.025,0.075,0.05,
+stair_lever_last_m,G7,unif,cfg.lit_scenarios.stair_lever_last_m,+/-50% of 1.0 m (Laner 1999 gives no time),Morris factors.csv,0.5,1.5,1.0,
+rho_limestone,B9,unif,cfg.lit_scenarios.density_kg_m3.limestone/marble,"audit B9: textbook limestone 2,420 (REPORTED-ONLY) to Turner 2020 marble 2,711 (comparative)",Morris factors.csv,2420.0,2711.0,2600.0,
+learning_rate,G9,unif,cfg.lit_scenarios.learning_rate,+/-50% of 0.15 (no archaeological rate),Morris factors.csv,0.075,0.225,0.15,
+near_site_fixed_face_m,K4,unif,cfg.quarry.near_site_fixed_face_m,"+/-50% of 1,000 m (no source for the distance)",Morris factors.csv,500.0,1500.0,1000.0,
+min_haul_flatm,H6,unif,cfg.transport.min_haul_flatm,the PI's stated 10-20 m (15 = midpoint); land/sea choice stays as cached (as the Sobol harness),Morris factors.csv,10.0,20.0,15.0,
+R_m,A1,unif,"sc.R_m (alliance.Static neighbour radius for requests, relays, imitation; alliance.R_m 10000 unchanged)",range of Sobol run 1 (params.csv): 5-15 km = the 3 Nov radius runs R5 / R15; no help-distance source,Sobol run 1 params.csv,5000.0,15000.0,10000.0,
+lift_learning,SP-22,binary,cfg.sobol.lift_learning (code_v17s flag),"lift undiscounted (v17, SP-22 ruling 9 Nov, headline) vs discounted with the build stage by S8 learning and A3 skill (v16_final behaviour)",lead 9 Nov,,,False,"[false, true]"
