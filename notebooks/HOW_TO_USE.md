@@ -38,9 +38,12 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
    (a package changed version after it was imported): Runtime > Restart session, then run all again.
 4. 02 downloads the public inputs into `DATA_DIR` on your Drive (about 400 MB) and copies the Nurnet files there; the
    next notebooks reuse them.
-5. **Derived inputs (first time only):** the prebuilt pack (`DERIVED_URL`) is not public yet, so in the config cell of
-   02 also set `REBUILD_DERIVED = True` (about 30-45 min; see [Derived inputs](#derived-inputs)). Without them 02
-   stops at section 5 with "derived input(s) missing in DERIVED_DIR". Later runs reuse `DERIVED_DIR` on Drive.
+5. **Derived inputs (first time only, no setting needed):** the prebuilt pack (`DERIVED_URL`) is not public yet, so
+   02 (section 0b) prints a note and rebuilds them automatically when they are missing from `DERIVED_DIR` (about
+   30-45 min; see [Derived inputs](#derived-inputs)). Later runs reuse `DERIVED_DIR` on Drive. If 03 or 06 is opened
+   in a runtime that does not see them (no Drive), it gets the inputs the same way before it starts.
+
+Clean-room test: 01-06 pass with derived inputs supplied (commit a2010ed); the automatic rebuild path is being tested end to end.
 
 Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `demo` and `quick` presets, the audit, the demo
 sensitivity designs and the derived-input rebuild; the `full` preset (7,167 sites, 100 seeds per scenario) takes
@@ -258,7 +261,8 @@ rasters per friction; 68 files, listed in `notebooks/inputs_manifest.csv`, group
 
 1. **Prebuilt pack** of the v17 runs: `DERIVED_URL` in 02 (or `python notebooks/fetch_data.py --derived-url
    URL`). Placeholder: the pack is part of the results package, which is not public yet (DOI pending).
-2. **Rebuild** from the raw inputs: `REBUILD_DERIVED = True` in 02, or
+2. **Rebuild** from the raw inputs: automatic in 02 (section 0b, `REBUILD_DERIVED = "auto"`, the default) when any
+   derived input is missing and no pack is available; `REBUILD_DERIVED = True` always rebuilds, `False` never; or
    `python notebooks/fetch_data.py --rebuild-derived [--stone-rule hybrid|stones7]`. It runs the commands of
    `data/derived/README.md` in order, with the configuration of the v17 runs. Times and peak memory from the project's logs (8 GB machine): cost rasters per
    friction ~0.85 GB each; base haul table 14 s (stones7) / 249 s (hybrid), 1.7-2.4 GB; each further haul table about

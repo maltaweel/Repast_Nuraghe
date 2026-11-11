@@ -10,7 +10,7 @@ software requirements, getting the data automatically or
 **Data.** The Nurnet files (site list `nurnet_nuraghi.shp`, 7,167 nuraghi with tower counts, and the per-site
 building stone) are Nurnet's data and are included in `data/nurnet/`; for the latest version and source information
 contact Nurnet at nurnet.presidente@gmail.com. Every other raw input is public and is downloaded from its official
-source by `fetch_data.py` (02, section 0). Derived inputs: rebuilt (`fetch_data.py --rebuild-derived`, about
+source by `fetch_data.py` (02, section 0). Derived inputs: rebuilt automatically by 02 when missing (`fetch_data.py --rebuild-derived`, about
 30-45 min) or the prebuilt pack (`DERIVED_URL`, placeholder until the results package is public).
 
 The folders are set at the top of each notebook's config cell (`REPO_DIR`, `DATA_DIR`, `DERIVED_DIR`, `CONFIG`,
@@ -23,6 +23,7 @@ separate data input). All six were executed end to end at demo size (03 preset `
 06 `SIZE = "demo"`) with the v17 code on Linux (Python 3.13.5, the pinned packages, 2 MPI ranks), and again in a
 Colab-like clean room (10 Nov 2026: fresh clone of this repository from `/content`, Python 3.12, only the packages the
 notebooks install themselves, a Drive-like folder shared by the six notebooks); not yet on Colab itself.
+Clean-room test: 01-06 pass with derived inputs supplied (commit a2010ed); the automatic rebuild path is being tested end to end.
 
 ## How to audit in Colab (quick start)
 
@@ -30,8 +31,9 @@ notebooks install themselves, a Drive-like folder shared by the six notebooks); 
 2. In the config cell of each: `MOUNT_DRIVE = True` and the same Drive folders (each Colab notebook has its own
    runtime): `DATA_DIR = "/content/drive/MyDrive/Repast_Nuraghe/data"`, `DERIVED_DIR =
    "/content/drive/MyDrive/Repast_Nuraghe/data/derived/cache"`, `OUTPUTS_DIR = "/content/drive/MyDrive/Repast_Nuraghe/outputs"`.
-3. Runtime > Run all. The setup cell clones the repository and installs OpenMPI and the pinned packages. In 02 also set
-   `REBUILD_DERIVED = True` the first time (the derived inputs, about 30-45 min; the prebuilt pack is not public yet).
+3. Runtime > Run all. The setup cell clones the repository and installs OpenMPI and the pinned packages. Nothing else to
+   set: the first time 02 rebuilds the derived inputs automatically (about 30-45 min; the prebuilt pack is
+   not public yet) and prints a note saying so.
 4. 05_audit prints PASS / FAIL / NOT YET AVAILABLE per step: (a) code checksums vs `CODE_V17_SHA256SUMS`, (b) inputs
    vs `inputs_manifest.csv`, (c) `config/v16_final/config_full_audited.yaml` vs `param_audit/PARAM_TRACE.csv`, (d) a
    rerun of the headline scenario on 300 sites, seeds 1-3, vs the fingerprint in `outputs/reference/` (placeholder),

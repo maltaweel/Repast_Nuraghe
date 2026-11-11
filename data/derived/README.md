@@ -9,7 +9,7 @@ committed. Two ways to get it:
    When the pack is public: `python notebooks/fetch_data.py --derived-url URL` (or `DERIVED_URL` in
    `notebooks/02_inputs.ipynb`, section 0b) downloads and unpacks it (placeholder until then).
 2. **Rebuild** them with the commands below; `python notebooks/fetch_data.py --rebuild-derived [--stone-rule
-   hybrid|stones7]` (or `REBUILD_DERIVED = True` in 02) runs them all in this order into `data/derived/cache/`.
+   hybrid|stones7]` (or 02, section 0b: automatic when any derived input is missing and no pack is available; `REBUILD_DERIVED = True` forces it) runs them all in this order into `data/derived/cache/`.
 
 **How long a rebuild takes** (from the project's logs, 8 GB machine; one process at a time): cost rasters per
 friction about 0.85 GB peak each (time not logged); base haul table 14 s with stones7, 249 s with hybrid (1.7-2.4 GB);

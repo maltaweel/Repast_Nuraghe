@@ -413,8 +413,12 @@ Total: about 30-45 min with hybrid (the full audited rule), 15-20 min with stone
 not been timed end to end). Peak memory ~2.5 GB (one process at a time)."""
 
 
-def rebuild_derived(data_dir, derived_dir, stone_rule="hybrid", python=sys.executable, dry_run=False):
-    """Rebuild every derived input of the manifest into DERIVED_DIR, in the order of data/derived/README.md."""
+def rebuild_derived(data_dir, derived_dir, stone_rule="hybrid", python=sys.executable, dry_run=False, resume=True):
+    """Rebuild every derived input of the manifest into DERIVED_DIR, in the order of data/derived/README.md.
+
+    resume=True: steps finished by an earlier, interrupted rebuild with the same configuration (recorded in
+    DERIVED_DIR/../_rebuild/steps_done.txt) are skipped, so a disconnected runtime continues where it stopped.
+    resume=False: every step is run again."""
     log(REBUILD_NOTES)
     if stone_rule == "hybrid" and not os.path.isfile(os.path.join(data_dir, "stone", "nid_materiale_prod.csv")):
         raise RuntimeError("stone_rule hybrid needs DATA_DIR/stone/nid_materiale_prod.csv: run fetch() first (it copies "
@@ -453,13 +457,31 @@ def rebuild_derived(data_dir, derived_dir, stone_rule="hybrid", python=sys.execu
     # the stones4 k-best routes need its own cost_mu/..._mu0.1 (link the base one)
     cmds += [["ln", "-sf", cost("0.1"), os.path.join(C, "stones4", "cost_mu", "drag_cost_8dir_mu0.1_int.tif")],
              P + ["tools/kbest_quarries.py", cfg4]]
+    sig = hashlib.sha256(b"".join(open(p, "rb").read() for p in (cfg, cfg4))).hexdigest()
+    done_f = os.path.join(work, "steps_done.txt")
+    done = set()
+    if resume and os.path.isfile(done_f):
+        lines = open(done_f).read().splitlines()
+        if lines and lines[0] == sig:
+            done = set(lines[1:])
+    if not dry_run and (not done or not resume):
+        with open(done_f, "w") as f:
+            f.write(sig + "\n")
+    if done:
+        log(f"  resuming an interrupted rebuild: {len(done)} of {len(cmds)} steps already done ({done_f})")
     t0 = time.time()
     for c in cmds:
+        key = " ".join(c[1:]) if c[0] == python else " ".join(c)
         if dry_run:
             log("  (dry run) $ " + " ".join(c))
+        elif key in done:
+            log("  (done earlier) $ " + " ".join(c))
         else:
             run(c, cwd=os.path.join(REPO, "code"))
+            with open(done_f, "a") as f:
+                f.write(key + "\n")
     if not dry_run:
+        os.remove(done_f)            # complete: a later rebuild (e.g. after DERIVED_DIR was emptied) starts afresh
         log(f"derived inputs rebuilt in {(time.time() - t0) / 60:.1f} min")
     return derived_status(derived_dir)
 

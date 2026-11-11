@@ -308,8 +308,9 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
         if miss:
             raise PreflightError(
                 f"{len(miss)} derived input(s) missing in DERIVED_DIR = {src} (e.g. {miss[0]}). Get them first: "
-                "02_inputs.ipynb section 0b with REBUILD_DERIVED = True (about 30-45 min; the prebuilt pack DERIVED_URL "
-                "is not public yet), or set DERIVED_DIR to a folder that holds them (HOW_TO_USE.md, Derived inputs). "
+                "02_inputs.ipynb section 0b (rebuilds them automatically when they are missing and the prebuilt pack "
+                "DERIVED_URL is not available: about 30-45 min; or repro.prepare_inputs()), or set DERIVED_DIR to a "
+                "folder that holds them (HOW_TO_USE.md, Derived inputs). "
                 "On Colab keep DERIVED_DIR on Google Drive so that every notebook sees it.")
         for dp, dn, fn in os.walk(src):
             rel = os.path.relpath(dp, src)
@@ -347,6 +348,85 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
     print(f"work folder ready: {work_dir}\n  config {cfg} (from {os.path.relpath(LAYOUT['config'], REPO)})\n"
           f"  code version {CODE_VERSION}\n  data_dir {inputs}\n  cache {cdir} ({cache})\n  stone_rule {stone_rule}")
     return cfg
+
+
+# --------------------------------------------------------------------------- inputs without any setting (fresh runtime)
+AUTO_REBUILD_NOTE = (
+    "NOTE: {n} derived input(s) missing in DERIVED_DIR = {d} and no prebuilt pack is available (DERIVED_URL not set "
+    "or not reachable): REBUILDING THEM NOW from the raw inputs (fetch_data.rebuild_derived, stone rule {rule}). "
+    "This takes about 30-45 min and ~2.5 GB of memory; it is done once per DERIVED_DIR. On Google Colab put "
+    "DERIVED_DIR (and DATA_DIR) on Google Drive (MOUNT_DRIVE = True, config cell) so that the other notebooks find "
+    "the rebuilt files instead of rebuilding them. If the runtime stops during the rebuild, run the notebook again: it continues from the last finished step. To skip this, set REBUILD_DERIVED = False (02) or DERIVED_DIR to "
+    "a folder that holds them.")
+
+
+def _rebuild_flag(rebuild):
+    """True / False / "auto" (default); "1"/"true", "0"/"false" also accepted."""
+    if isinstance(rebuild, bool):
+        return rebuild
+    return {"1": True, "true": True, "0": False, "false": False}.get(str(rebuild).strip().lower(), "auto")
+
+
+def derived_missing():
+    """Derived inputs of the manifest (group 'derived') not present in DERIVED_DIR (LAYOUT['cache'])."""
+    return [r["path"] for r in read_manifest() if r["group"] == "derived" and not os.path.isfile(resolve(r["path"]))]
+
+
+def get_derived(derived_url=None, rebuild="auto", stone_rule=SHIPPED_STONE_RULE):
+    """02_inputs section 0b: make sure every derived input is in DERIVED_DIR (LAYOUT['cache']).
+
+    derived_url: URL of the prebuilt pack (None: fetch_data.DERIVED_URL = env NURAGHE_DERIVED_URL; not public yet).
+      Given explicitly, the pack is downloaded even if the files are present.
+    rebuild: True = rebuild every derived input (even if present); False = never rebuild (only report what is
+      missing); "auto" (default) = rebuild only if inputs are missing and the pack is not set or not available.
+    Returns the derived inputs still missing ([] = complete)."""
+    import fetch_data
+    data, cache = LAYOUT["data"], LAYOUT["cache"]
+    rebuild = _rebuild_flag(rebuild)
+    if rebuild is True:
+        print("REBUILD_DERIVED = True: rebuilding every derived input (about 30-45 min with hybrid, ~2.5 GB).")
+        return fetch_data.rebuild_derived(data, cache, stone_rule=stone_rule, resume=False)
+    url = derived_url or fetch_data.DERIVED_URL
+    missing = derived_missing()
+    if url and (missing or derived_url):
+        try:
+            fetch_data.fetch_derived(cache, url)
+        except Exception as e:                       # pack unreachable / wrong checksum: fall back (below)
+            print(f"prebuilt derived-input pack not available ({e})")
+        missing = derived_missing()
+    fetch_data.derived_status(cache)
+    if not missing:
+        return []
+    if rebuild is False:
+        print("REBUILD_DERIVED = False: not rebuilding. " + fetch_data.REBUILD_NOTES)
+        return missing
+    print(AUTO_REBUILD_NOTE.format(n=len(missing), d=cache, rule=stone_rule), flush=True)
+    return fetch_data.rebuild_derived(data, cache, stone_rule=stone_rule, resume=True)   # continues an interrupted one
+
+
+def prepare_inputs(derived_url=None, rebuild="auto", stone_rule=SHIPPED_STONE_RULE):
+    """For a notebook opened in a runtime where 02_inputs has not run (03, 05 step d, 06; e.g. a new Colab runtime
+    without Google Drive): copy the Nurnet files if missing and, if derived inputs are missing, download the public
+    raw inputs (fetch_data.fetch, keeps what is present) and get the derived inputs as in 02 section 0b (get_derived:
+    prebuilt pack if available, else an automatic rebuild of about 30-45 min). Does nothing when all are present.
+    Returns the derived inputs still missing ([] = complete)."""
+    import fetch_data
+    data, rebuild = LAYOUT["data"], _rebuild_flag(rebuild)
+    raw_missing = [r["path"] for r in read_manifest() if r["group"] == "raw_input" and not os.path.isfile(resolve(r["path"]))]
+    missing = derived_missing()
+    if not raw_missing and not missing:
+        return []
+    step = {"sites": "sites", "stone": "stone", "soils": "soils", "water": "rivers", "geology": "lithology",
+            "dem": "dem", "costsurface": "costsurface"}
+    steps = [n for n in fetch_data.INPUTS if n in {step.get(p.split("/")[1]) for p in raw_missing}]
+    if not missing or rebuild is False:                          # model runs need only the Nurnet site list
+        steps = [n for n in steps if n in ("sites", "stone")]
+    elif steps:
+        print(f"{len(missing)} derived input(s) missing in {LAYOUT['cache']} (02_inputs not run with this DERIVED_DIR): "
+              f"getting the missing raw inputs first ({', '.join(steps)}; fetch_data.py, a few minutes).", flush=True)
+    if steps:                                                    # only what is missing; files present are kept
+        fetch_data.fetch(data, only=steps, rasters=True)
+    return get_derived(derived_url, rebuild=rebuild, stone_rule=stone_rule) if missing else []
 
 
 # --------------------------------------------------------------------------- running
@@ -687,7 +767,8 @@ def code_audit(repo, sums=CODE_SUMS):
     CODE_PROVENANCE.md.
 
     Every file listed in SUMS must be either byte-identical (OK), or scrubbed and listed in the 'Changed files' table
-    of CODE_PROVENANCE.md (FAILED, expected: comments, docstrings, paths), or excluded and listed there (missing,
+    of CODE_PROVENANCE.md (SCRUBBED, expected: comments, docstrings, paths; `sha256sum -c` reports these as FAILED),
+    or excluded and listed there (missing,
     expected). Anything else is an unexplained difference. Returns (table, unexplained)."""
     import pandas as pd
     changed, excluded = _provenance_lists(repo, all_listed=True)
@@ -705,8 +786,11 @@ def code_audit(repo, sums=CODE_SUMS):
         else:
             res = "OK" if sha256(p) == h else "FAILED"
             exp = res == "OK" or rel in changed
+            if res == "FAILED" and exp:
+                res = "SCRUBBED"           # differs from the run's checksum as documented (not a failure)
         rows.append({"file": rel, "result": res, "explained": exp,
-                     "why": {"OK": "byte-identical to the run", "FAILED": "scrubbed (CODE_PROVENANCE.md)" if exp else "NOT EXPLAINED",
+                     "why": {"OK": "byte-identical to the run", "SCRUBBED": "scrubbed (CODE_PROVENANCE.md)",
+                             "FAILED": "NOT EXPLAINED",
                              "missing": "excluded (CODE_PROVENANCE.md)" if exp else "NOT EXPLAINED"}[res]})
     t = pd.DataFrame(rows)
     print(t.groupby(["result", "why"]).size().rename("files").to_string())
