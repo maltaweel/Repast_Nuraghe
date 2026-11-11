@@ -99,7 +99,8 @@ Parameter audit and traceability: [param_audit/](param_audit/) (below).
    downloads every public input from its official source (`notebooks/fetch_data.py`) and gets the derived inputs;
    03 and 04 run and analyse scenarios; 05 is the step-by-step audit (code checksums, inputs, configuration, a fixed
    rerun, the headline numbers), each step with its expected result; 06 runs the sensitivity steps (A5 grid, Morris,
-   Sobol) at demo size.
+   Sobol) at demo size. The full-size sensitivity results are in `outputs/sensitivity/`, and the Sobol harnesses in
+   `sensitivity/` (see [Sensitivity results](#sensitivity-results)).
 
 The Nurnet files (site list and per-site building stone) are included in `data/nurnet/`; for the latest version and
 source information contact Nurnet at nurnet.presidente@gmail.com.
@@ -119,6 +120,45 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
   in the results package (DOI pending).
 - **Results** of the full audited run (per-seed tables, part files, logs): results package, DOI pending.
 
+## Sensitivity results
+
+The sensitivity results of the final model (code v17, configuration `config/v16_final/config_full_audited.yaml`)
+are in [`outputs/sensitivity/`](outputs/sensitivity/), as small island-level tables (no per-site data). It is the only
+folder of the repository with model results. Each subfolder has a README with the factors, ranges, commands and dates.
+
+| folder | what | status |
+|---|---|---|
+| `a5_alliance/` | alliance-model grid on `A5_full`: 27 cells (radius x learning ratio x track cost) + the `A0_alone` reference, 100 seeds each | complete |
+| `sobol2/` | Sobol run 2 on the headline: 26 factors, Saltelli N = 512 (14,336 evaluations x 3 seeds) | design now; results with the final pass |
+| `coop_sobol/` | cooperation-model Sobol: 11 factors x scenarios none / mixed / full, N = 512 (19,968 evaluations) | design now; results with the final pass |
+| `morris/` | Morris screens (32-factor screen; physical 5-factor screen) | with the final pass |
+| `feasibility/` | feasibility grid (pull x drag x tonnage) | with the final pass |
+
+**Reading the tables.** All are CSV (`*.csv.gz`: gzip-compressed; `pandas.read_csv` reads both).
+
+- *Inputs:* `design.csv(.gz)` (one row per evaluation: `eval_id`, `base_row`, `block` = the Saltelli block A, AB_<factor>
+  or B, the uniform sample `u_<factor>` and the factor values), `factors.csv` (name, config key, distribution,
+  range, reason), `problem.json` (the SALib problem and the sampling settings).
+- *Per-run tables:* `runs.csv.gz` (`sobol2`) has one row per model run (evaluation x seed); `per_eval.csv.gz` one row per
+  evaluation (the mean of its seeds for `sobol2`; one seed for `coop_sobol`), with `status` and the outputs (for
+  example `island_years`, `island_mh` = island man-hours, `mh_transport_share`; `island_total_mh`, `island_days_max`
+  and `median_site_total_mh_TWR1..7` = median over the sites with 1-7 towers). `a5_alliance/` has its own
+  `cells.csv`, `island_by_seed.csv` and `sensitivity.csv` (described in its README).
+- *Index tables* (`indices.csv`, and `indices_N256.csv` on the first half of the design as a convergence check):
+  one row per (`scenario`,) `output` and `factor`; `N` = base rows used; `S1` = first-order index (the share of the
+  output's variance due to the factor alone); `ST` = total-order index (alone and in interaction with the others);
+  `S1_conf` / `ST_conf` = half-width of the 95% bootstrap confidence interval (1,000 resamples), `*_lo` / `*_hi` =
+  the interval's ends. Morris tables give `mu_star` (mean absolute elementary effect) with its 95% interval.
+- `MANIFEST.csv`: every exported file with its size, number of rows, SHA-256 and source run; check a file with
+  `sha256sum FILE` against the `sha256` column.
+
+**Regenerating them.** The Sobol harnesses are in [`sensitivity/`](sensitivity/) (the scripts that ran, with the
+code variant of Sobol run 2 as a patch on `code/`; commands, runtime and memory in each README). They write the
+run tables and indices into their own folder; `python outputs/sensitivity/export.py --project <folder>` turns them
+into the tables above (it recomputes the indices with SALib 1.6.0 and checks them against the run's own analysis).
+The A5 grid runs from `code/` (`outputs/sensitivity/a5_alliance/README.md`); `notebooks/06_sensitivity.ipynb` runs
+every design at demo size.
+
 ## Repository layout
 
 ```
@@ -136,7 +176,9 @@ data/            data/nurnet/ (Nurnet's data, included); the other inputs are fe
 notebooks/       01-06: setup, inputs (fetch_data.py), scenarios, analysis, audit, sensitivity; HOW_TO_USE.md; Jupyter or Colab
 param_audit/     parameter audit and traceability (public-safe copies)
 tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders; not in the frozen snapshot)
-outputs/         everything a run writes (NOT committed, except reference/ and summary/ for the audit)
+outputs/         everything a run writes (NOT committed, except sensitivity/ (the sensitivity results) and reference/ and
+                 summary/ for the audit)
+sensitivity/     harnesses of the Sobol runs (sobol2/, coop_sobol/; see Sensitivity results)
 CODE_SHA256SUMS  checksums of the run's code snapshot (CODE_V13_/V14_/V15_/V16_FINAL_/V17_SHA256SUMS: v13, v14, v15, v16_final, v17);  CODE_PROVENANCE.md  what differs and why
 ```
 

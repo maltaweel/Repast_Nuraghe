@@ -1,0 +1,33 @@
+name,row,kind,lo,hi,headline,key,why,levels
+n_phases,T1,int,5.0,15.0,10,sc.phase_frac = 1 / n_phases (phasing needs 1/k),+/-50% of 10 cohorts (P10); 5 cohorts = the project's P20 variant,
+season_days,T3,unif,40.0,120.0,90.0,cfg.alliance.season_days,"communal-labour alternatives in lit_alternatives.csv: 40 (Erasmus via Webster 1991: 853) to 120 (Turner 2020: 80); 220-328 = professional labour, excluded",
+block_min_kg,B4,unif,30.0,143.0,60.0,cfg.stone.block_min_kg,"lower = -50%; upper 143 kg = Webster 1991: 852 '< 0.06 m3' x 2,386 (lit_alternatives blockmin_webster143)",
+rho_limestone,B9,unif,2420.0,2711.0,2600.0,cfg.lit_scenarios.density_kg_m3.limestone/marble,"audit B9: textbook limestone 2,420 (REPORTED-ONLY) to Turner 2020 marble 2,711 (comparative)",
+hardness_hard,B11,unif,1.0,3.0,2.0,cfg.lit_scenarios.hardness.basalt = .granite (others stay 1.0),+/-50% of 2.0; 1.0 = no hard-stone penalty (physical floor); Hurst 1905 dressing ratio 1.83 inside,
+bedrock_everywhere,Q3,binary,,,True,cfg.add4.bedrock_everywhere,"PI rule L2 on (headline) vs off (v15b rule: off-outcrop sites collect scree, 2.0 ph/m3)","[true, false]"
+dress_rule,Q4,binary,,,by_towers,cfg.lit_scenarios.list.REALISTIC.mixed.dress_none_max_towers / dress_fine_min_towers,"rule (none 1 tower, Webster 2, fine >= 3) vs no rule (Webster dressing at every site: none_max 0, fine_min 99)","[""by_towers"", ""webster_all""]"
+lift_share_of_build,G6,unif,0.25,0.75,0.5,cfg.lit_scenarios.lift_share_of_build,+/-50% of 0.5 (no source),
+stair_lever_last_m,G7,unif,0.5,1.5,1.0,cfg.lit_scenarios.stair_lever_last_m,+/-50% of 1.0 m (Laner 1999 gives no time),
+lift_rule,G8,binary,,,by_type,cfg.lit_scenarios.list.REALISTIC.mixed.lift_by_type,"rule (lever for corridor nuraghi, stair otherwise) vs no rule (stair everywhere: lift_by_type {})","[""by_type"", ""stair_all""]"
+learning_rate,G9,unif,0.075,0.225,0.15,cfg.lit_scenarios.learning_rate,+/-50% of 0.15 (no archaeological rate),
+min_haul_flatm,H6,unif,10.0,20.0,15.0,cfg.transport.min_haul_flatm,the PI's stated 10-20 m (15 = midpoint); land/sea choice stays as cached (as the Sobol harness),
+long_min_haul_m,H9,unif,500.0,1500.0,1000.0,cfg.lit_scenarios.list.REALISTIC.mixed.long_min_haul_m,"+/-50% of 1,000 m (no source)",
+relay_min_flatm,H12,unif,150.0,450.0,300.0,cfg.alliance.relay_min_flatm,+/-50% of 300 flat-m (no source),
+relay_fractions,H12,binary,,,0.25/0.5/0.75,cfg.alliance.relay_fractions,"a set, not a number: 3 hand-off points (headline) vs the single midpoint hand-off (simplest form)","[""0.25/0.5/0.75"", ""0.5""]"
+split_cost_mh,H13,unif,0.0,2.0,1.0,cfg.scenarios.split_cost_mh,0 = the project's alt_split0 row; 2 = symmetric (no per-split source),
+stone_rule,K1,binary,,,hybrid,"cfg.stone_rule + cfg.paths.cache_dir (prebuilt alt_stones7 cache, read-only)","PI rule hybrid (recorded stone, else nearest of 7) vs stones7 (nearest of 7 only; the ALT_stones7 row)","[""hybrid"", ""stones7""]"
+setup_mh,K3,unif,100.0,300.0,200.0,cfg.alliance.setup_mh,+/-50% of 200 ph (plausibility only: 48-60 m3 stripping),
+near_site_fixed_face_m,K4,unif,500.0,1500.0,1000.0,cfg.quarry.near_site_fixed_face_m,"+/-50% of 1,000 m (no source for the distance)",
+max_asks,A2,int,1.0,5.0,3,cfg.alliance.max_asks,+/-50% of 3 rounded outward to integers (1 = ask one candidate),
+trust0,A3,unif,0.25,0.75,0.5,cfg.alliance.trust0,+/-50%,
+delta_up,A3,unif,0.05,0.15,0.1,cfg.alliance.delta_up,+/-50%,
+delta_down,A3,unif,0.1,0.3,0.2,cfg.alliance.delta_down,+/-50%,
+beta0,A4,unif,-1.0,1.0,0.0,cfg.alliance.beta0,"value 0, so +/-50% is void: +/-1 logit unit (acceptance at trust 0 from 0.27 to 0.73), same width as beta1 x trust0",
+beta1,A4,unif,1.0,3.0,2.0,cfg.alliance.beta1,+/-50%,
+beta2,A4,unif,0.025,0.075,0.05,cfg.alliance.beta2,+/-50%,
+beta3,A4,unif,0.1,0.3,0.2,cfg.alliance.beta3,+/-50%,
+alpha,A7,unif,0.25,0.75,0.5,cfg.alliance.alpha,+/-50%,
+p_imit,A8,unif,0.15,0.45,0.3,cfg.alliance.p_imit,+/-50%,
+help_mode,A9,binary,,,join,sc.help_mode,join (headline) vs handover (the MOST_REALISTIC_handover rule: the helper takes the task over),"[""join"", ""handover""]"
+specialisation,A9,binary,,,True,sc.specialisation,A3 skill specialisation on (headline) vs off,"[true, false]"
+transfer_h,S4,unif,0.125,0.375,0.25,cfg.sea.transfer_h,+/-50% of 0.25 h; acts on the charged land legs of sea faces (Static land_h); land/sea choice stays as cached,
