@@ -2,7 +2,9 @@
 
 ## The run snapshot (frozen v12 code), the v13, v14, v15, v16_final and v17 code
 
-The full audited run (2-4 November 2026; configuration `config/config_full_audited.yaml`, queues
+The full audited run (2-4 November 2026; configuration: the earlier version of `config/config_full_audited.yaml`,
+with minimum haul 100 m and no near-site rule, in the git history; since 11 November 2026 the file holds the
+configuration of the final runs, the values of `config/v16_final/config_full_audited.yaml`; queues
 `config/queues/queue_full.tsv` and `queue_full_p23.tsv`) used ONE frozen copy of the code: every run started
 before 2 November 2026, 22:00, used it. The SHA-256 checksums of that snapshot, written when it was frozen, are in
 `CODE_SHA256SUMS` (copied unchanged; 107 files: every `.py`, `.sh` and `.yaml` file of the snapshot except
@@ -19,7 +21,7 @@ v13 code**; the queue's commands run from `@RUN_DIR@/code_v13` (in a run folder 
 `CODE_SHA256SUMS` (only the `alliance.py` line differs). `v13_side_chain.sh` was written after the checksum file:
 SHA-256 `96882435718a6408b4b94f338081b439c57c9409f6d3b5a9ce614c3ccb15af67`.
 
-**Identity test (switches off).** The frozen code and the v13 code were run on `config_full_audited.yaml`, the
+**Identity test (switches off).** The frozen code and the v13 code were run on `config_full_audited.yaml` (earlier version), the
 300-site subset `code/sites300_real.txt`, seeds 1-2, one rank, and the decompressed content of every part file was
 hashed (gzip headers hold time stamps). All four scenarios are identical; combined hashes (frozen = v13):
 

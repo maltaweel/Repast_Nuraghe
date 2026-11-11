@@ -4,15 +4,16 @@ Everything a notebook does that is longer than a few lines lives here, so the no
 sensitivity steps of 06 are in sensitivity.py). Standard library + pandas only. The folders are set once by
 set_layout() (the notebooks' config cell does it).
 
-Model code and configuration: code/ is the v17 code (CODE_VERSION 2026-11-09-v17: lift, every lift rule, priced at
-the undiscounted rate; the learning factor and skill act on quarrying, dressing and building only; ODD 7.9,
-CODE_PROVENANCE.md). The v17 code runs the v16_final configuration, config/v16_final/config_full_audited.yaml
-(RUN_CONFIG; = config/config_full_audited.yaml + quarry.near_site_fixed_face_m 1000 + transport.min_haul_flatm 15).
+Model code and configuration: code/ is the model's code (CODE_VERSION 2026-11-09-v17: lift, every lift rule, priced
+at the undiscounted rate; the learning factor and skill act on quarrying, dressing and building only; ODD 7.9,
+CODE_PROVENANCE.md). The notebooks run the configuration of the final runs, config/v16_final/config_full_audited.yaml
+(RUN_CONFIG; the same values as the model's configuration config/config_full_audited.yaml: minimum haul
+transport.min_haul_flatm 15, near-site rule quarry.near_site_fixed_face_m 1000; only cache_dir / output_dir differ).
 
     REPO_DIR/
-        code/                    the model code (v17; see CODE_PROVENANCE.md, CODE_V17_SHA256SUMS)
-        config/                  v16_final/config_full_audited.yaml (the configuration of the v17 runs; RUN_CONFIG),
-                                 config_full_audited.yaml (the audited base before v15) + variants, queues
+        code/                    the model code (see CODE_PROVENANCE.md, CODE_V17_SHA256SUMS)
+        config/                  v16_final/config_full_audited.yaml (the configuration of the final runs; RUN_CONFIG),
+                                 config_full_audited.yaml (the model's configuration) + variants, queues
         data/                    raw inputs, in the layout the configs expect under data_dir (data/README.md)
             sites/, stone/           copies of Nurnet's data from data/nurnet/ (made by fetch_data.py)
         data/nurnet/             Nurnet's data, included: site list + per-site building stone (data/nurnet/README.txt)
@@ -810,8 +811,8 @@ def _flat(d, pre=""):
 
 
 def config_changes(repo, config=None):
-    """Model keys whose value differs between config/config_full_audited.yaml (the audited base, the configuration
-    that param_audit/ was written on) and CONFIG (default RUN_CONFIG): {key: (audited base value, value now)}.
+    """Model keys whose value differs between config/config_full_audited.yaml (the model's configuration, whose values
+    param_audit/PARAM_TRACE.csv holds) and CONFIG (default RUN_CONFIG; none): {key: (value there, value in CONFIG)}.
     Paths (data_dir, paths.*, materiale.file/citation) are not model keys and are skipped."""
     import yaml
     a = _flat(yaml.safe_load(open(os.path.join(repo, "config", "config_full_audited.yaml"))))
@@ -824,10 +825,10 @@ def config_changes(repo, config=None):
 def config_audit(repo, config=None, base=AUDIT_SCENARIO):
     """Step (c): every value of param_audit/PARAM_TRACE.csv against the configuration (default RUN_CONFIG).
 
-    PARAM_TRACE.csv holds the values of config/config_full_audited.yaml (the audited base). A value that differs only
-    because the key was changed on purpose from that base to RUN_CONFIG (config_changes(): v15
-    transport.min_haul_flatm 100 -> 15 m and quarry.near_site_fixed_face_m 1000; CODE_PROVENANCE.md) is reported as
-    'changed since the audit (documented)', not as a difference.
+    PARAM_TRACE.csv holds the values of config/config_full_audited.yaml (the model's configuration; RUN_CONFIG has
+    the same values). With another CONFIG, a value that differs only because the key was changed on purpose from
+    config/config_full_audited.yaml (config_changes()) is reported as 'changed since the audit (documented)', not as a
+    difference.
 
     'MR:<key>' paths are read from the resolved headline scenario dict (the frozen code's alliance.scenario()),
     other paths from the YAML; several paths separated by ';' give a list. Values are compared as the JSON text
@@ -879,8 +880,8 @@ def config_audit(repo, config=None, base=AUDIT_SCENARIO):
           f"{nd} changed since the audit (documented), {int((t.same == False).sum())} differ; "  # noqa: E712
           f"{len(t) - n} code-level rows (not config keys); "
           f"PARAM_TRACE 'value_matches_audit' = yes for {int((t['audited = config (trace)'] == 'yes').sum())}")
-    print(f"configuration {os.path.relpath(config or os.path.join(repo, RUN_CONFIG), repo)} vs the audited base "
-          f"config/config_full_audited.yaml: {len(delta)} model key(s) changed: "
+    print(f"configuration {os.path.relpath(config or os.path.join(repo, RUN_CONFIG), repo)} vs the model's "
+          f"configuration config/config_full_audited.yaml: {len(delta)} model key(s) changed: "
           + "; ".join(f"{k} {a} -> {b}" for k, (a, b) in delta.items()))
     return t
 

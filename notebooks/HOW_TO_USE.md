@@ -1,20 +1,21 @@
 # How to use the notebooks and link the data
 
-Six notebooks reproduce and audit the model, in this order. They run the v17 code (`code/`, `CODE_VERSION`
+Six notebooks reproduce and audit the model, in this order. They run the model's code (`code/`, `CODE_VERSION`
 2026-11-09-v17: lift, every lift rule, priced at the undiscounted rate; the learning factor and skill act on
-quarrying, dressing and building only; ODD 7.9) with the configuration of the v17 runs,
-`config/v16_final/config_full_audited.yaml` (the audited `config/config_full_audited.yaml` with
-`quarry.near_site_fixed_face_m: 1000` and `transport.min_haul_flatm: 15`). The notebooks contain no model results:
+quarrying, dressing and building only; ODD 7.9) with the configuration of the final runs,
+`config/v16_final/config_full_audited.yaml` (the same values as the model's configuration
+`config/config_full_audited.yaml`: audited parameters, minimum haul 15 m, near-site rule 1,000 m; only `cache_dir` /
+`output_dir` differ). The notebooks contain no model results:
 every number they show is computed when you run them; the results of the full runs are a separate data input (the
 results package).
 
 | # | notebook | what it does | expected result |
 |---|---|---|---|
-| 1 | `01_setup.ipynb` | installs OpenMPI and the pinned Python packages, checks the versions, runs a 2-rank MPI smoke test, imports the model code, checks the code version and runs the v17 lift unit tests | `pinned packages: 35; mismatches: 0`, `rank 0 of 2` / `rank 1 of 2`, `model code imports OK`, `code version 2026-11-09-v17`, `9 tests passed` |
+| 1 | `01_setup.ipynb` | installs OpenMPI and the pinned Python packages, checks the versions, runs a 2-rank MPI smoke test, imports the model code, checks the code version and runs the lift unit tests | `pinned packages: 35; mismatches: 0`, `rank 0 of 2` / `rank 1 of 2`, `model code imports OK`, `code version 2026-11-09-v17`, `9 tests passed` |
 | 2 | `02_inputs.ipynb` | gets every input (section 0: `fetch_data.py`), checks it against `inputs_manifest.csv`, sets the stone rule, gets the derived inputs (pack or rebuild), writes the work folder | a fetch table with `0 failed/differing`; `derived inputs ...: 68 of 68 present`; `work folder ready` |
 | 3 | `03_scenarios.ipynb` | runs scenarios with `code/model.py` (repast4py + MPI), including the headline `MOST_REALISTIC_AUDITED_LIT_P10`: presets `demo` (30 sites, seed 1, about a minute), `quick` (300 sites, seeds 1-3), `full`, `custom` | island totals per scenario |
 | 4 | `04_analysis_report.ipynb` | tables per tower class, maps of man-hours, centrality of the help networks, network need | tables and maps |
-| 5 | `05_audit.ipynb` | the step-by-step audit: (a) code vs the run's v17 checksums (`CODE_V17_SHA256SUMS`), (b) inputs vs the manifest, (c) configuration vs the parameter trace (one documented change since the audit: minimum haul 100 -> 15 m), (d) a fixed rerun vs a fingerprint, (e) the headline numbers from the per-seed tables of the results | (a)-(c) PASS; (d), (e) NOT YET AVAILABLE until the fingerprint and the tables are supplied, then PASS |
+| 5 | `05_audit.ipynb` | the step-by-step audit: (a) code vs the checksums of the final runs' code (`CODE_V17_SHA256SUMS`), (b) inputs vs the manifest, (c) configuration vs the parameter trace (every value equal), (d) a fixed rerun vs a fingerprint, (e) the headline numbers from the per-seed tables of the results | (a)-(c) PASS; (d), (e) NOT YET AVAILABLE until the fingerprint and the tables are supplied, then PASS |
 | 6 | `06_sensitivity.ipynb` | the sensitivity steps at demo size: the A5 alliance grid (27 cells + A0_alone, `sensitivity.csv`), a Morris screen and a Sobol design / analysis of the headline (`notebooks/sensitivity.py`, SALib); regenerates the full designs (Morris 330 evaluations, Sobol 14,336) for comparison with the design files of the results package | a 27-row `sensitivity.csv`, mu* per factor and output, S1 / ST per factor and output (demo values: they only show that the chain works) |
 
 Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in-jupyter-on-your-own-machine) -
@@ -259,12 +260,12 @@ The model runs read cached derived inputs (haul tables, k-best quarry routes, se
 rasters per friction; 68 files, listed in `notebooks/inputs_manifest.csv`, group `derived`, and explained in
 `data/derived/README.md`). Two ways to get them into `DERIVED_DIR`:
 
-1. **Prebuilt pack** of the v17 runs: `DERIVED_URL` in 02 (or `python notebooks/fetch_data.py --derived-url
+1. **Prebuilt pack** of the final runs: `DERIVED_URL` in 02 (or `python notebooks/fetch_data.py --derived-url
    URL`). Placeholder: the pack is part of the results package, which is not public yet (DOI pending).
 2. **Rebuild** from the raw inputs: automatic in 02 (section 0b, `REBUILD_DERIVED = "auto"`, the default) when any
    derived input is missing and no pack is available; `REBUILD_DERIVED = True` always rebuilds, `False` never; or
    `python notebooks/fetch_data.py --rebuild-derived [--stone-rule hybrid|stones7]`. It runs the commands of
-   `data/derived/README.md` in order, with the configuration of the v17 runs. Times and peak memory from the project's logs (8 GB machine): cost rasters per
+   `data/derived/README.md` in order, with the configuration of the final runs. Times and peak memory from the project's logs (8 GB machine): cost rasters per
    friction ~0.85 GB each; base haul table 14 s (stones7) / 249 s (hybrid), 1.7-2.4 GB; each further haul table about
    12 s with stones7 (up to ~4 min with hybrid); k-best routes 95 s, 1.9 GB; wider-literature inputs 13 s, 2.2 GB; sea
    tables 192 s, 1.1 GB; bichrome distances 15 s; food catchments not timed. **Total about 30-45 min with hybrid,
@@ -282,7 +283,7 @@ The full audited run reused derived inputs built by earlier runs of the project 
 - *WRONG ... SHA-256 differs*: a truncated download or another version; delete the file and fetch it again. Files
   rebuilt by `fetch_data.py` are reported as *REBUILT* (not an error).
 - *Out of memory* during a run: fewer MPI ranks (`RANKS`), or the `demo` / `quick` preset.
-- *code version ... expected 2026-11-09-v17*: `code/` is not the v17 code; check out the repository again. Part
+- *code version ... expected 2026-11-09-v17*: `code/` is not the code of the final runs; check out the repository again. Part
   files of other code versions are never reused (the code version is part of every run signature).
 - *stone_rule = stones7 needs the stones7 derived-input cache* (06): set `STONES7_CACHE`, or leave it unset (the
   factor is then fixed at hybrid).

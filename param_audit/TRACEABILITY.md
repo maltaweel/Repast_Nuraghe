@@ -183,7 +183,7 @@ Code locations are the first non-comment reads of the key in code/{alliance, lit
 | H3 | transport.pull_kg_per_person | 100 | 100 | yes | code/alliance.py:242; code/lit.py:150; code/sea.py:27 | yes | DERIVED | 5 | MR_P10_v11_pull125 (config copy, 42.49 kg) |
 | H4 | transport.return_walk_ms | 1.39 | 1.39 | yes | code/alliance.py:979; code/alliance.py:1008; code/lit.py:151 | yes | SOURCED | 1 |  |
 | H5 | transport.load_unload_h | 0.25 | 0.25 | yes | code/alliance.py:804; code/alliance.py:1268; code/sea.py:26 | yes | DERIVED | 2 |  |
-| H6 | transport.min_haul_flatm | 100 | 100 | yes | code/alliance.py:1263; code/alliance.py:1264; code/census_v12.py:227 | yes | SOURCED | 1 |  |
+| H6 | transport.min_haul_flatm | 15 | 15 | yes | code/alliance.py:1263; code/alliance.py:1264; code/census_v12.py:227 | yes | Authors' assumption (specified by the authors; 100 m, SOURCED, in the audit of 2 Nov 2026) | 1 |  |
 | H7 | lit_scenarios.list.REALISTIC.mixed.short.mu | 0.38 | 0.38 | yes | code/alliance.py:818; code/lit.py:186; code/lit.py:193; code/alliance. | yes | SOURCED | 6 | S3c_dry_ground, S3d_rough (lit family) |
 | H8 | lit_scenarios.list.REALISTIC.mixed.long.mu; alliance.track_m | [0.1, 0.1] | 0.1 | yes | code/alliance.py:243; code/alliance.py:1255 | yes | SOURCED | 4 | S3a_rails_tallow, S3b_rails_grease (lit family); A4/A5 track |
 | H9 | lit_scenarios.list.REALISTIC.mixed.long_min_haul_m | 1000 | 1000 | yes | code/lit.py:188; code/census_v12.py:229 | yes | Authors' assumption (agent's design choi | 0 |  |
