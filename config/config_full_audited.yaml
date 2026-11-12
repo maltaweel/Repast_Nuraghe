@@ -1,9 +1,9 @@
-# The configuration of the model (audited parameter values; the configuration of the final runs, the same values as
-# config/v16_final/config_full_audited.yaml, which differs only in cache_dir / output_dir). Audited values: param_audit/.
+# The configuration of the model (audited parameter values; the same values as
+# config/scenarios/config_full_audited.yaml, which differs only in cache_dir / output_dir). Audited values: param_audit/.
 # Minimum haul transport.min_haul_flatm 15 m and the near-site rule quarry.near_site_fixed_face_m 1000 (end of file).
-# The earlier runs of the queues in config/queues/ other than queue_v16_final.tsv (and the superseded queue_v14 / v15)
-# used an earlier version of this file (min_haul_flatm 100, no quarry: block; in the repository history); the other
-# configs directly in config/ (variants, R5 / R15, v13) are copies of that earlier version. Final runs: config/v16_final/.
+# The scenario configurations of the queue config/queue.tsv are in config/scenarios/.
+# Line numbers of this file are cited in the ODD as cfg:<line>; keep them when editing comments.
+# Earlier development versions of the configuration are in the git history.
 # Run: python model.py config_full_audited.yaml --alliance MOST_REALISTIC_AUDITED_LIT_P10 (README, notebooks/).
 # Nuraghe build ABM - single configuration file.
 # All input paths are relative to data_dir. Change data_dir (one line) to move the inputs.
@@ -504,7 +504,7 @@ alliance_wl:     # merged by alliance.scenario(); names end in _P10 when run
   MOST_REALISTIC_M4_1t:        {<<: *mr, haul_profile: {walk: {<<: *walk, min_kg: 1000}}}
   MOST_REALISTIC_M4_any:       {<<: *mr, haul_profile: {walk: {<<: *walk, min_kg: 0}}}
 
-# --- 2 Nov 2026 (v12) census scenarios (census/TESTABLE_PLAN.md; code/CENSUS_V12.md; census_v12.py). Each = MOST_REALISTIC +
+# --- 2 Nov 2026 (v12) census scenarios (census/TESTABLE_PLAN.md; code/CENSUS_V12.md; census_scenarios.py). Each = MOST_REALISTIC +
 # ONE switch, run as NAME_P10 (S22 and X_nurtime unphased). Shared rates below: page or ASSUMPTION / FREE.
 census_v12:
   lift_ref_kg: 450              # S4_graded: 0.37 ph per course x piece mass / 450 kg (TESTABLE_PLAN D07; 450 = model block median)

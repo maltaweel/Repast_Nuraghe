@@ -1,4 +1,4 @@
-# coop_sobol: cooperation-model Sobol on code v17
+# coop_sobol: cooperation-model Sobol
 
 **Status: the inputs are here; the results land with the final pass.** On 11 Nov 2026 the run had 3,207 of
 19,968 evaluations (scenario `none`, base rows 0-245 complete).
@@ -6,8 +6,8 @@
 ## Design (inputs, here now)
 
 - The uncoupled cooperation scenarios `none`, `mixed`, `full` (p_coop 0.0, 0.5, 1.0) of
-  `config/v16_final/config_full_audited.yaml`, in the day engine (`code/model.py`); configuration read-only, factors
-  applied to an in-memory copy. Code: `code/` (CODE_VERSION `2026-11-09-v17`). Started 10 Nov 2026.
+  `config/scenarios/config_full_audited.yaml`, in the day engine (`code/model.py`); configuration read-only, factors
+  applied to an in-memory copy. Code: `code/`. Started 10 Nov 2026.
 - The 11 factors of the earlier (28 Oct 2026) cooperation-model Sobol; four ranges changed to sourced values (see
   `factors.csv`, columns `old`, `changed`, `why`).
 - Saltelli design: SALib 1.6.0 `sobol.sample(N=512, calc_second_order=False, scramble=True, seed=20261110)`,

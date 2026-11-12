@@ -1,9 +1,8 @@
-"""code_v16_final: updated for the new add4 defaults (L2, L3 ON; tests marked code_v16_final).
-v16 tests (5 Nov 2026): addendum-4 flags L1-L4 (off = v15b, on = the new rule), L5, S1-S3 and the v16 summary
+"""Tests of the addendum-4 flags (5 Nov 2026; add4 defaults L2, L3 ON): flags L1-L4 (off = v15b, on = the new rule), L5, S1-S3 and the v16 summary
 columns. Light unit tests (no kbest / raster loading); the whole-run identity (all flags off vs v15b) and the
 flag-on runs are in the run's v16_test/ folder (not published).
 
-  cd code_v16_flags && PYTHONDONTWRITEBYTECODE=1 python tests/test_add4_flags.py      (or python -m pytest -q ...)
+  cd code && NURAGHE_TEST_CONFIG=/path/to/config.yaml PYTHONDONTWRITEBYTECODE=1 python tests/test_add4_flags.py      (or python -m pytest -q ...)
 """
 import copy
 import math
@@ -25,7 +24,9 @@ import report_alliance  # noqa: E402
 import sea as seamod  # noqa: E402
 from nbcommon import load_config  # noqa: E402
 
-CFG = os.path.join(os.environ.get("NURAGHE_PROJECT", "."), "runs/2026-11-02-v12-census/full_audited/v15b_outcrop/configs/config_full_audited.yaml")
+# Configuration read by the tests: NURAGHE_TEST_CONFIG = the model's configuration with data_dir and a derived-input
+# cache set (e.g. WORK_DIR/config.yaml written by notebooks/02_inputs.ipynb; README, "Tests").
+CFG = os.environ.get("NURAGHE_TEST_CONFIG", "NURAGHE_TEST_CONFIG-not-set")
 
 
 class approx:
@@ -229,11 +230,11 @@ def test_S3_ceiling_all_communities(cfg):
 
 # --------------------------------------------------------------------------- S2
 def test_S2_levy_carry():
-    import census_v12
+    import census_scenarios
     cz = types.SimpleNamespace(levy={"days": 10, "share": 0.5}, lintel=None, wait=None,
                                m=types.SimpleNamespace(Hh=8.0, B=np.array([10, 20])))
     cz.levy_used_s = np.array([500.0, 100.0])                 # budgets 10 x 0.5 x B x 8 = 400, 800
-    census_v12.Census.season_start(cz)
+    census_scenarios.Census.season_start(cz)
     assert list(cz.levy_used_s) == [100.0, 0.0]               # excess 100 carries; under-use does not
 
 

@@ -110,10 +110,10 @@ def write_md(P, E, I, conv, n_eff, bad_rows, unf, err):
         except Exception:
             pass
     L = []
-    L.append("# Sobol run 2 on the v17 headline MOST_REALISTIC_AUDITED_LIT_P10\n")
-    L.append(f"Run `runs/2026-11-10-sobol2-v17/`. Code `code_v17s` (= code_v17, CODE_VERSION {P['code_version']}, plus "
-             f"the flag `sobol.lift_learning`; default off = code_v17 exactly, checks/check_v17s.log). Config "
-             f"`v16_final/configs/config_full_audited.yaml` read-only, factors applied in memory.\n")
+    L.append("# Sobol run 2 on the headline MOST_REALISTIC_AUDITED_LIT_P10\n")
+    L.append(f"Code `code_variant` (= code/, CODE_VERSION {P['code_version']}, plus "
+             f"the flag `sobol.lift_learning`; default off = code/ exactly). Config "
+             f"`configs/config_full_audited.yaml` read-only, factors applied in memory.\n")
     L.append("## Design\n")
     L.append(f"- Saltelli (SALib 1.6.0 sobol.sample, calc_second_order=False, scramble, seed {P['sample_seed']}): "
              f"N = {N}, k = {k}, N (k + 2) = {N * (k + 2):,} evaluations x seeds {P['seeds_per_eval']} "

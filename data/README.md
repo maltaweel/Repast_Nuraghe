@@ -104,7 +104,7 @@ and `.cpg` identical, coordinates within 5 mm, rows in another order; so `.shp/.
 | What | Aru, A., Baldaccini, P. and Vacca, A. 1991. *Carta dei suoli della Sardegna* 1:250,000 (RAS/AGRIS); field `CLASSI` = land-capability class(es) of each mapping unit |
 | File | `soils/soils250k.geojson` (WFS layer `Agris:carta_dei_suoli_sardegna_scala_250000`, published in EPSG:4326; GetFeature request, `outputFormat=application/json&srsName=EPSG:4326`, in `notebooks/HOW_TO_USE.md`). Byte-identical to the run's copy once the GeoServer `"timeStamp"` field is set back to that of the run's copy (`fetch_data.py` does it) |
 | CRS / scale | 1:250,000; reprojected to EPSG:25832 by the tools that read it |
-| How it feeds the model | `tools/food_capacity.py` builds each site's catchment by land-capability class (`derived/cache/food/site_food_r*.csv`), used by the food-capacity scenarios (S12) and the work-feast variant; `tools/v12_checks.py` reads it for a post hoc check |
+| How it feeds the model | `tools/food_capacity.py` builds each site's catchment by land-capability class (`derived/cache/food/site_food_r*.csv`), used by the food-capacity scenarios (S12) and the work-feast variant; `tools/pattern_checks.py` reads it for a post hoc check |
 | Credit | Aru, Baldaccini & Vacca 1991, Regione Autonoma della Sardegna / AGRIS |
 | Licence | CC BY (see provider) |
 | Links | https://www.sardegnaportalesuolo.it/ ; WFS: https://geoserver.sardegnaportalesuolo.it/geoserver/wfs?service=WFS&request=GetCapabilities |

@@ -218,9 +218,9 @@ def unzip(zp, dest):
         z.extractall(dest)
 
 
-# The configuration of the final runs (the same values as the model's configuration config/config_full_audited.yaml:
+# The model's configuration as the queue reads it (the same values as config/config_full_audited.yaml:
 # quarry.near_site_fixed_face_m 1000, transport.min_haul_flatm 15, which the sea tables apply). Same as repro.RUN_CONFIG.
-RUN_CONFIG = os.path.join("config", "v16_final", "config_full_audited.yaml")
+RUN_CONFIG = os.path.join("config", "scenarios", "config_full_audited.yaml")
 
 
 def write_config(data_dir, cache_dir, out, stone_rule=None):

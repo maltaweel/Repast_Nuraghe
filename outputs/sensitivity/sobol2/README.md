@@ -1,15 +1,16 @@
-# sobol2: Sobol run 2 on the v17 headline
+# sobol2: Sobol run 2 on the headline
 
 **Status: the inputs are here; the results land with the final pass** (the run was 6,343 of 14,336 evaluations
 on 11 Nov 2026). Until then this folder holds only the design.
 
 ## Design (inputs, here now)
 
-- Headline cell `MOST_REALISTIC_AUDITED_LIT_P10`, configuration `config/v16_final/config_full_audited.yaml`
+- Headline cell `MOST_REALISTIC_AUDITED_LIT_P10`, configuration `config/scenarios/config_full_audited.yaml`
   (read-only; each factor is applied to an in-memory copy).
-- Code: `code/` (CODE_VERSION `2026-11-09-v17`) with one added config flag, `sobol.lift_learning` (factor 26).
-  Flag off = code v17 exactly (checked per site, bit for bit, on seeds 1-2); flag on = the v16_final lift rule
-  (lift discounted by learning and skill). This code variant and the run harness are not yet in the repository.
+- Code: `code/` with one added config flag, `sobol.lift_learning` (factor 26).
+  Flag off = `code/` exactly (checked per site, bit for bit, on seeds 1-2); flag on = an earlier lift rule
+  (lift discounted by learning and skill). The code variant (a patch on `code/`) and the run harness are in
+  `sensitivity/sobol2/`.
 - Saltelli design: SALib 1.6.0 `sobol.sample(N=512, calc_second_order=False, scramble=True, seed=20261110)`,
   k = 26, so N (k + 2) = **14,336 evaluations**. One evaluation = one design row x seeds 1, 2, 3 (common random
   numbers); its value is the 3-seed mean. 43,008 model runs. Started 10 Nov 2026.

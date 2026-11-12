@@ -1,17 +1,17 @@
 # sensitivity
 
-The harnesses of the Sobol sensitivity runs of the final model (code v17), published so that the runs can be repeated.
+The harnesses of the Sobol sensitivity runs of the model (`code/`), published so that the runs can be repeated.
 Their results are in [`outputs/sensitivity/`](../outputs/sensitivity/) (see that folder's README for the tables).
 
 | folder | what it runs | results in |
 |---|---|---|
-| [sobol2/](sobol2/) | Sobol run 2 on the headline `MOST_REALISTIC_AUDITED_LIT_P10`: 26 factors, Saltelli N = 512, 14,336 evaluations x seeds 1-3 (43,008 whole-island runs); uses the code variant `code_v17s` (code v17 + one config flag) | `outputs/sensitivity/sobol2/` |
+| [sobol2/](sobol2/) | Sobol run 2 on the headline `MOST_REALISTIC_AUDITED_LIT_P10`: 26 factors, Saltelli N = 512, 14,336 evaluations x seeds 1-3 (43,008 whole-island runs); uses the code variant `code_variant` (`code/` + one config flag) | `outputs/sensitivity/sobol2/` |
 | [coop_sobol/](coop_sobol/) | cooperation-model Sobol: 11 factors x the cooperation scenarios none / mixed / full, Saltelli N = 512, 19,968 evaluations (one seed each) | `outputs/sensitivity/coop_sobol/` |
 
 ## Placeholders
 
-The scripts are the ones that ran, with the local folders replaced by placeholders (as in `config/queues/`). Replace
-them before running:
+The scripts are the ones that ran, with the local folders replaced by placeholders (as in `config/queue.tsv`) and the
+run-folder paths set to the layout below. Replace the placeholders before running:
 
 | placeholder | meaning |
 |---|---|
@@ -26,21 +26,21 @@ cp -r $REPO/sensitivity/sobol2 $WORK && cd $WORK
 sed -i "s#@RUN_DIR@#$RUN#g; s#@WORK_DIR@#$WORK#g; s#@PYTHON@#$(command -v python3)#g; s#@PROJECT@#$RUN#g" *.py *.sh
 ```
 
-Layout of `@RUN_DIR@`:
+Layout of `@RUN_DIR@` (the run folder of the README's "Run the queue"):
 
 ```
-code_v17/                                   copy of code/ (coop_sobol)
-code_v17s/                                  copy of code/ + sensitivity/sobol2/code_v17s.patch (sobol2)
-v16_final/configs/config_full_audited.yaml  config/v16_final/config_full_audited.yaml with data_dir, paths.cache_dir
-                                            and output_dir set to your folders (sobol2)
-v17/configs/config_full_audited.yaml        the same file (coop_sobol)
-v16_final/outputs/caches/config_full_audited_alt_stones7/
+code/                                       copy of code/ (coop_sobol)
+code_variant/                               copy of code/ + sensitivity/sobol2/code_variant.patch (sobol2)
+configs/config_full_audited.yaml            config/scenarios/config_full_audited.yaml with data_dir, paths.cache_dir
+                                            and output_dir set to your folders
+outputs/caches/config_full_audited/runs/    the engine-B runs of the queue (optional identity check of coop_sobol)
+outputs/caches/config_full_audited_alt_stones7/
                                             a derived-input cache built with the stones7 stone rule (sobol2, factor
                                             stone_rule only)
 ```
 
 The configuration the notebooks write after `notebooks/02_inputs.ipynb` (`WORK_DIR/config.yaml`, with the folders
-already set) can be copied to both configuration paths. The derived inputs are described in `data/derived/README.md`
+already set) can be copied to `configs/config_full_audited.yaml`. The derived inputs are described in `data/derived/README.md`
 (`python notebooks/fetch_data.py --rebuild-derived`; with `--stone-rule stones7` into a second folder for the stones7
 cache, an equivalent build that has not been compared byte for byte with the run's cache).
 

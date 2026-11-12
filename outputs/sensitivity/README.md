@@ -1,13 +1,12 @@
 # outputs/sensitivity
 
-Sensitivity results of the final model (code v17), published as small island-level tables. This folder is the
+Sensitivity results of the model (`code/`), published as small island-level tables. This folder is the
 only place in the repository that holds numeric model results (the authors' decision of 11 Nov 2026, for the
 sensitivity runs only). The headline results and all raw per-site outputs (per-site man-hours, per-site
 specialisation, part files) are not in the repository.
 
-Code: `code/` of this repository, CODE_VERSION `2026-11-09-v17` (introduced in commit 987a345, 9 Nov 2026; file
-checksums in `CODE_V17_SHA256SUMS`). Configuration: `config/v16_final/config_full_audited.yaml` (the v17 runs use
-this file unchanged; only `data_dir`, `cache_dir` and `output_dir` differ locally). Each subfolder's README gives
+Code: `code/` of this repository (file checksums in `CODE_SHA256SUMS`). Configuration:
+`config/scenarios/config_full_audited.yaml` (the runs use this file unchanged; only `data_dir`, `cache_dir` and `output_dir` differ locally). Each subfolder's README gives
 the command, the dates, N, the factors and their ranges.
 
 | folder | what | status |
@@ -15,7 +14,7 @@ the command, the dates, N, the factors and their ranges.
 | [a5_alliance/](a5_alliance/) | alliance-model grid on A5_full: 27 cells (R_m x b x track cost) + the A0_alone reference, seeds 1-100 each | complete |
 | [sobol2/](sobol2/) | Sobol run 2 on the headline `MOST_REALISTIC_AUDITED_LIT_P10`: 26 factors, Saltelli N = 512 (14,336 evaluations x seeds 1-3) | design now; results land with the final pass |
 | [coop_sobol/](coop_sobol/) | cooperation-model Sobol: 11 factors x scenarios none / mixed / full, Saltelli N = 512 (19,968 evaluations, one seed each) | design now; results land with the final pass |
-| [morris/](morris/) | Morris screens on v17 (32-factor screen; physical 5-factor screen) | lands with the final pass |
+| [morris/](morris/) | Morris screens on the model (32-factor screen; physical 5-factor screen) | lands with the final pass |
 | [feasibility/](feasibility/) | feasibility grid (pull x drag x tonnage) on the sourced ranges | lands with the final pass |
 
 `MANIFEST.csv`: every exported file with its size, number of rows, SHA-256, its source in the project's run

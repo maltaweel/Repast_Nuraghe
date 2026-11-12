@@ -1,4 +1,4 @@
-# nuraghe-build-abm notebooks (v17 code, CODE_VERSION 2026-11-09-v17): exact package versions of the tested
+# nuraghe-build-abm notebooks (the model's code): exact package versions of the tested
 # environment (Python 3.13.5; read with `uv pip freeze`). SALib + multiprocess: Morris / Sobol designs (06_sensitivity).
 # Install (needs OpenMPI + mpicc first, see 01_setup):
 #   CC=mpicc CXX=mpicxx pip install -r requirements-colab.txt

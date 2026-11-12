@@ -1,6 +1,6 @@
-# feasibility: feasibility grid on code v17
+# feasibility: feasibility grid
 
-**Lands with the final pass.** The grid had not been run on code v17 on 11 Nov 2026; this folder is empty until then.
+**Lands with the final pass.** The grid had not been run on the model's code on 11 Nov 2026; this folder is empty until then.
 
 Planned contents (exported by `../export.py` from the rerun harness, island level only):
 

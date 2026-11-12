@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cooperation-model Sobol on code_v17: analysis. Per scenario (none, mixed, full) and per output: first-order S1 and
+"""Cooperation-model Sobol on code/: analysis. Per scenario (none, mixed, full) and per output: first-order S1 and
 total-order ST with 95% bootstrap confidence intervals (SALib 1.6.0 sobol.analyze, calc_second_order=False,
 1,000 resamples, conf 0.95, seed 1), on the single-seed value of each evaluation. Convergence: the same indices on the
 first 256 base rows (a valid N = 256 Saltelli prefix) vs all 512. Comparison with the 28 Oct GPU indices
@@ -109,9 +109,9 @@ def main():
 def write_md(P, I, C, notes):
     F = pd.read_csv(os.path.join(HERE, "factors.csv"), keep_default_na=False).set_index("name")
     k, N = P["problem"]["num_vars"], P["N"]
-    L = ["# Cooperation-model Sobol on code_v17 (none, mixed, full)\n",
-         f"Run `runs/2026-11-10-coopsobol-v17/`. Code `full_audited/code_v17` (CODE_VERSION {P['code_version']}), "
-         f"engine B (model.py), config `v17/configs/config_full_audited.yaml` read-only, factors applied in memory.\n",
+    L = ["# Cooperation-model Sobol on code/ (none, mixed, full)\n",
+         f"Code `code/` (CODE_VERSION {P['code_version']}), "
+         f"engine B (model.py), config `configs/config_full_audited.yaml` read-only, factors applied in memory.\n",
          "## Design\n",
          f"- Saltelli (SALib 1.6.0 sobol.sample, calc_second_order=False, scramble, seed {P['sample_seed']}): N = {N}, "
          f"k = {k}, N (k + 2) = {P['rows']:,} rows per scenario x {len(P['scenarios'])} scenarios = "

@@ -1,7 +1,7 @@
 """Sensitivity analysis of the headline scenario MOST_REALISTIC_AUDITED_LIT_P10 (notebooks/06_sensitivity.ipynb).
 
-Two global designs on the v17 code (code/, CODE_VERSION 2026-11-09-v17) and the configuration of the v17 runs
-(config/v16_final/config_full_audited.yaml, copied by 02 to WORK_DIR/config.yaml):
+Two global designs on the model (code/) and the model's configuration
+(config/scenarios/config_full_audited.yaml, copied by 02 to WORK_DIR/config.yaml):
 
 1. Morris screening (elementary effects; Morris 1991): 32 factors (the parameters that the parameter audit lists as
    the authors' assumptions, with a value range each), SALib morris.sample, p = 4 levels, delta = 2/3.
@@ -24,10 +24,11 @@ Level mapping of the unit sample u: unif lo + u (hi - lo); binary u < 0.5 -> lev
 int: Morris round(lo + u (hi - lo)) (u is on the 4-level grid), Sobol equal-probability bins
 lo + floor(u (hi - lo + 1)).
 
-lift_learning (Sobol only): level 0 = lift undiscounted (the v17 rule, spec addendum k: the learning factor and skill
-act on quarrying, dressing and building only, never on lift); level 1 = lift discounted with the build stage (the
-v16_final rule). Level 1 needs a code switch (config key sobol.lift_learning) that is NOT in the published code/: the
-full Sobol run used a copy of the v17 code with that one switch added (default off = the v17 code exactly). With the
+lift_learning (Sobol only): level 0 = lift undiscounted (the model's rule, spec addendum k: the learning factor and skill
+act on quarrying, dressing and building only, never on lift); level 1 = lift discounted with the build stage (an
+earlier rule). Level 1 needs a code switch (config key sobol.lift_learning) that is NOT in the published code/: the
+full Sobol run used a copy of code/ with that one switch added (sensitivity/sobol2/code_variant.patch; default off =
+code/ exactly). With the
 published code the factor is therefore left out of the demo (demo_names("sobol")); the full design is still
 regenerated with it (sobol_design(SOBOL_NAMES, 512)) so that it can be compared with the design file of the results
 package.
@@ -62,7 +63,7 @@ SOBOL_FULL = {"N": 512, "seed": 20261110, "seeds": [1, 2, 3], "k": 26, "n_evals"
               "calc_second_order": False, "scramble": True}
 
 # --------------------------------------------------------------------------------------------- factors
-# row = row of param_audit/PARAM_AUDIT.md; headline = the value in the v17 configuration; key = what apply() sets.
+# row = row of param_audit/PARAM_AUDIT.md; headline = the value in the model's configuration; key = what apply() sets.
 FACTORS = [
     dict(name="n_phases", row="T1", kind="int", lo=5, hi=15, headline=10,
          key="sc.phase_frac = 1 / n_phases", why="+/-50% of 10 cohorts (P10); 5 cohorts = the P20 variant"),
@@ -137,7 +138,7 @@ FACTORS += [
          key="sc.R_m (help radius of the scenario; alliance.R_m unchanged)", why="5-15 km (no help-distance source)"),
     dict(name="lift_learning", row="-", kind="binary", levels=[False, True], headline=False,
          key="cfg.sobol.lift_learning (code switch, not in the published code)",
-         why="lift undiscounted (v17, headline) vs discounted with the build stage (v16_final)"),
+         why="lift undiscounted (headline) vs discounted with the build stage (earlier rule)"),
 ]
 SOBOL_NAMES = SOBOL_MORRIS + ["R_m", "lift_learning"]
 FBY = {f["name"]: f for f in FACTORS}
@@ -177,7 +178,7 @@ def demo_names(design, stones7_cache=None, include_lift_learning=False):
     if not stones7_cache:
         dropped.append(("stone_rule", "fixed at hybrid: no stones7 derived-input cache (STONES7_CACHE)"))
     if design == "sobol" and not include_lift_learning:
-        dropped.append(("lift_learning", "fixed at undiscounted (v17): the switch for level 1 is not in the published code"))
+        dropped.append(("lift_learning", "fixed at undiscounted (headline): the switch for level 1 is not in the published code"))
     for n, why in dropped:
         names.remove(n)
         print(f"  {n}: {why}")

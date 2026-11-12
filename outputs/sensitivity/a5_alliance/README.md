@@ -1,7 +1,7 @@
 # a5_alliance: alliance-model sensitivity grid (complete)
 
 Full factorial grid on scenario `A5_full` (requests, trust, specialisation, tracks, shared quarry), defined in
-`config/v16_final/config_full_audited.yaml` under `alliance.sensitivity`:
+`config/scenarios/config_full_audited.yaml` under `alliance.sensitivity`:
 
 | factor | config key | levels |
 |---|---|---|
@@ -14,12 +14,12 @@ Full factorial grid on scenario `A5_full` (requests, trust, specialisation, trac
 
 ## Provenance
 
-- Code: `code/` (CODE_VERSION `2026-11-09-v17`), configuration `config/v16_final/config_full_audited.yaml`.
+- Code: `code/`, configuration `config/scenarios/config_full_audited.yaml`.
 - Runs: the 27 cells, seeds 1-100, on 9 Nov 2026 (8 MPI ranks). That job stopped at its final report step only,
-  because `A0_alone` had not yet been run on v17. On 10 Nov 2026 `A0_alone` was run (seeds 1-100), then the cell
+  because `A0_alone` had not yet been run with this code. On 10 Nov 2026 `A0_alone` was run (seeds 1-100), then the cell
   job was rerun on 4 ranks (it reused the finished per-seed results of the same code version: the run signature
   includes CODE_VERSION) and wrote the per-cell summaries and `sensitivity.csv`. Exit 0, no out-of-memory event.
-- Commands (from `code/`; `CFG=../config/v16_final/config_full_audited.yaml` with `data_dir` set):
+- Commands (from `code/`; `CFG=../config/scenarios/config_full_audited.yaml` with `data_dir` set):
 
 ```
 mpirun -n 4 python model.py $CFG --seeds 1-100 --no-shapefile --alliance sensitivity   # the 27 cells

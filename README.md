@@ -28,38 +28,37 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   to trust, which reciprocity raises or lowers. Each community learns which choices worked for it, imitates
   successful neighbours, and gains skill with experience (ODD sections 3-4). The 10 km help radius is the headline
   value; a sensitivity runs it at 5 and 15 km on the headline (`MOST_REALISTIC_AUDITED_LIT_R5_P10` /
-  `_R15_P10`, `config/v16_final/config_R5_audited.yaml` / `config_R15_audited.yaml`, ODD Appendix B).
+  `_R15_P10`, `config/scenarios/config_R5_audited.yaml` / `config_R15_audited.yaml`, ODD Appendix B).
 - **Quarry face choice and the near-site rule.** Each site has up to 5 candidate quarry faces (the k-best
   least-cost routes); at each tower it picks one by epsilon-greedy learning (exploration with epsilon = 0.1,
   otherwise the face with the best learned value) or by imitating a cheaper neighbour. A site whose dry-ground route
   to its nearest (cheapest) face is at most 1,000 m (config key `quarry.near_site_fixed_face_m`; absent or 0 = off)
   always quarries from that face, with no exploration, value choice or imitation of the face; sites farther away keep
-  the choice among their faces (ODD section 7.6; `code/CHANGES_V14_NEARFACE.md`).
+  the choice among their faces (ODD section 7.6; `code/METHODS.md`).
 - **Minimum haul.** `transport.min_haul_flatm` is 15 m: the haul of a site that sits on its outcrop, and the floor of
   every whole route (drag and walk back; relay legs have no minimum). The sea tables apply it and are rebuilt per
-  config (ODD section 7.5; `code/CHANGES_V15_HAUL15.md`).
+  config (ODD section 7.5; `code/METHODS.md`).
 - **Stone, loading and rules behind flags.** The on-outcrop test uses the stone set a site actually quarries, and a
   site's stone is the class of the face it hauls from. Four rules sit behind flags in a top-level `add4:` config
   block: `bedrock_everywhere` (every site quarries at the bedrock rate) and `load_per_tonne` (loading per tonne) are
   on, `rails_cost_choice` and `sea_priced_as_charged` off. A stage with no work creates no help request, walk, trust
-  change or skill credit, and in join mode each party is priced at its own skill (`code/CHANGES_V15B_OUTCROP.md`,
-  `CHANGES_V16.md`, `CHANGES_V16_FINAL.md`, `code/METHODS.md`).
+  change or skill credit, and in join mode each party is priced at its own skill (ODD sections 7.1-7.7;
+  `code/METHODS.md`).
 - **Lift and learning.** Lift, by every lift rule, is priced at the undiscounted rate: the learning factor
   (1 - 0.15)^t and skill apply to quarrying, dressing and building only (ODD sections 7.7, 7.9, 7.12; test
-  `code/tests/test_v17_lift.py`).
-- **The code and configuration of the model.** `code/` is the code of the final runs (`CODE_VERSION`
-  `2026-11-09-v17`, checksums `CODE_V17_SHA256SUMS`; how it grew from the frozen code of the full audited run:
-  `CODE_PROVENANCE.md`); `config/config_full_audited.yaml` is its configuration (the same values as
-  `config/v16_final/config_full_audited.yaml`, the copy the final runs read, and as `code/config.yaml`). The run
-  signature includes `CODE_VERSION` and the `add4` settings. The results in the paper come from this code and
-  configuration; the final sensitivity results land with the final pass ([Sensitivity results](#sensitivity-results)).
-  The ODD describes this code (ODD change log).
+  `code/tests/test_lift.py`).
+- **The code and configuration of the model.** `code/` is the code of the model (SHA-256 of every file in
+  `CODE_SHA256SUMS`); `config/config_full_audited.yaml` is its configuration (the same values as
+  `config/scenarios/config_full_audited.yaml`, the copy the queue reads, and as `code/config.yaml`). The run
+  signature includes the code version string `CODE_VERSION` (`code/lit.py`) and the `add4` settings. The results in
+  the paper come from this code and configuration; the remaining sensitivity results land with the final pass
+  ([Sensitivity results](#sensitivity-results)). The ODD describes this code.
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
 - **What is measured.** Man-hours per site and stage, start and finish of every tower; per seed, island man-hours
   and island years (the time until the last tower is finished), over 100 seeds per scenario; the summary also gives
   the island-wide 95th percentile of site finish seasons and the spread across seeds (ODD section 4.11).
-- **Optional social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), a rule key `reputation_rule` (`all`, the default, or `gentle`: only defectors' and ungrateful refusals cost standing) and a switch `trusted_nodist` (no distance penalty in the acceptance of help between reciprocal partners, after Kasper & Borgerhoff Mulder 2015, Fig. 2) are off by default and in the headline; only the social scenarios use them (`config/config_v13_*.yaml`, `config_v13g_*.yaml`, `config_v13k_*.yaml`; ODD sections 7.15-7.16). With them off the outputs and run signatures are unchanged (`CODE_PROVENANCE.md`).
+- **Optional social switches.** Three opt-in mechanisms (`reputation`, `partner_choice`, `tie_imitation`), a rule key `reputation_rule` (`all`, the default, or `gentle`: only defectors' and ungrateful refusals cost standing) and a switch `trusted_nodist` (no distance penalty in the acceptance of help between reciprocal partners, after Kasper & Borgerhoff Mulder 2015, Fig. 2) are off by default and in the headline; only the social scenarios use them (`config/scenarios/config_social_*.yaml`; ODD sections 7.15-7.16). With them off the outputs and run signatures are unchanged (ODD 7.15).
 - **Parameters.** No parameter is calibrated: every value has an audited source (author, year, page) or is
   declared an assumption (`param_audit/`).
 
@@ -70,10 +69,10 @@ flowchart TD
     A["Raw inputs<br/>Nurnet site list + building stone: data/nurnet/<br/>ARPAS lithology, Copernicus DEM, soils, rivers"]
     B["Fetch / link<br/>notebooks/fetch_data.py<br/>notebooks/HOW_TO_USE.md"]
     C["Derived inputs<br/>code/preprocess.py, cost rasters: code/tools/build_cost_mu.py<br/>k-best quarry routes: code/tools/kbest_quarries.py<br/>sea tables: code/tools/sea_routes.py"]
-    D["Configuration<br/>config/config_full_audited.yaml + scenario variants<br/>config/queues/"]
+    D["Configuration<br/>config/config_full_audited.yaml<br/>config/scenarios/ + config/queue.tsv"]
     E["Model runs<br/>code/model.py, repast4py + MPI<br/>100 seeds per scenario"]
     F["Outputs<br/>per-seed part files"]
-    G["Summaries and checks<br/>code/tools/v12_summary.py and other *_summary.py<br/>code/tools/v12_checks.py"]
+    G["Summaries and checks<br/>code/tools/paired_summary.py and other *_summary.py<br/>code/tools/pattern_checks.py"]
     H["Audit<br/>notebooks/05_audit.ipynb<br/>param_audit/, ODD/"]
     A --> B --> C --> E
     D --> E
@@ -84,7 +83,7 @@ flowchart TD
 
 | Model description | Replicate the results |
 |---|---|
-| [ODD/ODD.md](ODD/ODD.md) (PDF: [ODD/ODD.pdf](ODD/ODD.pdf)): the ODD protocol of the model | [notebooks/](notebooks/): start with [notebooks/HOW_TO_USE.md](notebooks/HOW_TO_USE.md), then run `01_setup`, `02_inputs`, `03_scenarios`, `04_analysis_report`, `05_audit`, `06_sensitivity` in order, in Jupyter or Google Colab (the model's code `code/` and configuration, read from `config/v16_final/config_full_audited.yaml`) |
+| [ODD/ODD.md](ODD/ODD.md) (PDF: [ODD/ODD.pdf](ODD/ODD.pdf)): the ODD protocol of the model | [notebooks/](notebooks/): start with [notebooks/HOW_TO_USE.md](notebooks/HOW_TO_USE.md), then run `01_setup`, `02_inputs`, `03_scenarios`, `04_analysis_report`, `05_audit`, `06_sensitivity` in order, in Jupyter or Google Colab (the model's code `code/` and configuration, read from `config/scenarios/config_full_audited.yaml`) |
 
 Parameter audit and traceability: [param_audit/](param_audit/) (below).
 
@@ -121,7 +120,7 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
 
 ## Sensitivity results
 
-The sensitivity results of the model (code `code/`, configuration `config/v16_final/config_full_audited.yaml`)
+The sensitivity results of the model (code `code/`, configuration `config/scenarios/config_full_audited.yaml`)
 are in [`outputs/sensitivity/`](outputs/sensitivity/), as small island-level tables (no per-site data). It is the only
 folder of the repository with model results. Each subfolder has a README with the factors, ranges, commands and dates.
 
@@ -161,26 +160,26 @@ every design at demo size.
 ## Repository layout
 
 ```
-code/            the model and its tools: the code of the final runs (how it grew from the code of the full audited
-                 run: CODE_PROVENANCE.md)
+code/            the model and its tools
   model.py         entry point (baseline, cooperation, literature, alliance and pre-network scenarios)
-  alliance.py      adaptive alliances / MOST_REALISTIC; lit.py, sea.py, phasing.py, pre_networks.py, census_v12.py
+  alliance.py      adaptive alliances / MOST_REALISTIC; lit.py, sea.py, phasing.py, pre_networks.py, census_scenarios.py
   preprocess.py    haul tables (least-cost quarry -> site); nbcommon.py config loader + Dijkstra
-  tools/ tests/    derived-input builders, post hoc analyses, verification
-  full_chain.sh    the serialized chain that ran the full audited queue
-config/          config_full_audited.yaml (the model's configuration), v16_final/ (the configs of the final runs:
-                 the same values, one cache per config, + every scenario variant), queues/; kept as a record: the
-                 84 variants, R5 / R15 and v13 configs directly in config/ and tost_configs/ (earlier audited run:
-                 minimum haul 100 m, no near-site rule), v15_haul15/, v14_nearface/ (superseded reruns),
-                 sea_expect/, check_sea_meta.py
+  config.yaml      default configuration (the values of config/config_full_audited.yaml, relative paths)
+  tools/ tests/    derived-input builders, post hoc analyses, unit tests and verification scripts
+  run_queue.sh     runs the queue config/queue.tsv, one entry at a time (Run the queue, below)
+  METHODS.md       methods of the model (rules, equations, parameters)
+config/          config_full_audited.yaml (the model's configuration), scenarios/ (one configuration per scenario
+                 variant of the queue: the same values plus the variant's changes), queue.tsv (every run of the model),
+                 sea_expect/ + check_sea_meta.py (expected sea-table parameters of the variants with their own sea tables)
 data/            data/nurnet/ (Nurnet's data, included); the other inputs are fetched (data/README.md; data/derived/README.md)
 notebooks/       01-06: setup, inputs (fetch_data.py), scenarios, analysis, audit, sensitivity; HOW_TO_USE.md; Jupyter or Colab
 param_audit/     parameter audit and traceability (public-safe copies)
-tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders; not in the frozen snapshot)
+sensitivity/     harnesses of the Sobol runs (sobol2/, coop_sobol/; see Sensitivity results)
+tools_extra/     build_slope.py, build_dem.py, build_lithology.py, build_rivers.py (input builders)
 outputs/         everything a run writes (NOT committed, except sensitivity/ (the sensitivity results) and reference/ and
                  summary/ for the audit)
-sensitivity/     harnesses of the Sobol runs (sobol2/, coop_sobol/; see Sensitivity results)
-CODE_SHA256SUMS  checksums of the full audited run's code snapshot (CODE_V17_SHA256SUMS: the code of the model; CODE_V13_/V14_/V15_/V16_FINAL_SHA256SUMS: earlier code states);  CODE_PROVENANCE.md  what differs and why
+ODD/             ODD protocol of the model (ODD.md, ODD.pdf)
+CODE_SHA256SUMS  SHA-256 of every file of code/ (`cd code && sha256sum -c ../CODE_SHA256SUMS`)
 ```
 
 ## Requirements / Installation
@@ -213,7 +212,7 @@ about 6 minutes and peaks at about 6 GB (proportional set size 5.9 GB; resident 
 derived-input rebuild peaks at about 2.5 GB (one process at a time). Disk: about 0.5 GB of raw inputs, 0.75 GB of
 derived inputs, about 0.25 GB of part files per 100-seed scenario.
 
-`code/full_chain.sh` (the full queue) also needs `flock` and Linux cgroup v2 (it reads
+`code/run_queue.sh` (the queue) also needs `flock` and Linux cgroup v2 (it reads
 `/sys/fs/cgroup/memory.events` to stop on an out-of-memory kill).
 
 Environment variables used by the scripts (only where a path was hard-wired in the project):
@@ -221,9 +220,10 @@ Environment variables used by the scripts (only where a path was hard-wired in t
 | Variable | Meaning |
 |---|---|
 | `PYTHON` | the Python interpreter of the environment above (shell scripts; default `python3`) |
-| `NURAGHE_RUN_DIR` | the run folder of `code/full_chain.sh` (below) |
-| `NURAGHE_PROJECT` | the project folder of the earlier runs, for the historical chain/test scripts and some post hoc tools (`code/*_chain.sh`, `code/tests/*.sh`, `tools/v11_*`, `tools/v12_*`, ...); not needed for the model itself |
-| `NURAGHE_DATA` | the data folder, for `tools/v12_checks.py` (default `data`) |
+| `NURAGHE_RUN_DIR` | the run folder of `code/run_queue.sh` (below) |
+| `NURAGHE_TEST_CONFIG` | the configuration read by the unit tests (`code/tests/test_*.py`, below) |
+| `NURAGHE_PROJECT` | the project folder, for some post hoc tools that read the project's run folders (paths written into them); not needed for the model itself |
+| `NURAGHE_DATA` | the data folder, for `tools/pattern_checks.py` (default `data`) |
 
 ## Rebuild the derived inputs
 
@@ -257,90 +257,56 @@ finished seeds are kept as part files under `cache_dir/runs/<signature>/` (the s
 the site list) and skipped on restart. Field meanings and the model rules: `code/METHODS.md`. The notebooks
 (`notebooks/`) wrap the same commands.
 
-## Run the queues
+## Tests
 
-The results of the model come from `config/queues/queue_v16_final.tsv` on the configs in `config/v16_final/`, run
-with `code/` ([The final runs](#the-final-runs-every-scenario-of-the-model) below). That queue reuses the run folder
-and caches of the earlier full audited queue, so the folder is set up as for that queue first.
-
-### The earlier full audited queue (record; sets up the run folder)
-
-The earlier full audited run is `config/queues/queue_full.tsv` (78 entries, priority 1) followed by
-`config/queues/queue_full_p23.tsv` (370 entries, priorities 2-3): seeds 1-100 everywhere, one entry at a time,
-each scenario on its named config. It ran with the frozen code (`CODE_SHA256SUMS`) and an earlier version of
-`config/config_full_audited.yaml` (minimum haul 100 m, no near-site rule; git history); the other configs directly in
-`config/` are copies of that version. The file now holds the configuration of the model; to repeat this queue
-exactly, take the earlier version from the git history (`git show 63e61d1:config/config_full_audited.yaml`). `code/full_chain.sh` runs it serially and is resumable (a finished entry leaves
-`outputs/logs/q_<label>.ok`). It expects a run folder laid out as below:
+The unit tests (`code/tests/test_*.py`: Dijkstra, the `add4` flags, the fixes of the stage, join and stone rules, the
+run signature, the lift rule; fake models, no simulation) read one configuration, `NURAGHE_TEST_CONFIG`: the model's
+configuration with `data_dir` and `cache_dir` set (for example `WORK_DIR/config.yaml`, written by
+`notebooks/02_inputs.ipynb`). `test_D11_tables` reads the prepared tables of that cache.
 
 ```
-REPO=/path/to/Repast_Nuraghe; RUN=/path/to/run_full_audited; DATA=/path/to/data; PYTHON=/path/to/python
-mkdir -p $RUN/outputs/logs && ln -s $REPO/code $RUN/code
-cp $REPO/config/config_full_audited*.yaml $REPO/config/check_sea_meta.py $RUN/ && cp -r $REPO/config/tost_configs $RUN/
-sed -i "s|^data_dir: .*|data_dir: $DATA|" $RUN/config_full_audited*.yaml $RUN/tost_configs/*.yaml
-for q in queue_full.tsv queue_full_p23.tsv; do
-  sed -e "s|@RUN_DIR@|$RUN|g" -e "s|@PYTHON@|$PYTHON|g" $REPO/config/queues/$q > $RUN/$q; done
-# base cache: download or rebuild into $RUN/outputs/cache (data/derived/README.md); sea/ must be an EMPTY real
-# folder (the first queue entry, SEA_TABLES, rebuilds it)
-# own caches of the variant entries: link every base-cache entry except the part each entry rebuilds
-for d in $(grep -h '^  cache_dir:' $RUN/config_full_audited_*.yaml | awk '{print $2}' | sort -u | grep -vx outputs/cache); do
-  D=$RUN/$d; mkdir -p $D/sea
-  [ -f $REPO/config/sea_expect/$(basename $d).json ] && cp $REPO/config/sea_expect/$(basename $d).json $D/sea_expect.json
-  if [ $(basename $d) = cache_alt_stones7 ]; then mkdir -p $D/alliance $D/haul; keep="census cost_mu food stones4"
-  else keep=$(ls $RUN/outputs/cache | grep -vx -e sea -e runs -e sea_expect.json); fi
-  for b in $keep; do [ -e $D/$b ] || ln -s $RUN/outputs/cache/$b $D/$b; done
-done
-cd $RUN && NURAGHE_RUN_DIR=$RUN PYTHON=$PYTHON CUTOFF="2099-12-31 23:59" \
-  nohup bash code/full_chain.sh > outputs/logs/chain_full.out 2>&1 &
+cd code
+NURAGHE_TEST_CONFIG=/path/to/config.yaml python -m pytest -q tests/     # or: python tests/test_lift.py (etc.)
 ```
 
-`CUTOFF` stops the chain from starting an entry whose estimated end falls after that time (the run used a fixed
-deadline; dropped entries are listed in `outputs/logs/dropped.tsv`). Progress lines go to `$RUN/FULL_NOTES.md`.
-The queue was estimated at about 34 hours of wall time on the 8 GB machine that ran it.
+`tests/verify_*.py` and `tests/test_reproducibility.py` check whole runs (commands in their docstrings).
 
-### The final runs (every scenario of the model)
+## Run the queue
 
-`config/queues/queue_v16_final.tsv` holds the 432 model entries of the `queue_v15.tsv` queue, in the same order, each on its
-config in `config/v16_final/` (the `config/v15_haul15/` config of the same name; `output_dir` points to `v16_final/outputs` and
-`cache_dir` to its own `v16_final/outputs/caches/<config name>`, relative to the config; the two loading sensitivity
-rows `alt_load033` / `alt_load05` keep their own loading with `add4: {load_per_tonne: false}`). The queue has no
-preparation entries: each config's cache holds the prepared tables of the cache that the `config/v15_haul15/` config
-of the same name uses, built with `code/`. Its `preprocess.py` has the on-outcrop fix, so a base cache built with an
-earlier code differs in one row (site NID9220200, `on_outcrop`): rebuild the base cache with `code/`, run the `cmd`
-entries of `queue_v15.tsv` with `code/` (sea tables of every cache, `cache_alt_stones7` inputs), then link every entry
-of that cache except `runs/` into `$RUN/v16_final/outputs/caches/<config name>/` and give each its own empty `runs/`.
-`code/v16f_chain.sh` runs the queue like `full_chain.sh`: copy `config/v16_final/*.yaml` to `$RUN/v16_final/configs/`,
-write the queue to `$RUN/v16_final/queue_v16_final.tsv` with the same `sed`, link `$RUN/code_v16_final` to
-`$REPO/code`, and start `bash code/v16f_chain.sh` from `$RUN` with `NURAGHE_RUN_DIR=$RUN`. The run signature
-includes `CODE_VERSION` and the effective add4 settings, so no part file of an earlier version is reused. Run with
-`code/`, this queue gives the results of the model (signature `CODE_VERSION` `2026-11-09-v17`). The final runs read
-copies of these configs that differ only in `cache_dir` / `output_dir`; the code these configs were first run with
-(before the lift rule) is in the git history of `code/`.
+The results of the model come from `config/queue.tsv` (432 entries, seeds 1-100 each, one entry at a time), each on
+its configuration in `config/scenarios/`, run with `code/`. `code/run_queue.sh` runs it serially and is resumable (a
+finished entry leaves `outputs/logs/q_<label>.ok`). It expects a run folder laid out as below:
 
-### Superseded reruns (kept as a record): queue_v15
+```
+REPO=/path/to/Repast_Nuraghe; RUN=/path/to/run; DATA=/path/to/data; PYTHON=/path/to/python
+mkdir -p $RUN/configs $RUN/outputs/logs $RUN/outputs/caches && ln -s $REPO/code $RUN/code
+cp $REPO/config/scenarios/*.yaml $RUN/configs/ && sed -i "s|^data_dir: .*|data_dir: $DATA|" $RUN/configs/*.yaml
+sed -e "s|@RUN_DIR@|$RUN|g" -e "s|@PYTHON@|$PYTHON|g" $REPO/config/queue.tsv > $RUN/queue.tsv
+# prepared tables: see below
+cd $RUN && NURAGHE_RUN_DIR=$RUN PYTHON=$PYTHON nohup bash code/run_queue.sh > outputs/logs/chain.out 2>&1 &
+```
 
-This rerun (minimum haul 15 m + near-site rule, every scenario) is superseded by the final runs; its configs and queue
-are kept as a record. It runs with the v15 code (`code/` before the v16_final update, git history), which also
-holds `v15_chain.sh`. `config/queues/queue_v15.tsv` holds every entry of the full audited queue, the v13 social entries and the two
-help-radius entries, each on its config in `config/v15_haul15/` (the audited or v13 config with
-`transport.min_haul_flatm: 15` and `quarry.near_site_fixed_face_m: 1000`; the 200 / 210 / 300 m minimum-haul
-sensitivity configs keep their value; `cache_dir`/`output_dir` point to `v15_haul15/outputs`, relative to the
-config), plus a 10 m minimum-haul sensitivity of the headline (`config_full_audited_haul10.yaml`). Its first
-entries (`kind` = cmd) rebuild the sea tables of every cache at the new minimum and the own inputs of
-`cache_alt_stones7`. `v15_chain.sh` runs it like `full_chain.sh`. In the run folder above: copy
-`config/v15_haul15/*.yaml` to `$RUN/v15_haul15/configs/`, write the queue to `$RUN/v15_haul15/queue_v15.tsv` with the
-same `sed`, link `$RUN/code_v15_haul15` to a checkout of the v15 `code/`, give `$RUN/v15_haul15/outputs/cache*` the same inputs as
-the audited caches (links; `sea/` an empty real folder), and start `bash v15_chain.sh` (from that checkout) from `$RUN` with
-`NURAGHE_RUN_DIR=$RUN`. Its runs get their own signatures, so the audited outputs are not touched.
+**Prepared tables.** Each configuration reads its own cache, `outputs/caches/<config name>/` (`cache_dir`), with its
+own `runs/` folder (part files; the run signature keeps scenarios apart). Fill them before starting the queue:
 
-### Superseded reruns (kept as a record): queue_v14
+1. Base cache `outputs/caches/config_full_audited/`: download or rebuild it with `configs/config_full_audited.yaml`
+   (`data/derived/README.md`), including its sea tables (`python code/tools/sea_routes.py
+   configs/config_full_audited.yaml`).
+2. Every other configuration: link every entry of the base cache except `runs/` into its own cache folder, and give it
+   an empty `runs/`. The header of each file in `config/scenarios/` says whether it needs more:
+   - "its own sea tables" (the variants that change hauling, crew, blocks, loading or the sea; 35 files): `sea/` must
+     be an empty real folder; build it with `python code/tools/sea_routes.py configs/<config>` (`--speeds 0.67` for
+     `config_full_audited_alt_sea067.yaml`) and, where `config/sea_expect/<config name>.json` exists, copy that file to
+     the cache as `sea_expect.json` and check the build with `python config/check_sea_meta.py <cache>`;
+   - `config_full_audited_alt_stones7.yaml` also has its own haul tables and k-best routes (`alliance/`, `haul/` and
+     the base haul tables not linked): `python code/preprocess.py configs/<config>`, the same with `--tag mu0.38` and
+     `--tag mu0.1` and the matching `--cost-raster <cache>/cost_mu/drag_cost_8dir_mu<MU>_int.tif`, then
+     `code/tools/kbest_quarries.py`, `kbest_mu038.py` and `wl_inputs.py` on the configuration.
 
-This rerun (near-site rule only, minimum haul 100 m) is superseded and was not completed; its configs and
-queue are kept as a record. `config/queues/queue_v14.tsv` holds the entries of the full audited queue that the near-site rule affects (every
-entry with a quarry-face choice), each on its config in `config/v14_nearface/` (the audited config with
-`quarry.near_site_fixed_face_m: 1000`; `cache_dir`/`output_dir` point to `v14_nearface/outputs`, relative to the
-config). The v15 `code/` (git history) runs these configs as the v14 code did (the v13 switches are off in them);
-`v14_chain.sh` is in the git history of `code/`.
+The model's on-outcrop test (`preprocess.py`) reads the stone set a site quarries, so a base cache built with code
+other than `code/` can differ; rebuild it with `code/`. The run signature includes `CODE_VERSION` and the effective
+`add4` settings, so no part file of a different code version is reused. The queue was estimated at about 34 hours of
+wall time on the 8 GB machine of the runs (6-8 ranks per entry, `ranks` column).
 
 ## Parameter audit and traceability
 
@@ -368,51 +334,10 @@ Sardegna 1:25,000, © Regione Autonoma della Sardegna / ARPAS, CC BY 4.0. DEM: C
 Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma della Sardegna, PPR 2006 layer
 'Fiumi torrenti e altri corsi d'acqua' ('fiumitorrenti'), see provider. Details and links: `data/README.md`.
 
-## Changes
+## Version
 
-- 2026-11-11 (default config, wording): `config/config_full_audited.yaml` now holds the configuration of the model
-  (the values the final runs used, `config/v16_final/config_full_audited.yaml` apart from `cache_dir` /
-  `output_dir`): `transport.min_haul_flatm` 15 instead of 100 and the near-site rule (`quarry.near_site_fixed_face_m:
-  1000`); its line numbers are unchanged (ODD `cfg:<line>` citations). The earlier version (the base of the earlier
-  full audited queue and of the other configs directly in `config/`) is in the git history. `param_audit/` follows
-  (H6 in `PARAM_TRACE.csv` and `TRACEABILITY.md`: 15 m). The README and the notebook guides describe the final
-  model as the model.
-- 2026-11-09 (v17): `code/` is now the v17 code: the v16_final code with lift (all lift rules) priced at the
-  undiscounted rate, spec addendum k; the learning factor (1 - 0.15)^t and skill apply to quarrying, dressing and
-  building only (`alliance.py`: build stage split into a discounted build part and an undiscounted lift part, booked
-  exactly to `mh_lift`; `lit.py`: engine-B S8 learning no longer scales lifting; `CODE_VERSION` `2026-11-09-v17`; new
-  test `tests/test_v17_lift.py`). Checksums `CODE_V17_SHA256SUMS`; `CODE_PROVENANCE.md`, `code/METHODS.md` and the
-  ODD (`ODD/ODD.md`, `ODD/ODD.pdf`; change log) updated. No config changed; the v16_final configs and queue are used.
-- 2026-11-09 (default config): `code/config.yaml` now carries the values of the configuration the final v16_final
-  runs used (`config/v16_final/config_full_audited.yaml`) instead of the pre-audit defaults: the audited parameter
-  values (drag speed, return and helper walk speed, joints quarrying rate, facade rates, tower geometry, basalt and
-  granite density, adult share of the work party and the values that follow from them), minimum haul 15 m, the
-  near-site face rule (`quarry:` block) and the scenarios `MOST_REALISTIC_AUDITED_LIT`,
-  `MOST_REALISTIC_AUDITED_LIT_POPFROZEN` and `MOST_REALISTIC_POP_*`. Paths are unchanged. Omitted: the
-  single-change entries `MOST_REALISTIC_AUD_drag`, `_AUD_density`, `_AUD_geometry`, `_AUD_facade`, `_AUD_walk` and
-  `_AUD_joints` (each needs its own config copy, which is not published). No code change.
-- 2026-11-05 (ODD): `ODD/ODD.md` (and `ODD/ODD.pdf`) now describe the v16_final code and configs; the ODD has a
-  change log under its version line.
-- 2026-11-05 (v16_final): `code/` is now the v16_final code: the v15 code + the v15b on-outcrop fix (`preprocess.py`:
-  the on-outcrop test uses the stone set a site actually quarries) + the addendum-4 flags in an `add4:` config block
-  (L2 `bedrock_everywhere` and L3 `load_per_tonne` ON by default, L1 `rails_cost_choice` and L4
-  `sea_priced_as_charged` OFF), the island-wide 95th percentile of site finish seasons (L5), S1-S3, spread statistics
-  across seeds in the summary output, the relay leg-1 "nearer the quarry" filter removed, fixes D3, D6 and D11, and
-  `CODE_VERSION` in the run signature (`code/CHANGES_V15B_OUTCROP.md`, `CHANGES_V16.md`, `CHANGES_V16_FINAL.md`,
-  `code/v16f_chain.sh`, new tests `tests/test_add4_flags.py`, `tests/test_v16_final.py`). v16_final configs
-  `config/v16_final/`, queue `config/queues/queue_v16_final.tsv`, checksums `CODE_V16_FINAL_SHA256SUMS`; the v15
-  configs and queue are kept as a record (superseded; `v15_chain.sh` is in the git history of `code/`).
-- 2026-11-05 (v15): minimum haul `transport.min_haul_flatm` 15 m instead of 100 m (the haul of a site on its
-  outcrop and the floor of every whole route; config only), together with the near-site rule, on every scenario.
-  `code/` is now the v15 code: the v13 code (social switches `reputation`, `partner_choice`, `tie_imitation`,
-  `reputation_rule`, `trusted_nodist`, which the v14 code had dropped) + the v14 near-site rule in `alliance.py`
-  (`code/CHANGES_V15_HAUL15.md`, `code/v15_chain.sh`; the v13 side-chain scripts are back). v15 configs
-  `config/v15_haul15/`, queue `config/queues/queue_v15.tsv`, checksums `CODE_V15_SHA256SUMS`; the v14 configs and
-  queue are kept as a record (superseded).
-- 2026-11-05 (v14): near-site face rule (`quarry.near_site_fixed_face_m`): a site whose dry-ground route to its
-  nearest face is at most 1,000 m always quarries from that face. `code/` is now the v14 code (frozen v12 code +
-  this rule in `alliance.py`; the v13 social switches are in the previous version of `code/`); v14 configs
-  `config/v14_nearface/`, queue `config/queues/queue_v14.tsv`, checksums `CODE_V14_SHA256SUMS`.
+This repository holds one version of the model: the code in `code/` and the configurations in `config/` that
+produced the results. Earlier development versions are in the git history.
 
 ## Citation
 

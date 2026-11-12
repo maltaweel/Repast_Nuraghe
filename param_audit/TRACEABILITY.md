@@ -10,7 +10,7 @@ Queue snapshot: queue_full.tsv  + queue_full_p23.tsv : 313 entries, 507 distinct
 2. **Population family is no longer one-at-a-time.** The queued POP entries (lilliu30, webster_household, webster_density, calo_6km2, ugas_high, ugas400, ugas700, anchored) set `adult_share: 0.5` with their residents rule, so each differs from the audited baseline (0.4) in TWO keys; men_only (0.2) and adult06 (0.6) are one change. PARAM_TRACE lists them under both P1 and P2. Twins at 0.4: GAPS.md rank 4.
 3. **drag10 / pull125 sea tables.** `tools/sea_routes.py` reads transport.drag_speed_ms, return_walk_ms, load_unload_h, min_haul_flatm, pull_kg_per_person, the lever rate, course height and the block draw (sea_params, code/tools/sea_routes.py:154-171) to choose sea vs land routes. The LOO_drag and LOO_walk runs get their own SEA_TABLES; `MR_P10_v12_drag10` and `MR_P10_v11_pull125` use the shared cache_dir (tables built at 0.27 m/s and 100 kg). Their trip times are recomputed from their own config at run time (code/sea.py:32-39), but the sea/land choice is the audited one. Worth stating in the report or giving them own tables (2 x 220 s).
 4. **Config value vs audit final value: no mismatch.** All 70 audited rows carry the AUDITED value in config_full_audited.yaml (the 9 changed values: drag 0.27, walk 1.39, basalt 3000, granite 2700, joints_low 11.1, facade 131.2 / 40.95, height 14, top 6.8, adult_share 0.4). Stale text only: the config comments at transport.pull_kg_per_person / drag_speed_ms ('Value unchanged') and lit_scenarios geometry ('15 m, 12 m -> 8 m'), and PARAM_AUDIT Part 2 rows 8a ('round(0.5 x residents)') and 11b ('1.4 m/s') still describe the pre-audit values. P2 is marked 'provisional; final from the population runs' in the audit.
-5. **Post hoc checks are not queue entries.** The 10 V_* checks (tools/v12_checks.py) need re-running on the full_audited outputs after the chain; they are counted as LINKED through the queued runs they read.
+5. **Post hoc checks are not queue entries.** The 10 V_* checks (tools/pattern_checks.py) need re-running on the full_audited outputs after the chain; they are counted as LINKED through the queued runs they read.
 
 ## 1. Literature ideas -> scenarios -> queue (IDEA_TRACE.csv)
 
@@ -45,7 +45,7 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 | T08 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | T09 | ALREADY TESTED | LINKED | run | 16 | A4_trust_track; S9_alliance_sea_6; PHASE_alliance_P10; PHASE_alliance_P20; A5_full; P_G20_kmesh4_track; S9_pre_sea_5; GRID10_sea_b3; GRID10_P10_b3; GR... |  |
 | T10 | ALREADY TESTED | LINKED | run | 1 | S5c_complex_far | hybrid stone rule (recorded stone) |
-| T11 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | hybrid-rule haul of San Gavino sites (MR summary); post hoc via tools/v12_checks.py (not a queue entry; re-run on full_a |
+| T11 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | hybrid-rule haul of San Gavino sites (MR summary); post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_a |
 | L01 | ALREADY TESTED | LINKED | run | 2 | S4b_ramp; HIGH |  |
 | L02 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S4e_laner_h3_P10; MOST_REALISTIC_S4e_laner_h4_P10 |  |
 | L03 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S4d_spiral_7m5_P10; MOST_REALISTIC_S4d_spiral_full_P10 |  |
@@ -87,13 +87,13 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 | W13 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S22_demog_r035; MOST_REALISTIC_S22_demog_r042 | unphased by design |
 | W14 | ALREADY TESTED | LINKED | run | 4 | MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 | population_ceiling 300,000 in every MR run |
 | S01 | ALREADY TESTED | LINKED | run | 4 | MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 | 90-day season only; the 40/120/210-day runs are obsolete (pre-fix code) and no 40-day MR run is queued (gap) |
-| R01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R02 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R04 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R05 | TESTABLE NOW | LINKED | posthoc | 3 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100 | needs MR P10, P20 and P100; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R02 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R04 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R05 | TESTABLE NOW | LINKED | posthoc | 3 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100 | needs MR P10, P20 and P100; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
 | R06 | TESTABLE NOW | LINKED | run | 21 | X_nurtime | single-site predictions (unphased) |
-| R07 | TESTABLE NOW | LINKED | posthoc | 2 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_S20_lintels_3t0_P10 | also uses S20_lintels_3t0; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R07 | TESTABLE NOW | LINKED | posthoc | 2 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_S20_lintels_3t0_P10 | also uses S20_lintels_3t0; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
 | U01 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | U02 | NOT TESTABLE | NO SCENARIO |  | 0 | - | partial (queued) |
 | U03 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
@@ -105,12 +105,12 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 | Z01 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | Z02 | ALREADY TESTED | LINKED | run | 16 | P_G3_canton_hub; GRID10_sea_b1; GRID10_P10_b1; GRID10_P20_b1; P_G20_system_hub; S9_pre_sea_5; GRID10_sea_b3; P_G20_system_hub_P10; GRID10_P10_b3; P_G2... |  |
 | Z03 | ALREADY TESTED | LINKED | run | 77 | MOST_REALISTIC_M1_s1_R5_P10; MOST_REALISTIC_M1_s01_R5_P10; MOST_REALISTIC_M1_s10_R5_P10; MOST_REALISTIC_M1_s1_R2500_P10; MOST_REALISTIC_M1_s1_R10_P10;... |  |
-| G01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
+| G01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
 | G02 | ALREADY TESTED | LINKED | implicit | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | hybrid stone rule (preprocessing cache) in every run |
-| G03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
+| G03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
 | G04 | ALREADY TESTED | LINKED | run | 1 | S5b_any_buildstone | stones7 is a stone_rule value (preprocess.py --rule), not a queued scenario |
 | G05 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S23_bichrome_b05_P10; MOST_REALISTIC_S23_bichrome_b15_P10 |  |
-| G06 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/v12_checks.py (not a queue entry; re-run on full_audited outputs) |
+| G06 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
 | G07 | TESTABLE NOW | LINKED | run | 1 | MOST_REALISTIC_S25_size_P10 |  |
 
 ### NOT TESTABLE ideas: reason (census) and proxy
@@ -167,14 +167,14 @@ Code locations are the first non-comment reads of the key in code/{alliance, lit
 | Q4 | lit_scenarios.list.REALISTIC.mixed.dress_none_max_towers; li | [1, 3] | rule | yes | code/lit.py:206; code/lit.py:208 | yes | Authors' assumption (agent's design choi | 2 | S2a_unworked, S2b_fine, HIGH, LOW (lit family) |
 | Q5 | lit_scenarios.webster_md_per_tower | {"quarry": 500, "transport": 1100, "dres | 500 / 1300 / 700 md | yes | code/alliance.py:734; code/alliance.py:918; code/lit.py:96 | yes | SOURCED | 5 | webster, S7_webster_classes (lit family) |
 | Q6 | lit_scenarios.facade | {"facade_ph_m3_mid": 131.2, "cyclopean_p | 131.2 / 40.95 | yes | code/lit.py:118 | yes | DERIVED | 3 | S2b_fine, HIGH (lit family) |
-| Q7 | lit_scenarios.facing_thickness_m | 0.5 | 0.5 | yes | code/alliance.py:923; code/lit.py:116; code/census_v12.py:225 | yes | DERIVED | 0 |  |
+| Q7 | lit_scenarios.facing_thickness_m | 0.5 | 0.5 | yes | code/alliance.py:923; code/lit.py:116; code/census_scenarios.py:225 | yes | DERIVED | 0 |  |
 | G1 | lit_scenarios.geometry.tower_height_m | 14.0 | 14 | yes | code/alliance.py:921; code/alliance.py:1371; code/lit.py:36 | yes | SOURCED † | 7 |  |
 | G2 | lit_scenarios.geometry.base_diam_m | 12.0 | 12 | yes | code/alliance.py:921; code/lit.py:36; code/lit.py:114 | yes | DERIVED | 0 |  |
 | G3 | lit_scenarios.geometry.top_diam_m | 6.8 | 6.8 | yes | code/alliance.py:921; code/lit.py:36; code/lit.py:114 | yes | DERIVED | 1 |  |
 | G4 | lit_scenarios.geometry.course_height_m | 0.9 | 0.9 | yes | code/alliance.py:736; code/alliance.py:1372; code/lit.py:36 | yes | SOURCED | 0 |  |
 | G5 | lit_scenarios.lever_ph_per_block_course | 0.37 | 0.37 | yes | code/alliance.py:765; code/alliance.py:778; code/lit.py:128 | yes | SOURCED | 2 |  |
 | G6 | lit_scenarios.lift_share_of_build | 0.5 | 0.5 | yes | code/alliance.py:735; code/alliance.py:1892; code/lit.py:97 | yes | Authors' assumption (agent's design choi | 0 |  |
-| G7 | lit_scenarios.stair_lever_last_m | 1.0 | 1.0 | yes | code/lit.py:134; code/census_v12.py:147; code/census_v12.py:164 | yes | Authors' assumption (agent's design choi | 0 |  |
+| G7 | lit_scenarios.stair_lever_last_m | 1.0 | 1.0 | yes | code/lit.py:134; code/census_scenarios.py:147; code/census_scenarios.py:164 | yes | Authors' assumption (agent's design choi | 0 |  |
 | G8 | lit_scenarios.list.REALISTIC.mixed.lift_by_type; lit_scenari | [{"Nuraghe a corridoio (protonuraghe)":  | rule | yes | code/lit.py:212 | yes | Authors' assumption (agent's design choi | 25 | S4a_lever, S4b_ramp, S4c_internal_stair (lit family) |
 | G9 | lit_scenarios.learning_rate | 0.15 | 0.15 | yes | code/alliance.py:312; code/lit.py:137 | yes | Authors' assumption (agent's design choi | 0 | S8_learning (lit family, on); other lit scenarios off |
 | G10 | MR:b; alliance.defaults.b | [0.85, 0.85] | 0.85 | yes | code/alliance.py:247 | yes | DERIVED | 0 | A5_SENSITIVITY_27cells (b 0.85 / 0.95 / 1.0 on A5_full) |
@@ -183,10 +183,10 @@ Code locations are the first non-comment reads of the key in code/{alliance, lit
 | H3 | transport.pull_kg_per_person | 100 | 100 | yes | code/alliance.py:242; code/lit.py:150; code/sea.py:27 | yes | DERIVED | 5 | MR_P10_v11_pull125 (config copy, 42.49 kg) |
 | H4 | transport.return_walk_ms | 1.39 | 1.39 | yes | code/alliance.py:979; code/alliance.py:1008; code/lit.py:151 | yes | SOURCED | 1 |  |
 | H5 | transport.load_unload_h | 0.25 | 0.25 | yes | code/alliance.py:804; code/alliance.py:1268; code/sea.py:26 | yes | DERIVED | 2 |  |
-| H6 | transport.min_haul_flatm | 15 | 15 | yes | code/alliance.py:1263; code/alliance.py:1264; code/census_v12.py:227 | yes | Authors' assumption (specified by the authors; 100 m, SOURCED, in the audit of 2 Nov 2026) | 1 |  |
+| H6 | transport.min_haul_flatm | 15 | 15 | yes | code/alliance.py:1263; code/alliance.py:1264; code/census_scenarios.py:227 | yes | Authors' assumption (specified by the authors; 100 m, SOURCED, in the audit of 2 Nov 2026) | 1 |  |
 | H7 | lit_scenarios.list.REALISTIC.mixed.short.mu | 0.38 | 0.38 | yes | code/alliance.py:818; code/lit.py:186; code/lit.py:193; code/alliance. | yes | SOURCED | 6 | S3c_dry_ground, S3d_rough (lit family) |
 | H8 | lit_scenarios.list.REALISTIC.mixed.long.mu; alliance.track_m | [0.1, 0.1] | 0.1 | yes | code/alliance.py:243; code/alliance.py:1255 | yes | SOURCED | 4 | S3a_rails_tallow, S3b_rails_grease (lit family); A4/A5 track |
-| H9 | lit_scenarios.list.REALISTIC.mixed.long_min_haul_m | 1000 | 1000 | yes | code/lit.py:188; code/census_v12.py:229 | yes | Authors' assumption (agent's design choi | 0 |  |
+| H9 | lit_scenarios.list.REALISTIC.mixed.long_min_haul_m | 1000 | 1000 | yes | code/lit.py:188; code/census_scenarios.py:229 | yes | Authors' assumption (agent's design choi | 0 |  |
 | H10 | paths.cost_raster; lit_scenarios.baseline_mu | ["costsurface/sardinia_drag_cost_8dir_mu | 0.3 | yes | code/lit.py:150; code/tools/kbest_quarries.py:96 | yes (via cache: k-best routes  | Authors' assumption (agent's design choi | 0 |  |
 | H11 | (code) tools/build_cost_mu.py | (not a config key) | formula | yes | code/tools/build_cost_mu.py:42; code/tools/build_cost_mu.py:57 | yes (via cache: cost rasters i | SOURCED | 0 |  |
 | H12 | alliance.relay_fractions; alliance.relay_min_flatm | [[0.25, 0.5, 0.75], 300] | 0.25/0.5/0.75; 300 | yes | code/alliance.py:137; code/alliance.py:1432; code/alliance.py:1546 | yes | Authors' assumption (agent's design choi | 0 |  |
@@ -242,9 +242,9 @@ Scan of the resolved MOST_REALISTIC_AUDITED_LIT_P10 dict plus the global transpo
 | alliance.start_rate, alliance.max_seasons = 3000 | no | code/alliance.py:1681 | start_rate replaced by P10 cohorts; max_seasons overridden by MR 20000 (X1) |
 | builders.* (base 50, per_extra_tower 25, rand 0.9-1.1, min 50, max 200) | no | code/alliance.py:324; code/model.py:208 | MR uses builders_rule; base is computed (alliance.py:318) but unused; X_nurtime overrides builders_rule with this schema |
 | lit_scenarios.webster_md_per_tower.transport = 1100 | no | code/alliance.py:734; code/alliance.py:918; code/lit.py:96 | never used as labour (hauling is simulated) |
-| lit_scenarios.ramp.* | no (MR_P10); yes for S4b, S4d, S4e, X_nurtime ramp | code/lit.py:52; code/census_v12.py:153 | ramp earth rates and geometry act only with a ramp lift |
+| lit_scenarios.ramp.* | no (MR_P10); yes for S4b, S4d, S4e, X_nurtime ramp | code/lit.py:52; code/census_scenarios.py:153 | ramp earth rates and geometry act only with a ramp lift |
 | lit_scenarios.oxen.*, complex_far_*, webster_classes, duration.*, community_threshold_ph, defaults.*, baseline_mu | no (MR_P10) | (none found) | lit-family scenarios / reporting only; defaults are overwritten by REALISTIC.mixed |
-| census_v12.*, cz_*, gaps_*, wl_* anchors | no (MR_P10); yes in the census / gaps / WL scenarios | code/census_v12.py:136 | parameters of single switches; each queued switch is listed in PARAM_TRACE 'queued MR scenarios varying' |
+| census_v12.*, cz_*, gaps_*, wl_* anchors | no (MR_P10); yes in the census / gaps / WL scenarios | code/census_scenarios.py:136 | parameters of single switches; each queued switch is listed in PARAM_TRACE 'queued MR scenarios varying' |
 | other_mandays_per_tower, max_days, verify.*, scenarios.help_radius_m / help_walk_ms / coupled_max_ranks | no | code/model.py:300; code/model.py:303 | model.py cooperation family / verification only |
 
 ## 3. Literature alternatives -> queue (LIT_ALT_COVERAGE.csv)

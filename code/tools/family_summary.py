@@ -1,11 +1,11 @@
-"""Family summary (POP / AUD queues), a copy of v12_summary.py with queue + prefix args and builders added.
+"""Family summary (POP / AUD queues), a copy of paired_summary.py with queue + prefix args and builders added.
   python tools/family_summary.py W queue_pop.tsv v12_pop
 Original doc: v12 (2 Nov 2026) census summary: every finished queue entry against the v11 MOST_REALISTIC_P10 (the reference; the
 identity test shows the v12 code reproduces its part files exactly).
 
-  python tools/v12_summary.py W        (W = runs/2026-11-02-v12-census; run under the lock: it reads ~40 x 100 part files)
+  python tools/paired_summary.py W        (W = runs/2026-11-02-v12-census; run under the lock: it reads ~40 x 100 part files)
 
-Per seed, as tools/v11_summary.py: island MH = sum of mh_total over the 7,167 sites; island years = (max finish_day + 1)
+Per seed, as the earlier v11 summary tool (git history): island MH = sum of mh_total over the 7,167 sites; island years = (max finish_day + 1)
 / 90 (P10 simulated; S22 unphased: the same day count from season 1). Paired by seed (same seed in both runs):
 pct_years_s = 100 (years_s / years_ref_s - 1), pct_mh_s likewise; mean and a 95% t interval over the 100 seeds.
 Verdict (stated in the report): "moves results" when, for island years or island MH, the paired 95% interval excludes 0

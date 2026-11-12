@@ -1,7 +1,7 @@
 # outputs/summary (audit step e)
 
 Not in the repository: these tables are model results, a separate data input from the results package (the
-headline of the v17 runs). Put them here (or point `SUMMARY_DIR` / `NB_SUMMARY_DIR` of 05 at them). Expected files
+headline of the model's runs). Put them here (or point `SUMMARY_DIR` / `NB_SUMMARY_DIR` of 05 at them). Expected files
 and columns (read by `notebooks/repro.py`, `headline_from_summaries`):
 
 `per_seed_full_audited.csv`: one row per queue entry (`label` = the queue label, e.g. `MOST_REALISTIC_AUDITED_LIT_P10`)

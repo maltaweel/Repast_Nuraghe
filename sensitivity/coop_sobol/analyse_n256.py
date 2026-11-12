@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Cooperation-model Sobol on code_v17: Sobol indices from a PREFIX of the design (base rows 0..N-1), per scenario.
-Written 11 Nov 2026 for the halves-first order (chain_halves.sh): when every evaluation with base_row < 256 of a
+"""Cooperation-model Sobol on code/: Sobol indices from a PREFIX of the design (base rows 0..N-1), per scenario.
+Written 11 Nov 2026 for the halves-first order (the project's driver script, git history): when every evaluation with base_row < 256 of a
 scenario has a result, that scenario has a complete Saltelli N = 256 design.
 
 Why a prefix is a valid design (verified 11 Nov on design.csv, SALib 1.6.0):

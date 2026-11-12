@@ -3,10 +3,10 @@
 `reference_audit_sha256.csv` (not yet shipped: it is generated after the full audited run has finished) is the
 fingerprint of one fixed rerun:
 
-- scenario `MOST_REALISTIC_AUDITED_LIT_P10`, the v17 code (`CODE_VERSION` 2026-11-09-v17), configuration
-  `config/v16_final/config_full_audited.yaml` (the configuration of the v17 runs);
+- scenario `MOST_REALISTIC_AUDITED_LIT_P10`, the model's code `code/`, configuration
+  `config/scenarios/config_full_audited.yaml` (the model's configuration);
 - the 300 sites of `code/sites300_real.txt`, seeds 1-3, `--fresh`;
-- the derived inputs of the v17 runs (the prebuilt derived-input pack).
+- the derived inputs of the model's runs (the prebuilt derived-input pack).
 
 The code version is part of every run signature, so a fingerprint made with another code version cannot match.
 

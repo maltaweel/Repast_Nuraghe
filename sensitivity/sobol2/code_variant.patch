@@ -1,0 +1,87 @@
+--- a/alliance.py
++++ b/alliance.py
+@@ -435,6 +435,7 @@
+         st = lit.stage_hours(cfg, lit.scenario(cfg, "webster"), 1, "", 0)      # Webster stages per tower
+         self.base_stage = {"quarry": st["quarry"], "dress": st["dress"], "build": st["build"] + st["lift"]}
+         self.lift_share = st["lift"] / (st["build"] + st["lift"])
++        self.lift_learning = lit.lift_learning(cfg)      # code_variant: True = v16_final lift discount (Sobol run 2)
+         self.b = float(sc["b"])
+         self.expo = math.log2(self.b)
+         # ---- per-site seeded draws: builders + blocks exactly as model.Site (webster), then towers
+@@ -1787,6 +1788,8 @@
+         xlift (lever / stair lift of the extra sea-payload pieces, all lift; was inside the discounted stage and split
+         by the share in the report). -> (build base, lift)."""
+         b = self._stage(i, "build")
++        if getattr(self, "lift_learning", False):   # code_variant sobol.lift_learning: v16_final, lift stays inside the
++            return b + xlift, 0.0                     # discounted build stage (split by the share in charge, lift=None)
+         ls = self._lift_share(i)
+         return b * (1.0 - ls), b * ls + xlift
+ 
+@@ -1828,7 +1831,7 @@
+         else:
+             mo, mhp = extra * (1.0 - f), extra * f
+         lifts = (None, None)
+-        if stage == "build":                              # code_v17 SP-22: lift undiscounted, never x skill / S8
++        if stage == "build" and not getattr(self, "lift_learning", False):   # code_v17 SP-22: lift undiscounted
+             lifts = (lift * (1.0 - f), lift * f)
+             mo, mhp = mo + lifts[0], mhp + lifts[1]
+         t = self._join_task(i, helper, stage, mo + mhp, loc, up, final, nblk, parts=(f, mo, mhp), lifts=lifts)
+@@ -1934,7 +1937,8 @@
+             if p != i:
+                 walk = self.B[p] * self.wdist(p, loc, i if stage == "build" else None) / walk_ms / 3600.0
+             t = self.add_task(p, mh + walk, stage, up, final)
+-            self.charge(i, p, mh + walk, stage, walk, lift=lift if stage == "build" else None)
++            self.charge(i, p, mh + walk, stage, walk,
++                        lift=lift if stage == "build" and not self.lift_learning else None)   # code_variant flag
+             if credit and base is not None and stage in SKILL_STAGES and (p == i or sc.get("specialisation", False)):
+                 self.cum[p, SKILL_STAGES.index(stage)] += 1.0
+             return t
+@@ -2388,6 +2392,8 @@
+     if nf is not None:                                   # v14 near-site face rule: hashed only when on
+         h.update(NEARFACE_VERSION.encode())
+         h.update(json.dumps({"near_site_fixed_face_m": nf}).encode())
++    if lit.lift_learning(cfg):                           # code_variant: hashed only when on (default-off = code_v17)
++        h.update(b"code_v17s sobol.lift_learning=True")
+     h.update(V16_VERSION.encode())                       # v16: always (S1 parts column, S3 ceiling basis)
+     h.update(ADD4_VERSION.encode())                      # code_v16_final: the effective add4 settings, always
+     h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
+--- a/lit.py
++++ b/lit.py
+@@ -140,7 +140,16 @@
+     if lit.get("learning") and tw > 1:
+         f = sum((1.0 - L["learning_rate"]) ** i for i in range(tw)) / tw
+         q, dr, build = q * f, dr * f, build * f
++        if lift_learning(cfg):          # code_variant sobol.lift_learning = True: v16_final behaviour (lift x f as well)
++            lift = lift * f
+     return {"quarry": q, "dress": dr, "build": build, "lift": lift}
++
++
++def lift_learning(cfg):
++    """code_variant (10 Nov 2026, Sobol run 2 factor lift_learning): config flag sobol.lift_learning. False / absent
++    (default) = code_v17 (SP-22: lift undiscounted, exactly). True = the v16_final behaviour: lift is discounted with
++    the build stage by learning (S8, PM:23) and skill (A3, PM:173). Only for sensitivity analysis."""
++    return bool((cfg.get("sobol") or {}).get("lift_learning", False))
+ 
+ 
+ def transport(cfg, lit):
+@@ -179,7 +188,8 @@
+ 
+ # Code version of every result-changing code path (code_v16_final). Hashed into EVERY run signature (alliance.signature,
+ # model.run_signature) together with the effective add4 settings, so part files written by older code are never reused.
+-CODE_VERSION = "2026-11-09-v17"      # code_v17 (9 Nov): SP-22 lift undiscounted (spec addendum k, ODD 7.9); was 2026-11-05-v16_final
++CODE_VERSION = "2026-11-09-v17"      # (code_variant keeps code_v17's string: default-off = code_v17; flag hashed apart)
++# code_v17 (9 Nov): SP-22 lift undiscounted (spec addendum k, ODD 7.9); was 2026-11-05-v16_final
+ 
+ 
+ def add4(cfg):
+--- a/model.py
++++ b/model.py
+@@ -575,6 +575,8 @@
+     # so part files written by older code (or under other add4 settings) are never reused
+     h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
+     h.update(lit.CODE_VERSION.encode())
++    if lit.lift_learning(cfg):                           # code_variant: hashed only when on (default-off = code_v17)
++        h.update(b"code_v17s sobol.lift_learning=True")
+     return h.hexdigest()[:12]
+ 
+ 

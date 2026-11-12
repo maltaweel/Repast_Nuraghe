@@ -5,7 +5,8 @@ committed. Two ways to get it:
 
 1. **Download** the cached derived inputs of the full audited run from the results package
    ("data file/nuraghe-build-abm-full-audited", Nurnet cloud; DOI pending) and put them in
-   `data/derived/cache/` (notebooks) or in `<run folder>/outputs/cache/` (the full queue, see the top-level README).
+   `data/derived/cache/` (notebooks) or in `<run folder>/outputs/caches/config_full_audited/` (the queue, see the
+   top-level README, "Run the queue").
    When the pack is public: `python notebooks/fetch_data.py --derived-url URL` (or `DERIVED_URL` in
    `notebooks/02_inputs.ipynb`, section 0b) downloads and unpacks it (placeholder until then).
 2. **Rebuild** them with the commands below; `python notebooks/fetch_data.py --rebuild-derived [--stone-rule
@@ -23,11 +24,12 @@ In every command `CFG` is a configuration file whose `data_dir` points at the ra
 the cache being built (`config/config_full_audited.yaml`: `outputs/cache` relative to the config folder). Run from
 `code/`. All rasters are on the 30 m DEM grid in EPSG:25832.
 
-**Provenance note.** In the full audited run, the base cache was not rebuilt with the frozen code: its entries
-were reused (linked) from earlier runs of the same project (haul tables, outcrop raster and per-friction tables of
-29 Oct 2026; k-best routes of 2 Nov 2026 (v11); food catchments of 1 Nov 2026; cost rasters per friction), and the
-sea tables were rebuilt at the start of the run (`SEA_TABLES`, first queue entry). The commands below are those
-the project used. A rebuild with the frozen code has not been compared byte for byte with the reused files
+**Provenance note.** In the project's runs, the base cache was not rebuilt in one go: its entries were reused
+(linked) from earlier runs of the same project (haul tables, outcrop raster and per-friction tables of 29 Oct 2026;
+k-best routes of 2 Nov 2026; food catchments of 1 Nov 2026; cost rasters per friction), the base haul tables were
+rebuilt with the on-outcrop test of `code/preprocess.py`, and the sea tables were rebuilt per configuration. The
+commands below are those the project used. A complete rebuild with `code/` has not been compared byte for byte with
+the reused files
 (`tools/build_cost_mu.py ... --check` does this for the base cost raster).
 
 ## Rasters in `data_dir/costsurface/`
@@ -57,13 +59,13 @@ the project used. A rebuild with the frozen code has not been compared byte for 
 
 `code/run_all.sh` (steps 1-3 and the first line of step 8) runs the first rows of this table in order. Its last
 lines call three tools that are not in this repository (`tools/components.py`, `tools/master_comparison.py`,
-`report/make_report.py`; see `CODE_PROVENANCE.md`).
+`report/make_report.py`; not published).
 
-## Own caches of the queue (`outputs/cache_<variant>/`)
+## Own caches of the queue (`outputs/caches/<config name>/`)
 
-Some queue entries rebuild a part of the cache for one parameter variant (`SEA_TABLES_ALT_*`, `SEA_TABLES_LOO_*`,
-`PREP_ALT_stones7`, ...). Each such folder must exist before the queue reaches it: every entry of the base cache
-linked in, except the part the entry rebuilds, which must be an empty real folder (`sea/`; for `cache_alt_stones7`
-also `alliance/` and `haul/`, and no base haul tables). The expected sea parameters of each build are in
-`config/sea_expect/<cache>.json`; copy each to `outputs/<cache>/sea_expect.json` (read by `config/check_sea_meta.py`).
-The top-level README has a script for this.
+Every configuration of the queue (`config/scenarios/`) reads its own cache folder. Most link every entry of the base
+cache; 35 variants (the header of each configuration says which) rebuild their sea tables (`sea/`, an empty real
+folder: `tools/sea_routes.py` with that configuration), and `config_full_audited_alt_stones7` also its own haul
+tables and k-best routes (`alliance/`, `haul/` and the base haul tables). The expected sea parameters of a build are
+in `config/sea_expect/<config name>.json`; copy the file to `<cache>/sea_expect.json` and run
+`config/check_sea_meta.py <cache>`. The top-level README ("Run the queue") lists the steps.

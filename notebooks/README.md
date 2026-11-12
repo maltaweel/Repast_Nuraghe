@@ -1,9 +1,9 @@
 # Notebooks
 
 Six Jupyter notebooks that set up the environment, get and check the inputs, run scenarios, analyse them, audit
-the runs step by step, and run the sensitivity designs, with the model's code (`code/`, `CODE_VERSION` 2026-11-09-v17:
+the runs step by step, and run the sensitivity designs, with the model's code (`code/`:
 lift, every lift rule, priced at the undiscounted rate; the learning factor and skill act on quarrying, dressing and
-building only; ODD 7.9) and the configuration of the final runs, `config/v16_final/config_full_audited.yaml`. **Start with [HOW_TO_USE.md](HOW_TO_USE.md)** (Colab and Jupyter quick start,
+building only; ODD 7.9) and the model's configuration, `config/scenarios/config_full_audited.yaml`. **Start with [HOW_TO_USE.md](HOW_TO_USE.md)** (Colab and Jupyter quick start,
 software requirements, getting the data automatically or
 [linking the data yourself](HOW_TO_USE.md#linking-the-data-yourself), the derived inputs, expected results).
 
@@ -15,8 +15,8 @@ source by `fetch_data.py` (02, section 0). Derived inputs: rebuilt automatically
 
 The folders are set at the top of each notebook's config cell (`REPO_DIR`, `DATA_DIR`, `DERIVED_DIR`, `CONFIG`,
 `OUTPUTS_DIR`, `WORK_DIR`, `RESULTS_DIR`; defaults `data/`, `data/derived/cache/`,
-`config/v16_final/config_full_audited.yaml`, `outputs/`); the base configuration is
-`config/v16_final/config_full_audited.yaml` (the same values as the model's configuration
+`config/scenarios/config_full_audited.yaml`, `outputs/`); the base configuration is
+`config/scenarios/config_full_audited.yaml` (the same values as the model's configuration
 `config/config_full_audited.yaml`: audited parameters, minimum haul 15 m, near-site rule 1,000 m; only `cache_dir` /
 `output_dir` differ); all outputs are cleared, and the
 notebooks hold no model results (every number is computed when they run; the results of the full runs are a
@@ -35,8 +35,8 @@ Clean-room test: 01-06 pass with derived inputs supplied (commit a2010ed); the a
 3. Runtime > Run all. The setup cell clones the repository and installs OpenMPI and the pinned packages. Nothing else to
    set: the first time 02 rebuilds the derived inputs automatically (about 30-45 min; the prebuilt pack is
    not public yet) and prints a note saying so.
-4. 05_audit prints PASS / FAIL / NOT YET AVAILABLE per step: (a) code checksums vs `CODE_V17_SHA256SUMS`, (b) inputs
-   vs `inputs_manifest.csv`, (c) `config/v16_final/config_full_audited.yaml` vs `param_audit/PARAM_TRACE.csv`, (d) a
+4. 05_audit prints PASS / FAIL / NOT YET AVAILABLE per step: (a) code checksums vs `CODE_SHA256SUMS`, (b) inputs
+   vs `inputs_manifest.csv`, (c) `config/scenarios/config_full_audited.yaml` vs `param_audit/PARAM_TRACE.csv`, (d) a
    rerun of the headline scenario on 300 sites, seeds 1-3, vs the fingerprint in `outputs/reference/` (placeholder),
    (e) island years and man-hours from the per-seed tables of the results (placeholder).
 5. 06_sensitivity runs the A5 grid, a Morris screen and a Sobol design at demo size (minutes) and regenerates the
@@ -56,11 +56,11 @@ Colab needs the inputs in a folder every notebook can reach: Google Drive (`MOUN
 
 | Notebook | What it does / reproduces |
 |---|---|
-| `01_setup.ipynb` | Installs OpenMPI and the pinned Python packages (`requirements-colab.txt`), checks the versions, runs a 2-rank MPI smoke test and imports the model code; checks that `code/` is byte-identical to the repository version (`inputs_manifest.csv`, group `code`) and carries the code version of the final runs; runs the lift unit tests (`code/tests/test_v17_lift.py`). |
-| `02_inputs.ipynb` | Section 0 "Getting the data": every input, its source, the automatic fetch (`fetch_data.py`: copies the Nurnet files from `data/nurnet/`, downloads the public layers from the official sources, rebuilds the model files, checks SHA-256) and the manual alternative; section 0b the derived inputs (prebuilt pack `DERIVED_URL` or a full rebuild); preflight of every input (presence, size, SHA-256; files rebuilt from an official source are reported as such); a look at the sites and the cost raster; the stone rule (`hybrid`, the rule of the full audited run, by default); the work folder (`WORK_DIR/config.yaml` = the configuration of the final runs with only `data_dir`, `cache_dir`, `output_dir`, `stone_rule` set); an optional rebuild of the base haul table (`preprocess.py`). |
+| `01_setup.ipynb` | Installs OpenMPI and the pinned Python packages (`requirements-colab.txt`), checks the versions, runs a 2-rank MPI smoke test and imports the model code; checks that `code/` is byte-identical to the repository version (`inputs_manifest.csv`, group `code`) and carries the code version of the final runs; runs the lift unit tests (`code/tests/test_lift.py`). |
+| `02_inputs.ipynb` | Section 0 "Getting the data": every input, its source, the automatic fetch (`fetch_data.py`: copies the Nurnet files from `data/nurnet/`, downloads the public layers from the official sources, rebuilds the model files, checks SHA-256) and the manual alternative; section 0b the derived inputs (prebuilt pack `DERIVED_URL` or a full rebuild); preflight of every input (presence, size, SHA-256; files rebuilt from an official source are reported as such); a look at the sites and the cost raster; the stone rule (`hybrid`, the rule of the full audited run, by default); the work folder (`WORK_DIR/config.yaml` = the model's configuration with only `data_dir`, `cache_dir`, `output_dir`, `stone_rule` set); an optional rebuild of the base haul table (`preprocess.py`). |
 | `03_scenarios.ipynb` | Runs any scenario with `model.py` (repast4py + MPI), by default baseline, lit webster, A5_full, the headline MOST_REALISTIC_AUDITED_LIT_P10, MOST_REALISTIC_P10 and its `_alone` twin: presets `demo` (30 sites, seed 1), `quick` (300 sites, seeds 1-3), `full` (7,167 sites, seeds 1-100) or `custom`; resumable; island totals of the runs. The last section reruns a fixed reference subset and compares it exactly with a reference fingerprint (`OUTPUTS_DIR/reference/reference_sha256.csv`). No reference is shipped (a fingerprint holds only for the code version it was made with), so make one with `MAKE_REFERENCE = True` before using `RUN_REFERENCE_CHECK = True`. |
 | `04_analysis_report.ipynb` | Tables per scenario and tower class, maps of man-hours per nuraghe, centrality of the help networks (`tools/centrality.py`), network need with vs without the network (`tools/network_need.py`). The PDF report builder of the project is not included. |
-| `05_audit.ipynb` | The step-by-step audit, each step with its expected result: (a) `code/` vs `CODE_V17_SHA256SUMS` and `CODE_PROVENANCE.md`, and the code version; (b) raw and derived inputs vs `inputs_manifest.csv`; (c) every audited parameter of `param_audit/PARAM_TRACE.csv` vs `config/v16_final/config_full_audited.yaml` (every value equal; minimum haul 15 m, near-site face 1,000 m); (d) a fresh rerun of `MOST_REALISTIC_AUDITED_LIT_P10` on 300 sites, seeds 1-3, vs `outputs/reference/reference_audit_sha256.csv` (placeholder until generated with `code/`); (e) island years and man-hours recomputed from the per-seed tables of the results package (`per_seed_full_audited.csv` vs `summary_full_audited.csv`; placeholder). |
+| `05_audit.ipynb` | The step-by-step audit, each step with its expected result: (a) `code/` vs `CODE_SHA256SUMS`, and the code version; (b) raw and derived inputs vs `inputs_manifest.csv`; (c) every audited parameter of `param_audit/PARAM_TRACE.csv` vs `config/scenarios/config_full_audited.yaml` (every value equal; minimum haul 15 m, near-site face 1,000 m); (d) a fresh rerun of `MOST_REALISTIC_AUDITED_LIT_P10` on 300 sites, seeds 1-3, vs `outputs/reference/reference_audit_sha256.csv` (placeholder until generated with `code/`); (e) island years and man-hours recomputed from the per-seed tables of the results package (`per_seed_full_audited.csv` vs `summary_full_audited.csv`; placeholder). |
 | `06_sensitivity.ipynb` | The sensitivity steps at demo size: the A5 alliance grid (`model.py --alliance sensitivity`, 27 cells + A0_alone, `sensitivity.csv` written by `report_alliance.sensitivity`); a Morris screen (32 factors) and a Sobol design / analysis (24 + R_m factors; `lift_learning` needs a code switch that is not published) of the headline (`sensitivity.py`, SALib); regenerates the full designs (Morris r = 10: 330 evaluations; Sobol N = 512: 14,336 evaluations) and compares them with the design files of the results package when given. |
 
 Files: `HOW_TO_USE.md` (the guide), `fetch_data.py` (gets every input; standard library, calls the builders in
@@ -70,8 +70,8 @@ Python 3.13.5), `inputs_manifest.csv` (paths, sizes and SHA-256 per group: `raw_
 
 Notes:
 
-- The results (100 seeds, every queued scenario) were produced with the queues in `config/queues/` and the chain
-  scripts of `code/` (top-level README, "Run the queues"), not with these notebooks. The sensitivity results are in
+- The results (100 seeds, every queued scenario) were produced with the queue `config/queue.tsv` and
+  `code/run_queue.sh` (top-level README, "Run the queue"), not with these notebooks. The sensitivity results are in
   `outputs/sensitivity/` (the A5 grid now; Morris, Sobol and feasibility land with the final pass).
 - The default stone rule is `hybrid`, the rule of the full audited run (the per-site file is included in
   `data/nurnet/`). With `stone_rule: stones7` the haul tables, and therefore all results, differ.

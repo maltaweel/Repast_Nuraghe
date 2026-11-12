@@ -1,5 +1,0 @@
-9f1856937cbcea2fb36b388a0db7adfd0be309e5082ed01f4139c8ec1000b07e  ./alliance.py
-0b7e7ff3e3496385f9ba81cf42bc76bf6b3529e075b164adf33de8090eb4e4f2  ./lit.py
-5a89887c51fd2ac76d25c584fecbf356fc5a3eda1f6b4eab3a00771e1a534c0a  ./model.py
-c503d69c71984c546b7b1e086db898ccadd3f8cab6fb9a0421d1be169c0aaf78  ./tests/test_v17_lift.py
-3b7017832100fea5385b4339fa075200d20b5b1befc3e940cb49a83197cb0d59  ./tests/test_v17s_lift_learning.py

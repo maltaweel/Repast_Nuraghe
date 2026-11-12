@@ -5,7 +5,7 @@ season-based community engine (alliance.py); day-based engine-B rows (model.py, 
 quarry rule (SC:881: joints_low on the outcrop, else scree) and their load_unload_h. Before the fix, model.py's
 REALISTIC rows called lit.resolve_site with L2 on, so off-outcrop sites were quarried as joints_low.
 
-  cd code_v16_final && PYTHONDONTWRITEBYTECODE=1 python tests/test_L2B_engine_scope.py
+  cd code && NURAGHE_TEST_CONFIG=/path/to/config.yaml PYTHONDONTWRITEBYTECODE=1 python tests/test_L2B_engine_scope.py
 """
 import inspect
 import os
@@ -18,8 +18,9 @@ import lit  # noqa: E402
 import model  # noqa: E402
 from nbcommon import load_config  # noqa: E402
 
-FA = os.path.join(os.environ.get("NURAGHE_PROJECT", "."), "runs/2026-11-02-v12-census/full_audited")
-CFG = FA + "/v16_final/configs/config_full_audited.yaml"
+# Configuration read by the tests: NURAGHE_TEST_CONFIG = the model's configuration with data_dir and a derived-input
+# cache set (e.g. WORK_DIR/config.yaml written by notebooks/02_inputs.ipynb; README, "Tests").
+CFG = os.environ.get("NURAGHE_TEST_CONFIG", "NURAGHE_TEST_CONFIG-not-set")
 
 OFF = {"TWR_N": 1, "on_outcrop": False, "lit_haul_rule": "short", "lit_type": ""}
 

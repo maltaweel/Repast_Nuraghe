@@ -55,27 +55,27 @@ CENSUS_VERSION = "2026-11-02-census-1"
 CENSUS_KEYS = ("lift_graded", "lintel", "found", "fill", "vault_dress", "demog", "lift_ramp", "mortar", "rifascio",
                "bichrome", "levy", "mason_regions", "feast_attract", "mudbrick", "clearance", "carts", "size_draw",
                "lift_override")
-# 2 Nov 2026 (v13) social mechanisms (ODD 7.15, CODE_PROVENANCE.md): reputation (indirect reciprocity with
+# 2 Nov 2026 (v13) social mechanisms (ODD 7.15, git history): reputation (indirect reciprocity with
 # standing, third-party shunning), partner choice (assortment), imitation along help ties; social_log = bookkeeping only.
 # Each is OFF unless its key is set in the scenario. They make no random draws of their own. Hashed (with
 # cfg['scenarios'] minus its list, whose split_cost_mh acts on every alliance run) only when one of these keys is set, so
-# every earlier scenario keeps its signature and its code path (identity test: ODD 7.15, CODE_PROVENANCE.md). CODE_VERSION is
+# every earlier scenario keeps its signature and its code path (identity test: ODD 7.15, git history). CODE_VERSION is
 # deliberately NOT bumped: with the keys off the outputs are identical to the frozen v12 code (tested), and a bump would move every
 # existing scenario's cache folder.
 SOCIAL_VERSION = "2026-11-02-v13-social-2"   # -2: partner order = exchange partners first (both directions)
 SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log", "trusted_nodist")   # v13kd: end of file
-# v14 (5 Nov 2026, specified by the authors; CHANGES_V14_NEARFACE.md): config
+# v14 (5 Nov 2026, specified by the authors; change notes, git history): config
 # key quarry.near_site_fixed_face_m. A site whose dry-ground (mu 0.38) route (haul table mu0.38, haul_m) is <= this
 # many metres always quarries from face 0: no epsilon draw, no Q choice, no imitation of the face (the draws are
 # skipped, not drawn and discarded). Off (absent / none / 0) = the v12 code path; hashed only when on, so every run
 # with the key off keeps its signature (identity test: v14_nearface/identity/).
 NEARFACE_VERSION = "2026-11-05-nearface-1"
-# v16 (5 Nov 2026; addendum 4 of the specification; CHANGES_V16.md). Always hashed: v16 also
+# v16 (5 Nov 2026; addendum 4 of the specification; change notes, git history). Always hashed: v16 also
 # changes reporting (S1 relay_made in the strategy parts) and the S3 ceiling basis, so no v16 run reuses v15b parts.
 # The addendum-4 rules L1-L4 sit behind config flags add4.* (code_v16_final defaults: L2, L3 ON; L1, L4 OFF; lit.py).
 # code_v16_final: their effective settings are ALWAYS hashed (code_v16_flags hashed them only when one was on).
 V16_VERSION = "2026-11-05-v16-flags-2"   # -2: relay leg-1 nearer-than-owner filter removed (-1 = the test runs)
-# code_v16_final (CHANGES_V16_FINAL.md): D3 no dress work = no dress task traffic, D6 join parties at their own skill,
+# code_v16_final (change notes, git history): D3 no dress work = no dress task traffic, D6 join parties at their own skill,
 # D11 the site's stone = the class of its gated face 0. Always on (no flag); covered by CODE_VERSION.
 ADD4_VERSION = "2026-11-05-add4-1"
 
@@ -253,7 +253,7 @@ class Static:
         # the face it hauls from: face 0 of the gated mu 0.3 table (self.haul = cache sites_haul.csv, the table whose
         # rows are face 0 of kbest.npz; stone rule = the set actually quarried incl. fallback). The mixed table's own
         # quarry_stone came from separate least-cost searches on the mu 0.38 / mu 0.1 rasters and could name another
-        # outcrop class (bug D11, CHANGES_V16_FINAL.md). The mixed table still decides friction (lit_haul_rule, PM:22).
+        # outcrop class (bug D11, change notes, git history). The mixed table still decides friction (lit_haul_rule, PM:22).
         mh["quarry_stone_mixed"] = mh.quarry_stone.to_numpy()
         mh["quarry_stone"] = self._face0_stone(mh)
         self.tech = {"lit": L, "rule": mh.lit_haul_rule.to_numpy(), "stone": mh.quarry_stone.to_numpy(),
@@ -456,12 +456,12 @@ class AllianceModel:
             ttypes = S.tech["table"].lit_type.to_numpy()
             self.vol_f = np.array([float(tc.get(t, {}).get("volume", 1.0)) for t in ttypes])
             self.hgt_f = np.array([float(tc.get(t, {}).get("height", 1.0)) for t in ttypes])
-        # v12 census switches (census_v12.py); self.cz is None when every census key is off (original code path)
+        # v12 census switches (census_scenarios.py); self.cz is None when every census key is off (original code path)
         self.cz = None
         if any(sc.get(k) for k in CENSUS_KEYS):
             assert S.tech, "census switches need tech_rules"
-            import census_v12
-            self.cz = census_v12.Census(self, S, sc, seed)
+            import census_scenarios
+            self.cz = census_scenarios.Census(self, S, sc, seed)
             if sc.get("size_draw"):                       # S25: per-site volume / height factors drawn by floors
                 self.vol_f, self.hgt_f = self.cz.size_factors()
                 tc = True
@@ -1202,7 +1202,7 @@ class AllianceModel:
             self.m_loc[self.m_n] = self.S.xy[i]          # apprenticeship: a new master trained at this site
             self.m_n += 1
 
-    # ------------------------------------------------------------------ v13 social mechanisms (ODD 7.15, CODE_PROVENANCE.md)
+    # ------------------------------------------------------------------ v13 social mechanisms (ODD 7.15, git history)
     def _init_social(self, sc, N):
         """State of the v13 switches. reputation: per community, the log of its acts as an ASKED community, (requester,
         good) in time order; an observer k sees the act iff k is the requester or within R of it (R = the run's
@@ -1988,7 +1988,7 @@ class AllianceModel:
         if relay_ok:
             # v16 (specified by the authors, 5 Nov 2026): the leg-1 "nearer the quarry than the owner" candidate filter is
             # REMOVED; leg-1 candidates = the ordinary candidate list (as code_v15c_norelayfilter). v15b passed
-            # nearer_than=dself. Measured before removal (CHANGES_V16.md).
+            # nearer_than=dself. Measured before removal (change notes, git history).
             helper = self.request(i, "leg1", qxy, self.candidates(i, "leg1", qxy))
             self.charge_brokers(i, "leg1")
             cur["helpers"]["leg1"] = helper

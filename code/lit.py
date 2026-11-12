@@ -170,8 +170,8 @@ def oxen_yokes(mass, o):
 
 # --------------------------------------------------------------------------- v16: addendum 4 flags
 # Addendum 4 of the specification, L1-L4, each behind its own flag in the top-level config block `add4:`.
-# code_v16_flags: default OFF (5 Nov 2026). code_v16_final (CHANGES_V16_FINAL.md): L2 bedrock_everywhere and L3
-# load_per_tonne default ON (kept after the flag test, CHANGES_V16.md); L1 rails_cost_choice and L4 sea_priced_as_charged default
+# code_v16_flags: default OFF (5 Nov 2026). code_v16_final (change notes, git history): L2 bedrock_everywhere and L3
+# load_per_tonne default ON (kept after the flag test, change notes, git history); L1 rails_cost_choice and L4 sea_priced_as_charged default
 # OFF (not kept). The flags stay, so a row can still switch any of them with its own `add4:` block.
 ADD4_FLAGS = ("rails_cost_choice", "bedrock_everywhere", "load_per_tonne", "sea_priced_as_charged")
 ADD4_DEFAULTS = {"rails_cost_choice": False, "bedrock_everywhere": True, "load_per_tonne": True,

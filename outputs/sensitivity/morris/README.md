@@ -1,6 +1,6 @@
-# morris: Morris screens on code v17
+# morris: Morris screens
 
-**Lands with the final pass.** No Morris screen on code v17 had finished on 11 Nov 2026; this folder is empty
+**Lands with the final pass.** No Morris screen on the model's code had finished on 11 Nov 2026; this folder is empty
 until then.
 
 Planned contents (exported by `../export.py` from the rerun harness, island level only):
