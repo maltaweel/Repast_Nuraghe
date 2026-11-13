@@ -2,7 +2,7 @@
 
   python tools/stone_rule.py config.yaml
 
-Recorded stone: Nurnet's data (site building stone), `materiale` (aggregate statistics only in outputs).
+Recorded stone: Nurnet's data (site building stone), `stone_material` (aggregate statistics only in outputs).
 Writes to output/:
   stone_rule_hauls.csv        per rule: mean / median haul (flat-m and m), sites on an own-rule outcrop, quarry stone counts
   stone_rule_validation.csv   single-stone sites (9 classes): share whose model quarry stone matches the recorded stone
@@ -41,24 +41,24 @@ NINE = {"Basalto": {"basalt"}, "Granito": {"granite"}, "Calcare": {"limestone/ma
 PERM = {"stones4": {"Basalto", "Granito", "Calcare"}, "stones7": {"Basalto", "Granito", "Calcare", "Trachite", "Andesite"}}
 val = []
 for r, h in H.items():
-    d = h.merge(mat[["UID", "sa_materiale"]], on="UID", how="left")
-    single = d[d.sa_materiale.isin(NINE)]
+    d = h.merge(mat[["UID", "stone_material"]], on="UID", how="left")
+    single = d[d.stone_material.isin(NINE)]
     if r == "hybrid":
-        base = single[single.sa_materiale.isin([k for k, v in NINE.items() if v])]
-        ok = [q in NINE[m] or (m == "Trachite" and q == "tuff") for q, m in zip(base.quarry_stone, base.sa_materiale)]
+        base = single[single.stone_material.isin([k for k, v in NINE.items() if v])]
+        ok = [q in NINE[m] or (m == "Trachite" and q == "tuff") for q, m in zip(base.quarry_stone, base.stone_material)]
         val.append({"rule": r, "single_stone_sites": len(single), "sites_with_rule_stone": len(base),
                     "agree": int(np.sum(ok)), "agree_pct": 100 * np.mean(ok) if ok else np.nan,   # B10
                     "excluded_stone_sites": len(single) - len(base),
                     "note": "recorded stone used by construction (Trachite also matches tuff, as in the mapping)"})
         continue
-    base = single[single.sa_materiale.isin(PERM[r])]
-    ok = [q in NINE[m] for q, m in zip(base.quarry_stone, base.sa_materiale)]
+    base = single[single.stone_material.isin(PERM[r])]
+    ok = [q in NINE[m] for q, m in zip(base.quarry_stone, base.stone_material)]
     val.append({"rule": r, "single_stone_sites": len(single), "sites_with_rule_stone": len(base), "agree": int(np.sum(ok)),
                 "agree_pct": 100 * np.mean(ok) if ok else np.nan, "excluded_stone_sites": len(single) - len(base),   # B10
                 "excluded_pct": 100 * (len(single) - len(base)) / len(single) if len(single) else np.nan, "note": ""})
 pd.DataFrame(val).to_csv(os.path.join(OUT, "stone_rule_validation.csv"), index=False, float_format="%.2f")
-use = H["hybrid"].merge(mat[["UID", "sa_materiale"]], on="UID", how="left")
-use["value"] = use.sa_materiale.fillna("<empty>")
+use = H["hybrid"].merge(mat[["UID", "stone_material"]], on="UID", how="left")
+use["value"] = use.stone_material.fillna("<empty>")
 u = use.groupby(["value", "Q_SRC"]).size().unstack(fill_value=0).reset_index()
 u.to_csv(os.path.join(OUT, "stone_rule_use.csv"), index=False)
 # island totals, stones4 vs hybrid

@@ -119,7 +119,7 @@ slope builds).
 | input (file under `DATA_DIR`) | where it comes from | automatic | SHA-256 = the run's copy? |
 |---|---|---|---|
 | `sites/nurnet_nuraghi.{shp,shx,dbf,prj,cpg}` | Nurnet's data, included: `data/nurnet/nurnet_nuraghi.*` | copied | **yes** |
-| `stone/nid_materiale_prod.csv` | Nurnet's data, included: `data/nurnet/nurnet_site_building_stone.csv` | copied (renamed) | **yes** |
+| `stone/nid_materiale_prod.csv` | Nurnet's data, included: `data/nurnet/nurnet_site_building_stone.csv` | copied (renamed) | **yes** (same codes and values; column names normalised) |
 | `geology/sardinia_lithology_25832.*` | ARPAS 2019 Carta Litologica 1:25,000 (zip, 243 MB) | download + `tools_extra/build_lithology.py` | `.prj`, `.cpg` yes; `.shp/.shx/.dbf` no (see below) |
 | `dem/sardinia_dem_GLO30_25832.tif` | Copernicus DEM GLO-30, 8 tiles (AWS, 136 MB) + RAS regional boundary (mask) | download + `tools_extra/build_dem.py` | no (see below) |
 | `costsurface/sardinia_drag_cost_8dir_mu03_25832_int.tif` | from the DEM | `code/tools/build_cost_mu.py` | only if the DEM is identical |
@@ -223,7 +223,7 @@ ebcaa3d99664f05ff3e275d9a52c36e9b192abbfa84feaa3b55a775929619b21  sites/nurnet_n
 e411c159feaa18570da06954e5454ae0d54184c9a9224b0a46712199dcb3a569  sites/nurnet_nuraghi.dbf
 2bfc323fa76efbd54e39e220c4d8f16ab79728c0eab137ab43fe7fee726e60dc  sites/nurnet_nuraghi.prj
 3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824  sites/nurnet_nuraghi.cpg
-08a1d36f7d57b95df58dd4e27d03d97435f3087d3cbcf97b86a91920fe198adb  stone/nid_materiale_prod.csv
+7807224837fb729dc64a2428a859c6253a07c7dc47cd0d1d4d0040ad1e4c58ff  stone/nid_materiale_prod.csv
 4203246d73d713b3d029c3bb912bd494339bb374991b993f3d94b177f11e79fd  geology/sardinia_lithology_25832.shp
 b2d73866acc04ab51c1cdd496b6518e5fc2f5b7d08a59d36417ea218aee47239  geology/sardinia_lithology_25832.shx
 27934a5ae8c72669576f6a6739bb5e06f50f061ea031ef6f83480964bfc01489  geology/sardinia_lithology_25832.dbf
@@ -248,7 +248,7 @@ Nurnet's data; the files are included in `data/nurnet/`:
 | file in `data/nurnet/` | copy it to (under `DATA_DIR`) | SHA-256 |
 |---|---|---|
 | `nurnet_nuraghi.{shp,shx,dbf,prj,cpg}` | `sites/nurnet_nuraghi.{shp,shx,dbf,prj,cpg}` | in the block above (`sites/...`) |
-| `nurnet_site_building_stone.csv` | `stone/nid_materiale_prod.csv` | `08a1d36f7d57b95df58dd4e27d03d97435f3087d3cbcf97b86a91920fe198adb` |
+| `nurnet_site_building_stone.csv` | `stone/nid_materiale_prod.csv` | `7807224837fb729dc64a2428a859c6253a07c7dc47cd0d1d4d0040ad1e4c58ff` |
 
 For the latest version and source information contact Nurnet at nurnet.presidente@gmail.com. The site list is needed
 by every run; the building-stone file is read only when the haul tables are rebuilt with the hybrid stone rule (the

@@ -168,7 +168,7 @@ def main(cfg_path, cost_raster=None, stones_arg=None, tag=None):
 
 # ----------------------------------------------------------------------------------- stone rules (hybrid / stones7 / stones4)
 def materiale_sets(cfg, uids):
-    """Per site: the recorded STONE-class set from the `materiale` field of Nurnet's data (site building stone) (None = not recorded / unmapped), plus the
+    """Per site: the recorded STONE-class set from the `stone_material` field of Nurnet's data (site building stone) (None = not recorded / unmapped), plus the
     mapping table of every distinct value (for output/materiale_mapping.csv)."""
     M = cfg["materiale"]
     path = M["file"] if os.path.isabs(M["file"]) else os.path.join(cfg["data_dir"], M["file"])
@@ -184,12 +184,12 @@ def materiale_sets(cfg, uids):
                 cls += mp[t]; used.append(t)
         return (tuple(sorted(set(cls))) if cls else None), toks
     table = []
-    for v, n in d.sa_materiale.fillna("").value_counts().items():
+    for v, n in d.stone_material.fillna("").value_counts().items():
         cl, toks = parse(v)
-        table.append({"sa_materiale": v if v else "<empty>", "records_in_file": int(n), "tokens": " | ".join(toks),
+        table.append({"stone_material": v if v else "<empty>", "records_in_file": int(n), "tokens": " | ".join(toks),
                       "stone_classes": "; ".join(cl) if cl else "", "rule": "recorded" if cl else "fallback (7-stone)"})
     table = pd.DataFrame(table)
-    by_uid = dict(zip(d.codice, d.sa_materiale))
+    by_uid = dict(zip(d.codice, d.stone_material))
     sets = [parse(by_uid.get(u))[0] for u in uids]
     vals = [by_uid.get(u) if isinstance(by_uid.get(u), str) and by_uid.get(u) else "<empty>" for u in uids]
     return sets, vals, table

@@ -55,7 +55,7 @@ rasters) are listed with the reason in each section below and in `notebooks/HOW_
 | | |
 |---|---|
 | What | the recorded building stone of each nuraghe (where known) |
-| File | included as `data/nurnet/nurnet_site_building_stone.csv`; read as `stone/nid_materiale_prod.csv` under `data_dir` (`fetch_data.py` copies it; SHA-256 = the run's copy). UTF-8 CSV; the code reads the columns `codice` (= Nurnet `UID`) and `sa_materiale` (recorded stone, e.g. `Basalto`, `Granito`, `Trachite e Calcare`) |
+| File | included as `data/nurnet/nurnet_site_building_stone.csv`; read as `stone/nid_materiale_prod.csv` under `data_dir` (`fetch_data.py` copies it; same codes and values as the run's copy, column names normalised). UTF-8 CSV with the columns `codice` (= Nurnet `UID`), `stone_material` (recorded stone, e.g. `Basalto`, `Granito`, `Trachite e Calcare`) and `stone_lithology` (recorded lithology); the code reads `codice` and `stone_material` |
 | How it feeds the model | only `preprocess.py` reads it (stone rule `hybrid`, the rule of `config_full_audited.yaml`): a site with a recorded stone quarries that stone class (token map `materiale.map` in the config); the others the nearest outcrop of the 7 permitted classes. Model runs never read it; they read the haul tables built from it |
 | Credit | **Nurnet's data** |
 | Availability | included in this repository (`data/nurnet/`); for the latest version and source information contact Nurnet at nurnet.presidente@gmail.com |

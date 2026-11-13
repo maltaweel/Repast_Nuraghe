@@ -12,7 +12,7 @@ raw_input,data/geology/sardinia_lithology_25832.prj,403,2bfc323fa76efbd54e39e220
 raw_input,data/geology/sardinia_lithology_25832.cpg,5,3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824,rebuild,size + SHA-256 of the copy used for the 31 Oct 2026 package
 raw_input,data/dem/sardinia_dem_GLO30_25832.tif,94800062,1f01213b688333152621033095a453cb2498dbe0a94ccac02bcb4a36f2389e91,rebuild_mu;rebuild_sea;analysis_maps,size + SHA-256 of the copy used for the 31 Oct 2026 package
 raw_input,data/costsurface/sardinia_slope_deg_25832.tif,87054967,70a42c4621f145b71efe09d16ead7610a1e2b55646ac1b0dacdac6702d0f22ba,rebuild_sea,size + SHA-256 of the copy used for the 31 Oct 2026 package
-raw_input,data/stone/nid_materiale_prod.csv,591434,08a1d36f7d57b95df58dd4e27d03d97435f3087d3cbcf97b86a91920fe198adb,rebuild,"Nurnet's data (site building stone), included in the repository as data/nurnet/nurnet_site_building_stone.csv; read only by preprocess.py (stone_rule hybrid); size + SHA-256 of the copy that built the hybrid haul tables of the full audited run"
+raw_input,data/stone/nid_materiale_prod.csv,506776,7807224837fb729dc64a2428a859c6253a07c7dc47cd0d1d4d0040ad1e4c58ff,rebuild,"Nurnet's data (site building stone), included in the repository as data/nurnet/nurnet_site_building_stone.csv; read only by preprocess.py (stone_rule hybrid); size + SHA-256 of the included file; its codice and stone_material values are those of the copy that built the hybrid haul tables of the full audited run (column names normalised)"
 raw_input,data/water/sardinia_rivers_25832.shp,21160540,2d9371e8810330b49861aa463b63b65372745de54ff40b181a1039a085ffe2c1,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
 raw_input,data/water/sardinia_rivers_25832.shx,335116,70e4678d1b64e61b503e7fd936b75f830390215c4bdb39fceada7587ae43bb7d,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
 raw_input,data/water/sardinia_rivers_25832.dbf,1800809,557fd395b75a05cb766b084412b4930bdb879f19a5c26cfca2869fc46083d394,rebuild_wl,RAS rivers ('fiumitorrenti'); wider-literature inputs; size + SHA-256 of the copy used for the full audited run
@@ -90,14 +90,14 @@ derived,derived/stones4/haul/sites_haul_mu0.5.csv,,,run,derived input (data/deri
 code,code/METHODS.md,85190,5435a10b19c19eb10f0a0d76afc2d8b1225fbda9137e0c57b7c415afbbf99671,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/alliance.py,160740,502dc3aee2d71473328c9e41a5cafd8e66b3b16be1f56f1c9273d01a27d5c9ad,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/census_scenarios.py,30010,27745080d68b0a8177137b05025b9c439a20d776a1c249cba49bee9ae2c7b909,run;rebuild,repository code (CODE_SHA256SUMS)
-code,code/config.yaml,54261,21694e4fe1699dc4f4d2e6f7737135118d84c5fd5837a5c4cd57d9c05d8c8ad2,run;rebuild,repository code (CODE_SHA256SUMS)
+code,code/config.yaml,54268,6f13ac303a22896f9ce911968b1e47e43278ac313db36f1f5ad63dfbe0b661d7,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/lit.py,14915,1b2d3a7ca62853b90bc6a36c86c5ef6b1abe5b72a1a166bf2523a1b1aedd5e8c,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/memrun.py,1961,154a20ff8615a53031042e94cb5aab3fe060740fc12751b19be1ceca2ba66036,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/model.py,38225,1af1c5b63f170d0c262ecba957915a3b4930b1298ee461ae94ba759d0224d958,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/nbcommon.py,5775,f3de59342afeb63c97be0ac3f336f75f6980b4a08384bb161664051fe65b2628,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/phasing.py,1704,92248f7dad7b91c5afacf3df956b3cbca1ae29a647987995d609ab21fd284587,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/pre_networks.py,9909,8284483d98324d496cd10ef0160207476c8758e099f36b5128feac8bc22a31f7,run;rebuild,repository code (CODE_SHA256SUMS)
-code,code/preprocess.py,19328,56e3ba27ae089e2794192b764d5fa22a56b39598b4f0d37eb9de67ca042f98a9,run;rebuild,repository code (CODE_SHA256SUMS)
+code,code/preprocess.py,19339,b6be90d41372877816f48b59fc41c34d0fa70abe2b1784fb233909bba024d9aa,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/report.py,17575,0d8175669c6472d503568f9b5edfbac4f000f6d71c91427691036566ce9a0eff,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/report_alliance.py,22587,a98d3ecfb26aa5a675b078e69d0384dd7dbaeb532c3f8ddbb9b2d64b0c231819,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/requirements.txt,440,064b4906540cf496aedf7a3a6c2a14ed056fb5de0a72f9efa3f0149de1f16a6d,run;rebuild,repository code (CODE_SHA256SUMS)
@@ -157,7 +157,7 @@ code,code/tools/scenario_guide.py,16143,8cab555678bbd81bd8679112b86e024fb18ea874
 code,code/tools/sea_report.py,9925,7ad806534fa15157ba1101be5d4c7631386b29f398fc651654e11d151c947b0d,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/tools/sea_routes.py,28374,b89f3be3a6cc98f35845704a9027b19f0143e1d2cc7980a29ba4bb5b0c6565d4,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/tools/sea_subset_compare.py,2430,0289fc76eedb8726876760917df96693d005eee7e7cf03b05eabd2a2e0321287,run;rebuild,repository code (CODE_SHA256SUMS)
-code,code/tools/stone_rule.py,5919,2d7af10a9fd7306d30e8ee802460d6fd3051ecc153cd3ada1bbae1c344774daa,run;rebuild,repository code (CODE_SHA256SUMS)
+code,code/tools/stone_rule.py,5940,7901c8d10cc39b22449b1fe392d2c8bcb08a5e3b12c4607b0fef8e43cf54bec9,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/tools/summary_figures.py,8336,c805b1c4ad05a9283c9601ab76575460f2b52a44b1c41ec0f6e1b5b9cb1a6588,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/tools/wl_calibration.py,9722,492695e0d928f4ac1f60e7cb395621355380fddc609a0ea1ce0a6d3662c9dde8,run;rebuild,repository code (CODE_SHA256SUMS)
 code,code/tools/wl_figures.py,7797,dd2839a056e0ab59d2516ab372e13933e3cb19e796d670e93dd73603adabf760,run;rebuild,repository code (CODE_SHA256SUMS)

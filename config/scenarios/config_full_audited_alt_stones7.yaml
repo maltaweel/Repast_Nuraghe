@@ -19,12 +19,12 @@ crs: EPSG:25832
 # --- Quarry stone (the authors' list). The code of each type = position in this list (1-based).
 lithology_field: STONE
 # Stone rule (specified by the authors): HYBRID baseline = the recorded building stone where it is known
-# (Nurnet's data (site building stone), field `materiale`), otherwise the nearest of the 7 permitted classes.
+# (Nurnet's data (site building stone), field `stone_material`), otherwise the nearest of the 7 permitted classes.
 stone_rule: stones7   # GAPS: audited hybrid -> stones7
 allowed_stones: [limestone/marble, metamorphic, basalt, granite, acid volcanic, trachyte, andesite]
 stones4: [limestone/marble, metamorphic, basalt, granite]
 materiale:
-  file: stone/nid_materiale_prod.csv     # relative to data_dir; columns codice (= UID), sa_materiale
+  file: stone/nid_materiale_prod.csv     # relative to data_dir; columns codice (= UID), stone_material
   citation: "Nurnet's data (site building stone)"
   # token -> ARPAS STONE classes. A value is split on ' e ' and ','; a mix = the union of its mapped tokens;
   # tokens not listed (Arenaria, Marna, Non determinato, Selce, Dolomia, dacite, Granodiorite, truncated 'Sc', empty)

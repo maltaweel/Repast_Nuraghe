@@ -84,11 +84,11 @@ def resolve(path):
 # --------------------------------------------------------------------------- stone rule
 # Default stone rule: hybrid, the rule of the full audited run (recorded building stone per site where known, else the
 # nearest outcrop of the 7 permitted classes). The per-site file it needs is Nurnet's data (site building stone),
-# included as data/nurnet/nurnet_site_building_stone.csv and copied to SA_REL by fetch_data.py. 'stones7' (every site
+# included as data/nurnet/nurnet_site_building_stone.csv and copied to STONE_REL by fetch_data.py. 'stones7' (every site
 # the nearest outcrop of the 7 classes) is the fallback without that file; results then differ.
 SHIPPED_STONE_RULE = "hybrid"
-SA_REL = "data/stone/nid_materiale_prod.csv"
-SA_COLUMNS = ["codice", "sa_materiale"]          # codice = Nurnet UID (e.g. NID0052900); sa_materiale = recorded stone
+STONE_REL = "data/stone/nid_materiale_prod.csv"
+STONE_COLUMNS = ["codice", "stone_material"]          # codice = Nurnet UID (e.g. NID0052900); stone_material = recorded stone
 
 # --------------------------------------------------------------------------- the reference subset
 # 300 sites (code/sites300_real.txt), seeds 1-3, 4 scenarios. A reference fingerprint (reference_sha256.csv) must be
@@ -205,14 +205,14 @@ def fetch_provenance():
 def materiale_status(package_dir, want=SHIPPED_STONE_RULE):
     """Which stone rule a cache REBUILD in this session uses.
 
-    want: 'hybrid' (default, the rule of the full audited run: Nurnet's data (site building stone) at SA_REL, copied
+    want: 'hybrid' (default, the rule of the full audited run: Nurnet's data (site building stone) at STONE_REL, copied
     from data/nurnet/ by fetch_data.py: recorded stone where known, else stones7) | 'stones7' (every site uses the
     nearest outcrop of the 7 permitted classes; no per-site input) | 'auto' (hybrid if that file is present, else stones7).
     'hybrid' without the file raises. Only preprocess.py (rebuilding the cache) reads that file; model runs never do.
     """
     if want not in ("stones7", "hybrid", "auto"):
         raise ValueError(f"STONE_RULE must be 'stones7', 'hybrid' or 'auto', not {want!r}")
-    p = resolve(SA_REL)
+    p = resolve(STONE_REL)
     present = os.path.isfile(p)
     if want == "stones7":
         print(f"STONE RULE = stones7 (nearest outcrop of the 7 permitted classes for every site; not the rule of the "
@@ -221,12 +221,12 @@ def materiale_status(package_dir, want=SHIPPED_STONE_RULE):
     if present:
         with open(p, newline="", encoding="utf-8") as f:
             head = next(csv.reader(f))
-        miss = [c for c in SA_COLUMNS if c not in head]
+        miss = [c for c in STONE_COLUMNS if c not in head]
         if miss:
-            raise PreflightError(f"{SA_REL} is present but lacks column(s) {miss}; it needs {SA_COLUMNS} "
-                                 f"(codice = Nurnet UID, sa_materiale = recorded building stone). Found: {head[:10]}")
+            raise PreflightError(f"{STONE_REL} is present but lacks column(s) {miss}; it needs {STONE_COLUMNS} "
+                                 f"(codice = Nurnet UID, stone_material = recorded building stone). Found: {head[:10]}")
     if want == "hybrid" and not present:
-        raise PreflightError(f"STONE_RULE = 'hybrid' needs {SA_REL} (columns {SA_COLUMNS}): Nurnet's data (site "
+        raise PreflightError(f"STONE_RULE = 'hybrid' needs {STONE_REL} (columns {STONE_COLUMNS}): Nurnet's data (site "
                              "building stone), included as data/nurnet/nurnet_site_building_stone.csv: run "
                              "fetch_data.py (02_inputs, section 0) to copy it there, or use STONE_RULE = 'stones7'.")
     rule = "hybrid" if present else "stones7"
@@ -235,7 +235,7 @@ def materiale_status(package_dir, want=SHIPPED_STONE_RULE):
         print(f"STONE RULE = hybrid (per-site building-stone file found: {p}, columns OK).\n"
               "A cache rebuilt with it differs from a stones7 cache by design.")
     else:
-        print(f"STONE RULE = stones7. No per-site building-stone file at {SA_REL}.")
+        print(f"STONE RULE = stones7. No per-site building-stone file at {STONE_REL}.")
     print("*" * 100)
     return rule
 
