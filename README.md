@@ -114,7 +114,7 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
   for the runs (`notebooks/inputs_manifest.csv`); the files that cannot be byte-identical, and why, are listed there
   and in `data/README.md`.
 - **Derived inputs** (haul tables, quarry routes, sea tables, ...): rebuilt from the raw inputs by
-  `python notebooks/fetch_data.py --rebuild-derived` (about 30-45 min), or the prebuilt pack of the full audited run
+  `python notebooks/fetch_data.py --rebuild-derived` (about 30-45 min (about 80 min on Colab's free tier)), or the prebuilt pack of the full audited run
   in the results package (a separate data publication, not included in this repository).
 - **Results** of the full audited run (per-seed tables, part files, logs): results package (a separate data
   publication, not included in this repository).
@@ -233,7 +233,7 @@ rasters per friction). Download them from the results package or rebuild them wi
 `data/derived/README.md` (in order: cost and slope rasters, `preprocess.py`, haul tables per friction,
 `tools/kbest_quarries.py`, `tools/kbest_mu038.py`, `tools/wl_inputs.py`, `tools/sea_routes.py`,
 `tools/food_capacity.py`, `tools/census_bichrome.py`); `python notebooks/fetch_data.py --rebuild-derived` runs them
-all in order (about 30-45 min with the hybrid stone rule, peak about 2.5 GB).
+all in order (about 30-45 min (about 80 min on Colab's free tier) with the hybrid stone rule, peak about 2.5 GB).
 
 The stone rule of the full audited configuration is `hybrid`: the recorded building stone of each site where it is
 known, else the nearest outcrop of the 7 permitted classes. That per-site file is **Nurnet's data (site building

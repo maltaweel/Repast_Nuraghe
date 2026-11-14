@@ -401,7 +401,7 @@ def fetch_derived(derived_dir, url=None, sha=None, downloads=None):
 REBUILD_NOTES = """Derived-input rebuild (data/derived/README.md), with the times and peak memory recorded in the project's logs:
   cost rasters mu 0.05 / 0.1 / 0.38 / 0.5   tools/build_cost_mu.py            ~0.85 GB peak each (time not logged)
   base haul table                           preprocess.py                     14 s (stones7) / 249 s (hybrid), 1.7-2.4 GB
-  haul tables per friction, buildstone, stones7  preprocess.py --tag ...      ~12 s each with stones7 (hybrid: up to ~4 min each), ~2 GB
+  haul tables per friction, buildstone, stones7  preprocess.py --tag ...      ~12 s each with stones7 (hybrid: up to ~4 min each; 460-545 s on Colab), ~2 GB
   complexes quarrying far (S5c)             tools/haul_far.py                 seconds
   k-best quarry routes                      tools/kbest_quarries.py           95 s, 1.9 GB
   routes at mu 0.38 / wider-literature      tools/kbest_mu038.py, tools/wl_inputs.py   13 s (wl_inputs), 2.2 GB
@@ -409,7 +409,7 @@ REBUILD_NOTES = """Derived-input rebuild (data/derived/README.md), with the time
   food catchments r 1000/1500/2000/3000     tools/food_capacity.py            time not logged
   bichrome distances                        tools/census_bichrome.py          15 s, 1.5 GB
   stones4 comparison tables                 preprocess.py --rule stones4, tools/kbest_quarries.py   a few minutes
-Total: about 30-45 min with hybrid (the full audited rule), 15-20 min with stones7 (estimate from the component logs; the sequence has
+Total: about 30-45 min with hybrid, about 80 min on Colab's free tier (the full audited rule), 15-20 min with stones7 (estimate from the component logs; the sequence has
 not been timed end to end). Peak memory ~2.5 GB (one process at a time)."""
 
 

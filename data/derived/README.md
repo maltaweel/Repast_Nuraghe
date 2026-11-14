@@ -17,7 +17,7 @@ friction about 0.85 GB peak each (time not logged); base haul table 14 s with st
 each further haul table about 12 s with stones7 (up to about 4 min with hybrid); k-best quarry routes 95 s (1.9 GB);
 wider-literature inputs 13 s (2.2 GB); sea tables 192 s (1.1 GB); bichrome distances 15 s (1.5 GB); food catchments not
 timed; the stones7 alternative set of the queue (3 haul tables, k-best routes, mu 0.38 and wider-literature inputs)
-320 s. In total about 30-45 minutes with hybrid and 15-20 minutes with stones7 (an estimate from these component
+320 s. In total about 30-45 minutes (about 80 minutes on Colab's free tier) with hybrid and 15-20 minutes with stones7 (an estimate from these component
 times; the whole sequence has not been timed end to end).
 
 In every command `CFG` is a configuration file whose `data_dir` points at the raw inputs and whose `cache_dir` is

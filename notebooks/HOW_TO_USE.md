@@ -41,11 +41,14 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
    next notebooks reuse them.
 5. **Derived inputs (first time only, no setting needed):** the prebuilt pack (`DERIVED_URL`) is not included in this repository, so
    02 (section 0b) prints a note and rebuilds them automatically when they are missing from `DERIVED_DIR` (about
-   30-45 min; see [Derived inputs](#derived-inputs)). Later runs reuse `DERIVED_DIR` on Drive. If 03 or 06 is opened
+   30-45 min (about 80 min on Colab's free tier); see [Derived inputs](#derived-inputs)). Later runs reuse `DERIVED_DIR` on Drive. If 03 or 06 is opened
    in a runtime that does not see them (no Drive), it gets the inputs the same way before it starts.
-   Without Drive, everything lives on the runtime's own disk: run 01 to 06 in order in the same runtime; when asked,
-   use Runtime > Restart session (keeps the disk); never "Disconnect and delete runtime" between notebooks (it erases
-   the disk and the next notebook rebuilds the derived inputs again, about an hour on Colab); download results before closing.
+   **Without Drive:** Colab gives every notebook its own runtime and disk, so one notebook cannot see another's files.
+   Open 03, Run all (it downloads the inputs, rebuilds the derived files, about 80 min on Colab's free tier, and runs the
+   scenarios; after RESTART NEEDED use Runtime > Restart session, which keeps the disk), then run 04-06 inside that
+   runtime from a new cell at the end of 03:
+   `!cd /content/Repast_Nuraghe/notebooks && for nb in 04_analysis_report 05_audit 06_sensitivity; do NB_PRESET=demo python3 -m jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=-1 --output /content/out_$nb $nb.ipynb; done`
+   (same preset name as in 03). Do not delete the runtime or let it time out before you are done: that erases the disk.
 
 
 Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `demo` and `quick` presets, the audit, the demo
@@ -269,8 +272,8 @@ rasters per friction; 68 files, listed in `notebooks/inputs_manifest.csv`, group
    `python notebooks/fetch_data.py --rebuild-derived [--stone-rule hybrid|stones7]`. It runs the commands of
    `data/derived/README.md` in order, with the model's configuration. Times and peak memory from the project's logs (8 GB machine): cost rasters per
    friction ~0.85 GB each; base haul table 14 s (stones7) / 249 s (hybrid), 1.7-2.4 GB; each further haul table about
-   12 s with stones7 (up to ~4 min with hybrid); k-best routes 95 s, 1.9 GB; wider-literature inputs 13 s, 2.2 GB; sea
-   tables 192 s, 1.1 GB; bichrome distances 15 s; food catchments not timed. **Total about 30-45 min with hybrid,
+   12 s with stones7 (up to ~4 min with hybrid; 460-545 s each on Colab); k-best routes 95 s, 1.9 GB; wider-literature inputs 13 s, 2.2 GB; sea
+   tables 192 s, 1.1 GB; bichrome distances 15 s; food catchments not timed. **Total about 30-45 min with hybrid, about 80 min on Colab's free tier,
    15-20 min with stones7** (estimated from the component logs; the sequence has not been timed end to end).
 
 The derived inputs of the full audited run were built in several steps of the project (provenance note in

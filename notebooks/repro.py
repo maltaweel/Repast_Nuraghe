@@ -310,7 +310,7 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
             raise PreflightError(
                 f"{len(miss)} derived input(s) missing in DERIVED_DIR = {src} (e.g. {miss[0]}). Get them first: "
                 "02_inputs.ipynb section 0b (rebuilds them automatically when they are missing and the prebuilt pack "
-                "DERIVED_URL is not available: about 30-45 min; or repro.prepare_inputs()), or set DERIVED_DIR to a "
+                "DERIVED_URL is not available: about 30-45 min (about 80 min on Colab's free tier); or repro.prepare_inputs()), or set DERIVED_DIR to a "
                 "folder that holds them (HOW_TO_USE.md, Derived inputs). "
                 "On Colab keep DERIVED_DIR on Google Drive so that every notebook sees it.")
         for dp, dn, fn in os.walk(src):
@@ -355,7 +355,7 @@ def make_workdir(package_dir, work_dir, stone_rule=SHIPPED_STONE_RULE, cache="pr
 AUTO_REBUILD_NOTE = (
     "NOTE: {n} derived input(s) missing in DERIVED_DIR = {d} and no prebuilt pack is available (DERIVED_URL not set "
     "or not reachable): REBUILDING THEM NOW from the raw inputs (fetch_data.rebuild_derived, stone rule {rule}). "
-    "This takes about 30-45 min and ~2.5 GB of memory; it is done once per DERIVED_DIR. On Google Colab put "
+    "This takes about 30-45 min (about 80 min on Colab's free tier) and ~2.5 GB of memory; it is done once per DERIVED_DIR. On Google Colab put "
     "DERIVED_DIR (and DATA_DIR) on Google Drive (MOUNT_DRIVE = True, config cell) so that the other notebooks find "
     "the rebuilt files instead of rebuilding them. If the runtime stops during the rebuild, run the notebook again: it continues from the last finished step. To skip this, set REBUILD_DERIVED = False (02) or DERIVED_DIR to "
     "a folder that holds them.")
@@ -385,7 +385,7 @@ def get_derived(derived_url=None, rebuild="auto", stone_rule=SHIPPED_STONE_RULE)
     data, cache = LAYOUT["data"], LAYOUT["cache"]
     rebuild = _rebuild_flag(rebuild)
     if rebuild is True:
-        print("REBUILD_DERIVED = True: rebuilding every derived input (about 30-45 min with hybrid, ~2.5 GB).")
+        print("REBUILD_DERIVED = True: rebuilding every derived input (about 30-45 min with hybrid, about 80 min on Colab's free tier, ~2.5 GB).")
         return fetch_data.rebuild_derived(data, cache, stone_rule=stone_rule, resume=False)
     url = derived_url or fetch_data.DERIVED_URL
     missing = derived_missing()
@@ -409,7 +409,7 @@ def prepare_inputs(derived_url=None, rebuild="auto", stone_rule=SHIPPED_STONE_RU
     """For a notebook opened in a runtime where 02_inputs has not run (03, 05 step d, 06; e.g. a new Colab runtime
     without Google Drive): copy the Nurnet files if missing and, if derived inputs are missing, download the public
     raw inputs (fetch_data.fetch, keeps what is present) and get the derived inputs as in 02 section 0b (get_derived:
-    prebuilt pack if available, else an automatic rebuild of about 30-45 min). Does nothing when all are present.
+    prebuilt pack if available, else an automatic rebuild of about 30-45 min (about 80 min on Colab's free tier)). Does nothing when all are present.
     Returns the derived inputs still missing ([] = complete)."""
     import fetch_data
     data, rebuild = LAYOUT["data"], _rebuild_flag(rebuild)

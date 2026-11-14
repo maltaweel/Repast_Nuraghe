@@ -11,7 +11,7 @@ software requirements, getting the data automatically or
 building stone) are Nurnet's data and are included in `data/nurnet/`; for the latest version and source information
 contact Nurnet at nurnet.presidente@gmail.com. Every other raw input is public and is downloaded from its official
 source by `fetch_data.py` (02, section 0). Derived inputs: rebuilt automatically by 02 when missing (`fetch_data.py --rebuild-derived`, about
-30-45 min) or the prebuilt pack (`DERIVED_URL`; the pack is part of the results package, not included in this repository).
+30-45 min (about 80 min on Colab's free tier)) or the prebuilt pack (`DERIVED_URL`; the pack is part of the results package, not included in this repository).
 
 The folders are set at the top of each notebook's config cell (`REPO_DIR`, `DATA_DIR`, `DERIVED_DIR`, `CONFIG`,
 `OUTPUTS_DIR`, `WORK_DIR`, `RESULTS_DIR`; defaults `data/`, `data/derived/cache/`,
@@ -32,7 +32,7 @@ notebooks install themselves, a Drive-like folder shared by the six notebooks).
    runtime): `DATA_DIR = "/content/drive/MyDrive/Repast_Nuraghe/data"`, `DERIVED_DIR =
    "/content/drive/MyDrive/Repast_Nuraghe/data/derived/cache"`, `OUTPUTS_DIR = "/content/drive/MyDrive/Repast_Nuraghe/outputs"`.
 3. Runtime > Run all. The setup cell clones the repository and installs OpenMPI and the pinned packages. Nothing else to
-   set: the first time 02 rebuilds the derived inputs automatically (about 30-45 min; the prebuilt pack is
+   set: the first time 02 rebuilds the derived inputs automatically (about 30-45 min (about 80 min on Colab's free tier); the prebuilt pack is
    not included in this repository) and prints a note saying so.
 4. 05_audit prints PASS / FAIL / NOT INCLUDED per step: (a) code checksums vs `CODE_SHA256SUMS`, (b) inputs
    vs `inputs_manifest.csv`, (c) `config/scenarios/config_full_audited.yaml` vs `param_audit/PARAM_TRACE.csv`, (d) a
