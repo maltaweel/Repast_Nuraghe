@@ -43,6 +43,9 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
    02 (section 0b) prints a note and rebuilds them automatically when they are missing from `DERIVED_DIR` (about
    30-45 min; see [Derived inputs](#derived-inputs)). Later runs reuse `DERIVED_DIR` on Drive. If 03 or 06 is opened
    in a runtime that does not see them (no Drive), it gets the inputs the same way before it starts.
+   Without Drive, everything lives on the runtime's own disk: run 01 to 06 in order in the same runtime; when asked,
+   use Runtime > Restart session (keeps the disk); never "Disconnect and delete runtime" between notebooks (it erases
+   the disk and the next notebook rebuilds the derived inputs again, about an hour on Colab); download results before closing.
 
 
 Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `demo` and `quick` presets, the audit, the demo

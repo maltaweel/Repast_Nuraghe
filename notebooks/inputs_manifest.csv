@@ -69,7 +69,7 @@ derived,derived/sea/sites_haul_sea2kn.csv,,,run,derived input (data/derived/READ
 derived,derived/sea/sites_haul_sea4kn.csv,,,run,derived input (data/derived/README.md); presence only
 derived,derived/sea/sites_haul_sea5kn.csv,,,run,derived input (data/derived/README.md); presence only
 derived,derived/sea/sites_haul_sea6kn.csv,,,run,derived input (data/derived/README.md); presence only
-derived,derived/stones4/kbest.npz,,,run,derived input (data/derived/README.md); presence only
+derived,derived/stones4/alliance/kbest.npz,,,run,derived input (data/derived/README.md); presence only
 derived,derived/stones4/outcrop_code.tif,,,run,derived input (data/derived/README.md); presence only
 derived,derived/stones4/sites_haul.csv,,,run,derived input (data/derived/README.md); presence only
 derived,derived/stones4/haul/outcrop_code_base_check.tif,,,run,derived input (data/derived/README.md); presence only
