@@ -341,4 +341,4 @@ Please cite the paper that describes this model, this repository and the results
 
 ## Licence
 
-Licence: to be decided by the authors.
+The code, configuration, notebooks and documentation are released under the MIT License (see `LICENSE`). The archaeological site and building-stone data are Nurnet's data (Nurnet GeoPortal, https://geo.nurnet.net/); their reuse is subject to Nurnet's terms.
