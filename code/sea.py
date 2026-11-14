@@ -71,7 +71,7 @@ def load_routes(base_haul, cfg, kn):
     """The r_* route columns of the sea table for the sites of base_haul (same order). Needs a table built by tools/sea_routes.py."""
     t = pd.read_csv(haul_csv(cfg, kn)).set_index("UID")
     miss = [c for c in ROUTE_COLS if c not in t.columns]
-    assert not miss, f"add4.sea_priced_as_charged needs sea tables rebuilt with v16 tools/sea_routes.py (missing {miss})"
+    assert not miss, f"add4.sea_priced_as_charged needs sea tables rebuilt with tools/sea_routes.py (missing {miss})"
     h = t.loc[base_haul.UID.to_numpy(), ROUTE_COLS].reset_index()
     h["r_found"] = h["r_found"].astype(bool)
     return h

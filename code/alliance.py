@@ -2454,7 +2454,7 @@ def run(a, cfg, haul, names, seeds, out_root=None):
             if getattr(S, "info", None):                  # static per-site choices (rails sites, sea faces)
                 with open(os.path.join(run_dir, "static_info.json"), "w") as fh:
                     json.dump(S.info, fh, indent=1)
-                print(f"[{tag}] v16 static: {json.dumps(S.info)}", flush=True)
+                print(f"[{tag}] static: {json.dumps(S.info)}", flush=True)
             done = set() if a.fresh else {s for s in seeds if os.path.exists(os.path.join(run_dir, f"seed_{s:04d}.done"))}
         else:
             done = None
