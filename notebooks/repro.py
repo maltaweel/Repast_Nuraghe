@@ -431,8 +431,16 @@ def prepare_inputs(derived_url=None, rebuild="auto", stone_rule=SHIPPED_STONE_RU
 
 
 # --------------------------------------------------------------------------- running
+_MPI_INHERITED = ("OMPI_", "PMIX_", "OPAL_", "PRTE_")
+
+
 def _env():
+    """Environment for child processes. If this Python process has itself initialised MPI (e.g. a notebook kernel
+    that imported repast4py or mpi4py.MPI), Open MPI exports singleton OMPI_*/PMIX_* variables; a child mpirun that
+    inherits them treats itself as a nested launch and exits silently. Drop them in that case."""
     e = dict(os.environ)
+    if "PMIX_RANK" in e or e.get("OMPI_MCA_ess") == "singleton" or "PMIX_NAMESPACE" in e:
+        e = {k: v for k, v in e.items() if not k.startswith(_MPI_INHERITED)}
     e.setdefault("PYTHONDONTWRITEBYTECODE", "1")
     e.setdefault("OMPI_MCA_rmaps_base_oversubscribe", "1")
     return e
