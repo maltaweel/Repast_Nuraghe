@@ -739,6 +739,14 @@ class AllianceModel:
         self.order = np.zeros(0, np.int64)
         self.current = [None] * N                              # current tower: dict
         self.n_started = 0
+        # alliance.help_only_if_started (robustness check, Appendix S2; default false = the headline behaviour): when true
+        # a community whose own nuraghe has not started yet (start not reached / cohort not yet fired) is never a help
+        # candidate (requests, relays, lintel helpers) nor a levy helper. help_ok marks the started communities; a
+        # season's whole start batch (cohort / units / rate starts) is marked BEFORE its start_tower calls, so members
+        # of the same batch can help one another with their first towers (start_tower asks for help as it runs).
+        # Read with .get, so the key is absent from every published configuration and their signatures are unchanged.
+        self.help_only_started = bool(A.get("help_only_if_started", False))
+        self.help_ok = np.zeros(N, bool)
         self.start_acc = 0.0
         self.season = 0
         self.day = 0
@@ -1463,6 +1471,9 @@ class AllianceModel:
         if nearer_than is not None:
             keep = np.hypot(xy[v, 0] - quarry_xy[0], xy[v, 1] - quarry_xy[1]) < nearer_than
             v, hop, d = v[keep], hop[keep], d[keep]
+        if self.help_only_started:                        # help_only_if_started: drop not-yet-started helpers
+            keep = self.help_ok[v]                        # (before the max_asks cut; relay brokers are not filtered, only helpers)
+            v, hop, d = v[keep], hop[keep], d[keep]
         o = np.lexsort((v, d, hop))[: int(self.A["max_asks"])]
         out = []
         for k in o:
@@ -1497,6 +1508,8 @@ class AllianceModel:
         out = []
         for j, dij in zip(nb, d):
             j = int(j)
+            if self.help_only_started and not self.help_ok[j]:   # help_only_if_started: not yet started
+                continue
             if nearer_than is not None:
                 dq = math.hypot(self.S.xy[j, 0] - quarry_xy[0], self.S.xy[j, 1] - quarry_xy[1])
                 if dq >= nearer_than:
@@ -2103,6 +2116,7 @@ class AllianceModel:
         if self.phase_frac and self.units is not None:     # S10 / S11: ordered unit cohorts
             if all(c is None for c in self.current) and self.cur_phase + 1 < len(self.cohorts):
                 self.cur_phase += 1
+                self.help_ok[[int(u[0]) for u in self.cohorts[self.cur_phase]]] = True   # help_only_if_started
                 for (i, t0, t1) in self.cohorts[self.cur_phase]:
                     assert self.tower_idx[i] == t0, "unit order: additions before the keep"
                     if self.start_day[i] < 0:
@@ -2117,6 +2131,7 @@ class AllianceModel:
         elif self.phase_frac:                              # phased: the next cohort starts once ALL earlier ones are built
             if all(c is None for c in self.current) and self.cur_phase + 1 < len(self.cohorts):
                 self.cur_phase += 1
+                self.help_ok[np.asarray(self.cohorts[self.cur_phase], np.int64)] = True   # help_only_if_started
                 for i in self.cohorts[self.cur_phase]:          # gid order
                     i = int(i)
                     self.n_started += 1
@@ -2129,6 +2144,7 @@ class AllianceModel:
             else:
                 self.start_acc += float(self.sc.get("start_rate", A["start_rate"])) * N
                 tgt = int(self.start_acc + 1e-9)
+            self.help_ok[self.start_order[self.n_started:max(self.n_started, min(N, tgt))]] = True   # help_only_if_started
             while self.n_started < N and self.n_started < tgt:
                 i = int(self.start_order[self.n_started])
                 self.n_started += 1
@@ -2344,6 +2360,8 @@ def scenario(cfg, name):
 def signature(cfg, sc, haul):
     keys = ["hours_per_day", "builders", "stone", "transport"]
     al = {k: v for k, v in cfg["alliance"].items() if k not in ("list", "verify_scenarios", "sensitivity")}
+    if not al.get("help_only_if_started", True):         # an explicit false = the default: same signature as no key
+        del al["help_only_if_started"]
     h = hashlib.sha1(json.dumps({**{k: cfg[k] for k in keys}, "alliance": al}, sort_keys=True, default=str).encode())
     h.update(json.dumps(_sig_sc(sc), sort_keys=True).encode())   # v13g: = sc unless reputation_rule "all" is explicit
     h.update(haul[["UID", "TWR_N", "haul_flatm", "haul_m"]].to_csv(index=False).encode())

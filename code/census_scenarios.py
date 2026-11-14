@@ -447,7 +447,7 @@ class Census:
         H = float(m.Hh)
         for j in self.levy_nb[i]:
             j = int(j)
-            if m.defector[j]:
+            if m.defector[j] or (m.help_only_started and not m.help_ok[j]):   # help_only_if_started
                 continue
             if self.levy_used_s[j] < float(lv["days"]) * float(lv["share"]) * float(m.B[j]) * H:
                 return j
