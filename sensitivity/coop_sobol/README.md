@@ -1,8 +1,8 @@
 # sensitivity/coop_sobol: cooperation-model Sobol
 
-Sobol sensitivity analysis of the cooperation model on `code/`, repeating the design of an earlier (28 October
-2026) cooperation-model Sobol with the model's code and sourced ranges. Results:
-[`outputs/sensitivity/coop_sobol/`](../../outputs/sensitivity/coop_sobol/). Placeholders and the run-folder layout:
+Sobol sensitivity analysis of the cooperation model on `code/`, with the factors and scenarios of the cooperation-model
+("stage-2") Sobol design and sourced ranges. Results:
+[`outputs/sensitivity/coop_sobol/`](../../outputs/sensitivity/coop_sobol/). Path tokens and the run-folder layout:
 [`sensitivity/README.md`](../README.md).
 
 ## What it runs
@@ -30,17 +30,16 @@ Sobol sensitivity analysis of the cooperation model on `code/`, repeating the de
 
 | file | what |
 |---|---|
-| `coopsobol.py` | the harness: `design`, `check` (dry mapping check), `ids` (pending evaluation ids, gid = scenario index x 6,656 + row, order none, mixed, full), `eval --gid G` (-> `evals/<scenario>/NN/eval_RRRRR.csv` + `.ok`), `eval --baseline --scenario S --seed s` |
-| `analyse.py` | S1 and ST with 95% bootstrap confidence intervals per scenario and output (SALib `sobol.analyze`, 1,000 resamples, seed 1), the same on the first 256 base rows, and an optional comparison with the 28 October indices (not published); `--partial` for a look before the end |
+| `coopsobol.py` | the harness: `design`, `check` (dry mapping check), `ids` (unfinished evaluation ids, gid = scenario index x 6,656 + row, order none, mixed, full), `eval --gid G` (-> `evals/<scenario>/NN/eval_RRRRR.csv` + `.ok`), `eval --baseline --scenario S --seed s` |
+| `analyse.py` | S1 and ST with 95% bootstrap confidence intervals per scenario and output (SALib `sobol.analyze`, 1,000 resamples, seed 1), the same on the first 256 base rows, and an optional comparison with external stage-2 indices (not included); `--partial` for a look before the end |
 | `analyse_n256.py` | indices from a prefix of the design (base rows 0..N-1, N a power of 2), e.g. `--n 256` once the first half is done; `--complete-only` uses the largest complete prefix |
 
-The driver scripts of the project's machine (worker pool, memory guard) are in the git history; the commands below
-do the same. Check the code copy first: `cd $RUN/code && sha256sum -c $REPO/CODE_SHA256SUMS`.
+The commands below do what the driver scripts of the project's machine (worker pool, memory guard) did. Check the code copy first: `cd $RUN/code && sha256sum -c $REPO/CODE_SHA256SUMS`.
 
 ## How to run
 
 ```
-# after copying this folder to $WORK and replacing the placeholders (../README.md); $RUN/code = a copy of code/
+# after copying this folder to $WORK and replacing the path tokens (../README.md); $RUN/code = a copy of code/
 cd $WORK
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMBA_NUM_THREADS=1 OMPI_MCA_btl=self
 export COOPSOBOL_MAX_DAYS=200000
@@ -53,7 +52,7 @@ python analyse.py                               # indices_coopsobol.csv, indices
 python analyse_n256.py --n 256                  # optional: indices on the first half only
 ```
 
-Evaluations with an `.ok` file are skipped, so the `xargs` line can be rerun after an interruption. For the
+Evaluations with an `.ok` file are skipped, so the `xargs` line can be run again after an interruption. For the
 halves-first order, feed the ids with base row < 256 first. Regenerating the design from the published files gives
 a `design.csv` identical to `outputs/sensitivity/coop_sobol/design.csv.gz` (checked).
 

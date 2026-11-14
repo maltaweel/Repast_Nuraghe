@@ -1,4 +1,4 @@
-"""Wider-literature scenarios (1 Nov 2026 b): inputs along the k-best quarry routes of cache/alliance/kbest.npz.
+"""Wider-literature scenarios: inputs along the k-best quarry routes of cache/alliance/kbest.npz.
 
   python tools/wl_inputs.py CFG
 

@@ -291,10 +291,10 @@ def run_rule(cfg, rule, cost_raster=None, tag=None):
     names = np.array(["none"] + classes)
     qcode = np.where(ok, code.ravel()[np.maximum(res_o, 0)], 0)
     sr = np.where(res_r >= 0, res_r, row); sc_ = np.where(res_c >= 0, res_c, col)   # N5: snapped cell (nosnap: original)
-    # v15b (specified by the authors "they should only query the relevant stone ... if no info exists about this or it
+    # Specified by the authors ("they should only query the relevant stone ... if no info exists about this or it
     # cannot reach the desired stone then it goes for stone that is allowed"): on-outcrop is tested against the stone
-    # set the site ACTUALLY quarries = its recorded set if reachable, else the fallback set (was: always want[i], the
-    # recorded set, also for recorded_unreachable_fallback sites). Same set as site_stone_sets.csv below.
+    # set the site ACTUALLY quarries = its recorded set if reachable, else the fallback set (for
+    # recorded_unreachable_fallback sites: the fallback set). Same set as site_stone_sets.csv below.
     used = [base if qsrc[i] == "recorded_unreachable_fallback" else want[i] for i in range(len(uids))]
     on_out = np.array([code[sr[i], sc_[i]] > 0 and names[code[sr[i], sc_[i]]] in used[i] for i in range(len(uids))])
     out = pd.DataFrame({"UID": uids, "x": x, "y": y, "TWR_N": sites[f["towers"]].astype(int),

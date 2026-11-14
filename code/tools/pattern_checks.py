@@ -1,10 +1,10 @@
-"""v12 (2 Nov 2026) census post hoc checks (TESTABLE_PLAN.md part B, 10 checks, 0 runs) on the delivered v11 outputs.
+"""Census post hoc checks (10 checks of the literature census, no new runs) on the MOST_REALISTIC outputs.
 
-  python tools/pattern_checks.py W      (W = runs/2026-11-02-v12-census; run under the lock)
+  python tools/pattern_checks.py W      (W = the run folder; run under the lock)
 
-Inputs (read only): v11 MOST_REALISTIC_P10 per-site summary (scenarios_alliance/MOST_REALISTIC_P10/
+Inputs (read only): MOST_REALISTIC_P10 per-site summary (scenarios_alliance/MOST_REALISTIC_P10/
 nuraghe_manhours_summary.csv: mean over 100 seeds of man-hours, build days, builders, the face-0 route length haul_m),
-its 100 part files (per seed: builders, start/finish day, own man-hours), v11 summary/v11_runs.csv (P10, P20, P100 island
+its 100 part files (per seed: builders, start/finish day, own man-hours), the summary table of the P10, P20, P100 runs (island
 years), the hybrid haul tables (cache/sites_haul.csv: recorded / fallback stone, on_outcrop), the hybrid outcrop raster
 (cache/outcrop_code.tif) and the 1:250,000 soil map (land-capability classes, Aru et al. 1991).
 Route length = the site's least-cost (mu 0.3) route to its nearest allowed outcrop, as hauled by MR_P10 when it keeps

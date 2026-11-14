@@ -77,11 +77,11 @@ def target_kg(cfg, lit, tw):
 
 
 def md_hours(cfg, stage):
-    """v11 (2 Nov 2026): hours in one of Webster's (1991: 852, Table 1) man-days of a stage. Webster takes quarrying
+    """Hours in one of Webster's (1991: 852, Table 1) man-days of a stage. Webster takes quarrying
     (2,700 kg/man-day) and transport (1,200 kg/man-day) from Erasmus 1965 (pp. 286-7), whose man-day is a 5-h day
     (Erasmus 1965: 283, via Boswinkel 2021: 145); dressing (0.40 m3/man-day) and wall construction (0.80 m3/man-day)
     come from Abrams 1984, whose man-day is 8 h (Abrams 1994: 46-47, via Boswinkel 2021: 109; Devolder's 0.1 m3/ph
-    from Abrams = 0.8 m3 / 8 h, Boswinkel 2021: 125, Table 7.11). With `v11.webster_day_fix` off (v10) every
+    from Abrams = 0.8 m3 / 8 h, Boswinkel 2021: 125, Table 7.11). With `v11.webster_day_fix` off every
     man-day is converted at the model's working day hours_per_day."""
     v = cfg.get("v11") or {}
     if v.get("webster_day_fix"):
@@ -92,7 +92,7 @@ def md_hours(cfg, stage):
 def stage_hours(cfg, lit, tw, stone, n_blocks):
     """Deterministic person-hours of the non-transport stages for one site."""
     L = cfg["lit_scenarios"]
-    Hq, Hd, Hb = md_hours(cfg, "quarry"), md_hours(cfg, "dress"), md_hours(cfg, "build")   # v11 (H each when off)
+    Hq, Hd, Hb = md_hours(cfg, "quarry"), md_hours(cfg, "dress"), md_hours(cfg, "build")   # Webster day lengths (H each when off)
     md = L["webster_md_per_tower"]
     share = L["lift_share_of_build"]
     if lit.get("classes"):                                    # S7: Webster's class totals instead of x TWR_N
@@ -133,9 +133,9 @@ def stage_hours(cfg, lit, tw, stone, n_blocks):
         c = L["geometry"]["course_height_m"]
         lift = n_blocks * (1.0 - w[0]) * L["lever_ph_per_block_course"] * (L["stair_lever_last_m"] / c)
     # S8 learning: tower i (0-based) costs (1 - rate)^i of the first one
-    # code_v17, SP-22 ruling (specified by the authors, 9 Nov 2026: no discount on lift, long-term rates;
+    # SP-22 ruling (specified by the authors: no discount on lift, long-term rates;
     # spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate: the learning factor (PM:23) and
-    # skill (PM:173) apply to quarrying, dressing and building only, never to lift." (was: lift * f as well; engine B,
+    # skill (PM:173) apply to quarrying, dressing and building only, never to lift." (learning applies here in engine B,
     # model.py S8 rows; the season engine calls this with learning=False and applies S8 per tower itself)
     if lit.get("learning") and tw > 1:
         f = sum((1.0 - L["learning_rate"]) ** i for i in range(tw)) / tw
@@ -168,18 +168,18 @@ def oxen_yokes(mass, o):
         y[bad] += 1
 
 
-# --------------------------------------------------------------------------- v16: addendum 4 flags
+# --------------------------------------------------------------------------- addendum 4 flags
 # Addendum 4 of the specification, L1-L4, each behind its own flag in the top-level config block `add4:`.
-# code_v16_flags: default OFF (5 Nov 2026). code_v16_final (change notes, git history): L2 bedrock_everywhere and L3
-# load_per_tonne default ON (kept after the flag test, change notes, git history); L1 rails_cost_choice and L4 sea_priced_as_charged default
-# OFF (not kept). The flags stay, so a row can still switch any of them with its own `add4:` block.
+# Defaults: L2 bedrock_everywhere and L3
+# load_per_tonne default ON; L1 rails_cost_choice and L4 sea_priced_as_charged default
+# OFF. A row can switch any of them with its own `add4:` block.
 ADD4_FLAGS = ("rails_cost_choice", "bedrock_everywhere", "load_per_tonne", "sea_priced_as_charged")
 ADD4_DEFAULTS = {"rails_cost_choice": False, "bedrock_everywhere": True, "load_per_tonne": True,
                  "sea_priced_as_charged": False, "rail_lay_mh_per_m": 2.0, "load_ph_per_t": 1.2}
 
-# Code version of every result-changing code path (code_v16_final). Hashed into EVERY run signature (alliance.signature,
-# model.run_signature) together with the effective add4 settings, so part files written by older code are never reused.
-CODE_VERSION = "2026-11-09-v17"      # code_v17 (9 Nov): SP-22 lift undiscounted (spec addendum k, ODD 7.9); was 2026-11-05-v16_final
+# Code version of every result-changing code path. Hashed into EVERY run signature (alliance.signature,
+# model.run_signature) together with the effective add4 settings, so part files written by another code version are never reused.
+CODE_VERSION = "2026-11-09-v17"      # code version of the model; part of every run signature
 
 
 def add4(cfg):
@@ -203,7 +203,7 @@ _CPT = {}
 def crews_per_tonne(cfg, pull, mf):
     """Expected sledge crew (person-trips) per tonne of stone for blocks of the config's lognormal draw scaled by the
     S6 mass factor mf: E[ceil(m mf / pull)] / E[m mf / 1000]. Fixed sample (default_rng(0), 200,000 blocks, as
-    tools/sea_routes.py mean_crew), so it is deterministic and seed-independent (used only for the v16 static
+    tools/sea_routes.py mean_crew), so it is deterministic and seed-independent (used only for the static
     choices L1 / L4, which are made once per site before the run)."""
     s = cfg["stone"]
     key = (float(pull), float(mf), float(s["block_median_kg"]), float(s["block_sigma"]), float(s["block_min_kg"]),
@@ -233,8 +233,8 @@ def mixed_haul(cfg, lit, load, use_long=None):
     """Haul table of a mixed scenario: each site's row from the short-haul (sledge) table, replaced by the
     long-haul table's row where the short-haul route is longer than long_min_haul_m. `load(path)` reads one
     haul table (model.load_haul). Adds the per-site technique columns lit_haul_rule, lit_type.
-    v16 (addendum 4 L1, flag add4.rails_cost_choice): `use_long` (bool per row of the short table) replaces the
-    long_min_haul_m threshold; None (default) = the threshold rule, unchanged. Rows with no long-haul route stay short."""
+    Addendum 4 L1 (flag add4.rails_cost_choice): `use_long` (bool per row of the short table) replaces the
+    long_min_haul_m threshold; None (default) = the threshold rule. Rows with no long-haul route stay short."""
     m = lit["mixed"]
     short = load(haul_csv(cfg, {"haul": m["short"]["haul"]}))
     lng = load(haul_csv(cfg, {"haul": m["long"]["haul"]})).set_index("UID").reindex(short.UID).reset_index()
@@ -255,13 +255,13 @@ def mixed_haul(cfg, lit, load, use_long=None):
 def resolve_site(cfg, lit, rec, engine_b=False):
     """Single-rule scenario dict for one site of a mixed scenario.
     engine_b=True (model.py, day-based engine-B rows, SCENARIOS section 19): addendum-4 L2 is NOT applied, the row
-    keeps its own quarry rule (addendum 4 of the specification, scope clarification, lines 41-42; fix 9 Nov 2026)."""
+    keeps its own quarry rule (addendum 4 of the specification, scope clarification, lines 41-42)."""
     m = lit["mixed"]
     tw = int(rec["TWR_N"])
     d = {k: v for k, v in lit.items() if k != "mixed"}
     d.update(m[rec["lit_haul_rule"]])                                     # mu, haul (+ oxen in a variant)
     d["quarry"] = m["quarry_on_outcrop"] if bool(rec["on_outcrop"]) else m["quarry_off_outcrop"]
-    if add4(cfg)["bedrock_everywhere"] and not engine_b:                 # v16 L2: bedrock along joints everywhere
+    if add4(cfg)["bedrock_everywhere"] and not engine_b:                 # L2: bedrock along joints everywhere
         d["quarry"] = m["quarry_on_outcrop"]
     if tw <= int(m["dress_none_max_towers"]):
         d["dress"] = "none"

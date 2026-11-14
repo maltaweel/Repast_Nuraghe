@@ -17,7 +17,7 @@ rows in ID order. Deterministic: chunked read -> reproject (pyproj default trans
 -> append. Memory stays below ~400 MB with the default chunk.
 
 Comparison with the copy used for the runs (notebooks/inputs_manifest.csv): NOT byte-identical. That copy was
-exported on 14 Oct 2026 from the same ARPAS map as held in a project database (same 47,780 polygons, same IDs and
+exported from the same ARPAS map as held in a project database (same 47,780 polygons, same IDs and
 map units, same vertex counts); its coordinates differ from this reprojection by about 4-5 mm (a different datum
 transformation at import) and its rows are in database order. The .prj and .cpg files are byte-identical. On the
 30 m grid of the model the difference is immaterial; `--compare RUN_COPY.shp` reports it.

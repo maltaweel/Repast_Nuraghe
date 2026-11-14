@@ -907,7 +907,7 @@ def headline_from_summaries(summary_dir, label=AUDIT_SCENARIO, parts_dir=None, r
     missing = [p for p in (ps_path, sm_path) if not os.path.isfile(p)]
     if missing:
         for p in missing:
-            print(f"NOT YET AVAILABLE: {p} (a data input from the results package, not in the repository; see "
+            print(f"NOT INCLUDED (see README): {p} (a data input from the results package, not in the repository; see "
                   "outputs/summary/README.md)")
         if parts_dir:
             pp = per_seed_from_parts(parts_dir, label)

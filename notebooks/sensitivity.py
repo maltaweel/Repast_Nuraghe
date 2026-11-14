@@ -25,8 +25,8 @@ int: Morris round(lo + u (hi - lo)) (u is on the 4-level grid), Sobol equal-prob
 lo + floor(u (hi - lo + 1)).
 
 lift_learning (Sobol only): level 0 = lift undiscounted (the model's rule, spec addendum k: the learning factor and skill
-act on quarrying, dressing and building only, never on lift); level 1 = lift discounted with the build stage (an
-earlier rule). Level 1 needs a code switch (config key sobol.lift_learning) that is NOT in the published code/: the
+act on quarrying, dressing and building only, never on lift); level 1 = lift discounted with the build stage (the
+alternative rule). Level 1 needs a code switch (config key sobol.lift_learning) that is NOT in the published code/: the
 full Sobol run used a copy of code/ with that one switch added (sensitivity/sobol2/code_variant.patch; default off =
 code/ exactly). With the
 published code the factor is therefore left out of the demo (demo_names("sobol")); the full design is still
@@ -138,7 +138,7 @@ FACTORS += [
          key="sc.R_m (help radius of the scenario; alliance.R_m unchanged)", why="5-15 km (no help-distance source)"),
     dict(name="lift_learning", row="-", kind="binary", levels=[False, True], headline=False,
          key="cfg.sobol.lift_learning (code switch, not in the published code)",
-         why="lift undiscounted (headline) vs discounted with the build stage (earlier rule)"),
+         why="lift undiscounted (headline) vs discounted with the build stage (alternative rule)"),
 ]
 SOBOL_NAMES = SOBOL_MORRIS + ["R_m", "lift_learning"]
 FBY = {f["name"]: f for f in FACTORS}

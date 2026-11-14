@@ -1,4 +1,4 @@
-"""v12 (2 Nov 2026) census scenarios: the TESTABLE NOW ideas of census/TESTABLE_PLAN.md as switches on MOST_REALISTIC.
+"""Census scenarios: the TESTABLE NOW ideas of the literature census (param_audit/census.csv) as switches on MOST_REALISTIC.
 
 Every switch is a key of the scenario dict (config.yaml -> alliance_census) and is OFF unless set; alliance.py creates
 a Census object only when at least one of alliance.CENSUS_KEYS is set, so with every switch off the original code path
@@ -201,7 +201,7 @@ class Census:
         if sc.get("clearance"):                              # S18: clearance stone first (scree rate, min_haul_flatm haul)
             rem = float(self.clear_budget[i])
             qt, mix = [], []
-            L3 = bool(getattr(m, "L3", False))               # v16 L3 on the clearance haul too (fix 6 Nov, docking F7)
+            L3 = bool(getattr(m, "L3", False))               # L3 on the clearance haul too (docking F7)
             tmin = m.trip(0.0, 0.0, "whole", float(m.tp["drag_speed_ms"]), 0.0) if L3 else m.trip(0.0, 0.0, "whole")
             for t in range(tw):
                 tn = float(m.towers[i][t][0])
@@ -229,7 +229,7 @@ class Census:
                     ratio = min(3.0, max(1.0, f0["C"] / f0["L"])) if f0["L"] > 0 else 1.0
                     rails = Lc > float(self.L["list"]["REALISTIC"]["mixed"]["long_min_haul_m"])
                     pull_c = float(self.L["f_person_kgf"]) / (0.1 if rails else 0.38)
-                    L3 = bool(getattr(m, "L3", False))       # v16 L3 on the contrast haul too (fix 6 Nov, docking F5)
+                    L3 = bool(getattr(m, "L3", False))       # L3 on the contrast haul too (docking F5)
                     trip = m.trip(Lc * ratio, Lc, "whole", float(m.tp["drag_speed_ms"]), 0.0) if L3 else \
                         m.trip(Lc * ratio, Lc, "whole")
                     out = []
@@ -305,7 +305,7 @@ class Census:
             C, L = float(mv[f0["a"]:f0["b"]].sum()), f0["L"]
         else:
             C, L = f0["C"], f0["L"]
-        if getattr(m, "L3", False):                          # v16 L3 on the lintel haul too (fix 6 Nov)
+        if getattr(m, "L3", False):                          # L3 on the lintel haul too
             return float(self.lintel_crew[i]) * m.trip(C, L, "whole", float(m.tp["drag_speed_ms"]), 0.0) + \
                 float(self.lintel["kg"]) / 1000.0 * m.lp
         return float(self.lintel_crew[i]) * m.trip(C, L, "whole")
@@ -379,8 +379,8 @@ class Census:
     # ------------------------------------------------------------------ season start: levy budgets, lintel retries
     def season_start(self):
         if self.levy is not None:
-            # v16 S2 (addendum 4): the levied days per community per year may not exceed `days`; the work booked in a
-            # season beyond the budget (days x share x party x hours) carries to the next season (v15b: reset to 0)
+            # S2 (addendum 4): the levied days per community per year may not exceed `days`; the work booked in a
+            # season beyond the budget (days x share x party x hours) carries to the next season
             lv, H = self.levy, float(self.m.Hh)
             budget = float(lv["days"]) * float(lv["share"]) * self.m.B.astype(np.float64) * H
             self.levy_used_s[:] = np.maximum(0.0, self.levy_used_s - budget)

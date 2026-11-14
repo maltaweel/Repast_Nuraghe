@@ -1,4 +1,4 @@
-"""Summary of the 1 Nov 2026 scenario-gap runs (S10-S14) against MOST_REALISTIC_P10, from the per-seed part files.
+"""Summary of the scenario-gap runs (S10-S14) against MOST_REALISTIC_P10, from the per-seed part files.
 
   python tools/gaps_summary.py CFG --parts PARTS_ROOT [--ref-parts REF_ROOT] --names N1,N2,... --out DIR
 

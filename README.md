@@ -51,7 +51,7 @@ doi:[10.1109/WSC57314.2022.10015389](https://doi.org/10.1109/WSC57314.2022.10015
   `CODE_SHA256SUMS`); `config/config_full_audited.yaml` is its configuration (the same values as
   `config/scenarios/config_full_audited.yaml`, the copy the queue reads, and as `code/config.yaml`). The run
   signature includes the code version string `CODE_VERSION` (`code/lit.py`) and the `add4` settings. The results in
-  the paper come from this code and configuration; the remaining sensitivity results land with the final pass
+  the paper come from this code and configuration; the sensitivity results are in `outputs/sensitivity/`
   ([Sensitivity results](#sensitivity-results)). The ODD describes this code.
 - **Phasing.** In the headline scenario the island is built in cohorts of 10% of the communities, one cohort after
   the other (`_P10`; ODD section 7).
@@ -115,22 +115,23 @@ source information contact Nurnet at nurnet.presidente@gmail.com.
   and in `data/README.md`.
 - **Derived inputs** (haul tables, quarry routes, sea tables, ...): rebuilt from the raw inputs by
   `python notebooks/fetch_data.py --rebuild-derived` (about 30-45 min), or the prebuilt pack of the full audited run
-  in the results package (DOI pending).
-- **Results** of the full audited run (per-seed tables, part files, logs): results package, DOI pending.
+  in the results package (a separate data publication, not included in this repository).
+- **Results** of the full audited run (per-seed tables, part files, logs): results package (a separate data
+  publication, not included in this repository).
 
 ## Sensitivity results
 
 The sensitivity results of the model (code `code/`, configuration `config/scenarios/config_full_audited.yaml`)
 are in [`outputs/sensitivity/`](outputs/sensitivity/), as small island-level tables (no per-site data). It is the only
-folder of the repository with model results. Each subfolder has a README with the factors, ranges, commands and dates.
+folder of the repository with model results. Each subfolder has a README with the factors, ranges and commands.
 
 | folder | what | status |
 |---|---|---|
 | `a5_alliance/` | alliance-model grid on `A5_full`: 27 cells (radius x learning ratio x track cost) + the `A0_alone` reference, 100 seeds each | complete |
-| `sobol2/` | Sobol run 2 on the headline: 26 factors, Saltelli N = 512 (14,336 evaluations x 3 seeds) | design now; results with the final pass |
-| `coop_sobol/` | cooperation-model Sobol: 11 factors x scenarios none / mixed / full, N = 512 (19,968 evaluations) | design now; results with the final pass |
-| `morris/` | Morris screens (32-factor screen; physical 5-factor screen) | with the final pass |
-| `feasibility/` | feasibility grid (pull x drag x tonnage) | with the final pass |
+| `sobol2/` | Sobol analysis of the headline: 26 factors, Saltelli N = 512 (14,336 evaluations x 3 seeds) | complete |
+| `coop_sobol/` | cooperation-model Sobol: 11 factors x scenarios none / mixed / full, N = 512 (19,968 evaluations) | complete |
+| `morris/` | Morris screens (32-factor screen; physical 5-factor screen) | not included (run with `notebooks/06_sensitivity.ipynb`) |
+| `feasibility/` | feasibility grid (pull x drag x tonnage) | not included |
 
 **Reading the tables.** All are CSV (`*.csv.gz`: gzip-compressed; `pandas.read_csv` reads both).
 
@@ -151,7 +152,7 @@ folder of the repository with model results. Each subfolder has a README with th
   `sha256sum FILE` against the `sha256` column.
 
 **Regenerating them.** The Sobol harnesses are in [`sensitivity/`](sensitivity/) (the scripts that ran, with the
-code variant of Sobol run 2 as a patch on `code/`; commands, runtime and memory in each README). They write the
+code variant of the `sobol2` analysis as a patch on `code/`; commands, runtime and memory in each README). They write the
 run tables and indices into their own folder; `python outputs/sensitivity/export.py --project <folder>` turns them
 into the tables above (it recomputes the indices with SALib 1.6.0 and checks them against the run's own analysis).
 The A5 grid runs from `code/` (`outputs/sensitivity/a5_alliance/README.md`); `notebooks/06_sensitivity.ipynb` runs
@@ -205,7 +206,7 @@ On Python 3.10-3.11 the model runs and results agree except for last-digit diffe
    ```
    `torch` is not pinned: repast4py imports it, the model never uses it.
 3. Get the input data: `python notebooks/fetch_data.py` (or by hand: `notebooks/HOW_TO_USE.md`); set `data_dir:` in
-   the config you use to the **absolute** path of the data folder (the configs in `config/` hold a placeholder).
+   the config you use to the **absolute** path of the data folder (the configs in `config/` hold `/ABSOLUTE/PATH/TO/data`).
 
 Resources (measured on the 8 GB machine of the runs): one 100-seed run of the headline scenario on 6 MPI ranks takes
 about 6 minutes and peaks at about 6 GB (proportional set size 5.9 GB; resident 7.6 GB; largest rank 2.8 GB); the
@@ -320,7 +321,7 @@ wall time on the 8 GB machine of the runs (6-8 ranks per entry, `ranks` column).
   page, evidence type, testability, the scenario that implements each idea, and a field prediction). Quotations
   are not reproduced; see the cited works.
 - Results, per-scenario tables, logs and the derived inputs of the full audited run: results package
-  "data file/nuraghe-build-abm-full-audited" (Nurnet cloud), DOI pending. Files referred to in the audit documents
+  "data file/nuraghe-build-abm-full-audited" (Nurnet cloud), a separate data publication. Files referred to in the audit documents
   but not in this repository (e.g. `SCENARIO_PROVENANCE_v2.csv`, `GAPS.md`, `PARAM_NOT_IN_AUDIT.csv`,
   `LIT_ALT_COVERAGE.csv`) are in that package.
 
@@ -334,15 +335,9 @@ Sardegna 1:25,000, © Regione Autonoma della Sardegna / ARPAS, CC BY 4.0. DEM: C
 Soils: Aru, Baldaccini & Vacca 1991, RAS/AGRIS, CC BY. Rivers: Regione Autonoma della Sardegna, PPR 2006 layer
 'Fiumi torrenti e altri corsi d'acqua' ('fiumitorrenti'), see provider. Details and links: `data/README.md`.
 
-## Version
-
-This repository holds one version of the model: the code in `code/` and the configurations in `config/` that
-produced the results. Earlier development versions are in the git history.
-
 ## Citation
 
-Paper in preparation. Please cite the paper when it is published; until then, cite this repository and the
-results package (DOI pending).
+Please cite the paper that describes this model, this repository and the results package.
 
 ## Licence
 

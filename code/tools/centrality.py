@@ -125,7 +125,7 @@ def pagerank(N, src, dst, w, alpha=0.85, tol=1e-12, it=500):
 def eigvec(N, src, dst, w):
     A = sp.csr_matrix((w, (src, dst)), shape=(N, N))
     S = (A + A.T).astype(np.float64)
-    if S.nnz == 0 or not np.any(S.data):        # 19:45: empty layer (no help / no ties, e.g. _alone_, P_none): all-zero centrality
+    if S.nnz == 0 or not np.any(S.data):        # empty layer (no help / no ties, e.g. _alone_, P_none): all-zero centrality
         return np.zeros(N)
     vals, vecs = eigsh(S, k=1, which="LA")
     v = np.abs(vecs[:, 0])

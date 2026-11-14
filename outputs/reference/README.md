@@ -1,7 +1,7 @@
 # outputs/reference (audit step d)
 
-`reference_audit_sha256.csv` (not yet shipped: it is generated after the full audited run has finished) is the
-fingerprint of one fixed rerun:
+`reference_audit_sha256.csv` (not included in the repository; make it with `05_audit.ipynb`, see below) is the
+fingerprint of one fixed run:
 
 - scenario `MOST_REALISTIC_AUDITED_LIT_P10`, the model's code `code/`, configuration
   `config/scenarios/config_full_audited.yaml` (the model's configuration);
@@ -10,7 +10,7 @@ fingerprint of one fixed rerun:
 
 The code version is part of every run signature, so a fingerprint made with another code version cannot match.
 
-Columns: `item` (path under the rerun folder; part files of all ranks of one seed pooled as `...rank*.csv`), `kind`
+Columns: `item` (path under the run folder; part files of all ranks of one seed pooled as `...rank*.csv`), `kind`
 (`bytes`, `gz_content` or `rows`), `sha256`, `n` (bytes, decompressed bytes or data rows). Written and compared by
 `notebooks/repro.py` (`fingerprint`, `write_fingerprint`, `compare_reference`); made by `05_audit.ipynb` with
 `MAKE_AUDIT_REFERENCE = True`, checked by the same notebook with the default settings. The number of MPI ranks does

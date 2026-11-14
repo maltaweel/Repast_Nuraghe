@@ -1,6 +1,6 @@
 """Shared helpers for the phase / workforce / centrality tools: scenario discovery and lean, streamed run loading.
 
-Scenario families under an output root (default: the delivered v5 outputs, REF/output):
+Scenario families under an output root (default: REF/output):
   baseline  output/nuraghe_manhours_runs.csv.gz
   coop      output/scenarios/<name>/            (none low mixed mostly full high patchwork)
   lit       output/scenarios_lit/<name>/        (webster + S1a..S8 + LOW/HIGH bounds = 22)

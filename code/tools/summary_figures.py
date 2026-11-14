@@ -1,4 +1,4 @@
-"""Figures of the executive summary (1 Nov (b) edition; v11: reads all_scenarios_v11.csv, pull125 in the MR group), from outputs/summary_all/all_scenarios_ranked.csv.
+"""Figures of the executive summary (pull125 in the MR group), from outputs/summary_all/all_scenarios_ranked.csv.
 
   python tools/summary_figures.py RANKED_CSV OUT_DIR
 
@@ -38,7 +38,7 @@ GROUPS = [("Literature (chaîne opératoire)", ("Literature",)),
           ("Sea access S9", ("Sea access",)),
           ("Phasing P10/P20 twins", ("Phasing",)),
           ("MOST_REALISTIC (+ v11 pull125)", ("MOST_REALISTIC", "Season", "v11 sensitivity")),
-          ("S10–S14 (1 Nov)", ("S10-S14",)),
+          ("S10–S14", ("S10-S14",)),
           ("C1–M4 wider literature", ("Wider literature",))]
 
 

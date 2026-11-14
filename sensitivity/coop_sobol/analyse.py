@@ -2,9 +2,9 @@
 """Cooperation-model Sobol on code/: analysis. Per scenario (none, mixed, full) and per output: first-order S1 and
 total-order ST with 95% bootstrap confidence intervals (SALib 1.6.0 sobol.analyze, calc_second_order=False,
 1,000 resamples, conf 0.95, seed 1), on the single-seed value of each evaluation. Convergence: the same indices on the
-first 256 base rows (a valid N = 256 Saltelli prefix) vs all 512. Comparison with the 28 Oct GPU indices
-(output/sensitivity/hybrid/stage2/indices2_<scenario>.csv, N 4,096; different code and two changed ranges, see
-README) for the outputs both runs have.
+first 256 base rows (a valid N = 256 Saltelli prefix) vs all 512. Optional comparison with external
+stage-2 indices (@PROJECT@/output/sensitivity/hybrid/stage2/indices2_<scenario>.csv; not included, the column stays
+empty without them) for the outputs both have.
 
 Writes indices_coopsobol.csv (scenario, output, factor, S1, S1_conf, ST, ST_conf), indices_coopsobol_N256.csv,
 per_eval.csv and COOPSOBOL_RESULTS.md. Refuses to run until all 19,968 evaluations have a result, unless --partial
@@ -124,7 +124,7 @@ def write_md(P, I, C, notes):
         L.append(f"| {s} | {n['n_eff']} | {n['dropped']} | {n['unfinished']} | {n['error']} | {n['wall_med']:.1f} | "
                  f"{n['wall_sum_h']:.1f} |")
     L.append("\n## Factors\n")
-    L.append("| factor | range (now) | 28 Oct range | changed |")
+    L.append("| factor | range | stage-2 range | changed |")
     L.append("|---|---|---|---|")
     for n, f in F.iterrows():
         L.append(f"| `{n}` | {float(f['lo']):g}-{float(f['hi']):g} ({f['kind']}) | {f['old']} | {f['changed']} |")
@@ -133,7 +133,7 @@ def write_md(P, I, C, notes):
         if not len(T):
             continue
         L.append(f"\n## {out}\n")
-        L.append("| factor | " + " | ".join(f"{s} ST (95% CI) | {s} S1" for s in P["scenarios"]) + " | 28 Oct ST range |")
+        L.append("| factor | " + " | ".join(f"{s} ST (95% CI) | {s} S1" for s in P["scenarios"]) + " | stage-2 ST range |")
         L.append("|---|" + "---|---|" * len(P["scenarios"]) + "---|")
         old = {}
         for s in P["scenarios"]:

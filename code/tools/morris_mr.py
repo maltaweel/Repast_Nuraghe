@@ -12,9 +12,9 @@ SKIPPED: other_mandays_per_tower. The alliance model never reads it (stage hours
 the REALISTIC per-site rules), so it cannot be varied there; its literature analogue is the stage-hour set itself.
 Fixed at defaults: builders (MOST_REALISTIC work-party rule), block_median_kg, block_sigma, household_size,
 hours_per_day.
-RANGES: the stage-2 Sobol ranges are in a Nurnet collaborator's gpu/sobol2.py, which is NOT on this machine (REF README lists the
-factors only). The ranges below are (were placeholders; replaced 15:19 with a Nurnet collaborator's ranges) centred on the defaults; replace RANGES before the night run if
-a Nurnet collaborator's file is available (the design must then be regenerated).
+RANGES: the stage-2 Sobol ranges of a Nurnet collaborator (the README of the reference outputs lists the
+factors only). The ranges below are a Nurnet collaborator's ranges, centred on the defaults; to use other ranges, edit RANGES
+(the design must then be regenerated).
 Outputs per run: island MH, island days max / p95 (island finish days, phased), median site days TWR1-3.
 """
 import argparse
@@ -27,8 +27,8 @@ import pandas as pd
 import yaml
 
 RANGES = {"pull_kg_per_person": (20.0, 350.0), "drag_speed_ms": (0.03, 0.6), "tonnes_per_tower": (900.0, 2000.0),
-          "load_unload_h": (0.1, 1.0), "min_haul_flatm": (50.0, 300.0)}       # a Nurnet collaborator 29 Oct: alliance npz (pull, drag) + gpu/sobol2.py (rest)       # (were placeholders; replaced 15:19 with a Nurnet collaborator's ranges), see docstring
-LOG = {"pull_kg_per_person", "drag_speed_ms", "load_unload_h", "min_haul_flatm"}   # a Nurnet collaborator alliance Sobol npz 29 Oct: lo/hi + islog (20-350, 0.03-0.6, log)
+          "load_unload_h": (0.1, 1.0), "min_haul_flatm": (50.0, 300.0)}       # a Nurnet collaborator: alliance npz (pull, drag) + stage-2 Sobol (rest); see docstring
+LOG = {"pull_kg_per_person", "drag_speed_ms", "load_unload_h", "min_haul_flatm"}   # a Nurnet collaborator's alliance Sobol npz: lo/hi + islog (20-350, 0.03-0.6, log)
 SCEN = "MOST_REALISTIC_P10"
 
 

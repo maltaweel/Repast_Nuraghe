@@ -8,7 +8,8 @@ tables and two small folders shipped for the audit (`notebooks/05_audit.ipynb`):
 
 Audit folders:
 
-- `reference/`: the fingerprint of a fixed rerun of the headline scenario (step d of the audit);
+- `reference/`: the fingerprint of a fixed run of the headline scenario (step d of the audit);
 - `summary/`: the per-seed and summary tables of the full audited run (step e).
 
-Both are placeholders until the full audited run has finished; see the README in each folder.
+Neither file set is included in the repository (the audit reports these steps as NOT INCLUDED); the README in each
+folder describes the files and how to make or supply them.

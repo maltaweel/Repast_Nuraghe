@@ -74,8 +74,8 @@
  ],
  "n_evals": 19968,
  "seed_rule": "seed = base_row + 1 (one seed per evaluation; same seed in every scenario)",
- "code": "code/ (CODE_VERSION 2026-11-09-v17)",
- "config": "config/v16_final/config_full_audited.yaml",
+ "code": "code/ (code version: CODE_VERSION in code/lit.py)",
+ "config": "config/scenarios/config_full_audited.yaml",
  "code_version": "2026-11-09-v17",
  "outputs_28oct": [
   "island_total_mh",

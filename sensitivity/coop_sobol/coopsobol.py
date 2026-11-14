@@ -1,39 +1,39 @@
 #!/usr/bin/env python3
-"""Cooperation-model Sobol on the FINAL code (code_v17, CODE_VERSION 2026-11-09-v17), STAGED 10 Nov 2026.
-PI approval 10 Nov, option (b): Saltelli N = 512, the 11 factors of the 28 Oct cooperation-model ("stage-2") Sobol,
+"""Cooperation-model Sobol on code/ (the model's code; CODE_VERSION as in code/lit.py).
+Saltelli N = 512, the 11 factors of the cooperation-model ("stage-2") Sobol design,
 3 cooperation scenarios only (none, mixed, full), budget about 83 CPU-h.
 
 Model: engine B = model.py day engine (Site / Model, numba kernel site_day), cooperation scenarios
-`scenarios.list.{none, mixed, full}` of v17/configs/config_full_audited.yaml (p_coop 0.0 / 0.5 / 1.0, no inter-site help,
-no phasing, no literature stages). These are the same three scenarios (same names, same p_coop) as the 28 Oct GPU port
-(28 Oct GPU port, gpu/coop_kernel_pr.py UNCOUPLED list). The run is in-process, one MPI singleton rank (no mpirun), the whole
+`scenarios.list.{none, mixed, full}` of configs/config_full_audited.yaml (p_coop 0.0 / 0.5 / 1.0, no inter-site help,
+no phasing, no literature stages). These are the three uncoupled cooperation scenarios of the stage-2
+design (same names, same p_coop). The run is in-process, one MPI singleton rank (no mpirun), the whole
 island (7,167 sites) per evaluation; the config is read once and every factor is applied to an in-memory deep copy
-(no config or code file is written). code_v17 is imported read-only; numba's cache goes to ./numba_cache.
+(no config or code file is written). code/ is imported read-only; numba's cache goes to ./numba_cache.
 
 Design: SALib 1.6.0 sobol.sample(N=512, calc_second_order=False, scramble=True, seed=SAMPLE_SEED) on the unit cube,
 k = 11, N (k + 2) = 6,656 rows (SALib order per base row j: A, AB_1..AB_11, B). The same 6,656 rows are run in each of
 the 3 scenarios (common design): 19,968 evaluations. One evaluation = one design row x one scenario x ONE seed
-(the 28 Oct GPU design was one run per sample: 53,248 runs per scenario = N (k + 2) with N 4,096, k 11).
+(each evaluation is one whole-island run).
 Seed of an evaluation = base_row + 1 (1..512): the A, AB_i and B rows of one base row share a seed (common random
-numbers within a Saltelli block, as Sobol run 1), and the same seed is used in all 3 scenarios.
+numbers within a Saltelli block), and the same seed is used in all 3 scenarios.
 
 Level mapping of the uniform sample u in [0, 1):
   unif:    lo + u (hi - lo)
   logunif: exp(ln lo + u (ln hi - ln lo))
-  int:     lo + floor(u (hi - lo + 1)) (equal-probability bins; household 3..8 = the 28 Oct run's U(2.5, 8.5) rounded)
+  int:     lo + floor(u (hi - lo + 1)) (equal-probability bins; household 3..8 = U(2.5, 8.5) rounded)
 
-Outputs per evaluation (28 Oct definitions, 28 Oct stage-2 notes + Table D1): island_total_mh = sum mh_total,
+Outputs per evaluation (stage-2 definitions, Table D1): island_total_mh = sum mh_total,
 island_transport_mh = sum mh_transport, median_site_total_mh_TWR1..7 = median of mh_total over the sites with that
 tower count; island_days_max = max site days (working days to the last nuraghe, Table D1 / Fig. 1b); plus, recorded
-but not part of the 28 Oct set: island_days_p95, median_site_days_TWR1..7, n_splits, n_blocks.
+but not part of the stage-2 set: island_days_p95, median_site_days_TWR1..7, n_splits, n_blocks.
 
   python coopsobol.py design             -> factors.csv, problem.json, design.csv (refuses to overwrite)
   python coopsobol.py check              -> dry mapping check (no simulation)
-  python coopsobol.py ids                -> pending global ids (gid = scenario_index * 6656 + row), one per line
+  python coopsobol.py ids                -> unfinished global ids (gid = scenario_index * 6656 + row), one per line
   python coopsobol.py eval --gid G       -> one evaluation -> evals/<scen>/NN/eval_RRRRR.csv + .ok
   python coopsobol.py eval --baseline --scenario S --seed s [--compare]
                                              -> all factors at the config values -> checks/baseline_<S>_seed<s>.csv
-                                                (--compare: per-site identity against the v16_final engine-B parts)
+                                                (--compare: per-site identity against the queue's engine-B parts)
   python coopsobol.py eval --gid G --pilot    -> as eval, but writes to checks/pilot_* (no .ok, not in evals/)
 """
 import argparse
@@ -50,7 +50,7 @@ import types
 
 T_START = time.time()
 HERE = os.path.dirname(os.path.abspath(__file__))
-os.environ.setdefault("NUMBA_CACHE_DIR", os.path.join(HERE, "numba_cache"))   # never write into code_v17/__pycache__
+os.environ.setdefault("NUMBA_CACHE_DIR", os.path.join(HERE, "numba_cache"))   # never write into code/__pycache__
 
 import numpy as np   # noqa: E402
 import pandas as pd  # noqa: E402
@@ -72,51 +72,51 @@ RES_COLS = ["scenario", "eval_id", "gid", "base_row", "block", "seed", "status",
     ["t_import_s", "t_setup_s", "t_run_s", "wall_s", "peak_rss_mb", "pid"]
 
 # ----------------------------------------------------------------------------------- factors
-# old = the 28 Oct range (28 Oct GPU port, gpu/sobol2.py: SL.FACTORS = lit-Sobol five + six stage-2 factors; sources in README)
+# old = the range of the stage-2 Sobol design (lit-Sobol five + six stage-2 factors); changed = range differs from it
 FACTORS = [
     dict(name="pull_kg_per_person", key="transport.pull_kg_per_person", kind="logunif", lo=21.0, hi=127.0,
          old="20-350 log", changed="YES",
-         why="Sourced range, PI approval 10 Nov: 21 (sourced pull floor, ALT pull21) to 126.7 = 38 kgf / mu 0.3 "
+         why="Sourced range, approved by the authors: 21 (sourced pull floor, ALT pull21) to 126.7 = 38 kgf / mu 0.3 "
              "(Richards & Whitby 1997: 242, ALT pull38kgf); 300-500 kg (greased rails / rollers) excluded."),
     dict(name="drag_speed_ms", key="transport.drag_speed_ms", kind="logunif", lo=0.19, hi=1.0,
          old="0.03-0.6 log", changed="YES",
-         why="0.03 m/s floor dropped as unsourced (PI 5 Nov); current sourced range 0.19 (de Haan 2009: 7, 55.5 W at "
-             "294 N) to 1.0 (Harris 2016 AAM p. 4 peak), log-uniform as Sobol run 1 params.csv. 0.6 = press figure."),
+         why="0.03 m/s floor dropped as unsourced; sourced range 0.19 (de Haan 2009: 7, 55.5 W at "
+             "294 N) to 1.0 (Harris 2016 AAM p. 4 peak), log-uniform. 0.6 = press figure."),
     dict(name="other_mandays_per_tower", key="other_mandays_per_tower", kind="unif", lo=1200.0, hi=8000.0,
          old="1,200-8,000", changed="no",
-         why="Range kept (headline 2,500 = Webster 1991 Table 1 3,600 - 1,100 inside). Since v11 the pool is Webster's "
+         why="Range kept (headline 2,500 = Webster 1991 Table 1 3,600 - 1,100 inside). The pool is Webster's "
              "quarry/dress/build man-days at their source day lengths (5/8/8 h) + (value - 2,500) x hours_per_day, so "
-             "the factor shifts the pool by (value - 2,500) man-days of hours_per_day hours (v8: value x hours_per_day)."),
+             "the factor shifts the pool by (value - 2,500) man-days of hours_per_day hours."),
     dict(name="block_median_kg", key="stone.block_median_kg", kind="unif", lo=300.0, hi=1000.0,
          old="300-1,000", changed="no",
          why="Range kept (= TOST ends; headline 450 Webster 1991: 852; Lilliu 549 inside)."),
     dict(name="builders_mult", key="builders.base / per_extra_tower / min / max (x m)", kind="logunif", lo=0.5, hi=2.0,
          old="x0.5-2", changed="no",
          why="Range kept. Applied as m x (base 50, per_extra_tower 25, min 50, max 200): B = clip(round(m (50 + 25 "
-             "(tw - 1)) x U(0.9, 1.1)), 50 m, 200 m). Log-uniform (symmetric multiplier; the v11 Sobol crew_mult "
-             "0.5-2 log-uniform cites the 28 Oct run's builders_mult); the 28 Oct distribution is not recorded."),
+             "(tw - 1)) x U(0.9, 1.1)), 50 m, 200 m). Log-uniform (symmetric multiplier; "
+             "the stage-2 design records the range 0.5-2, not its distribution)."),
     dict(name="tonnes_per_tower", key="stone.tonnes_per_tower", kind="unif", lo=900.0, hi=2481.0,
          old="900-2,000", changed="YES",
-         why="Sourced range, PI approval 10 Nov: upper end raised to ALT 2,481 (model geometry 1,040 m3 x "
-             "2,386 kg/m3, DERIVED) so ALT 1,909 / 2,009 / 2,481 are inside; lower 900 as 28 Oct; headline 1,350."),
+         why="Sourced range, approved by the authors: upper end raised to ALT 2,481 (model geometry 1,040 m3 x "
+             "2,386 kg/m3, DERIVED) so ALT 1,909 / 2,009 / 2,481 are inside; lower 900 as in the stage-2 design; headline 1,350."),
     dict(name="block_sigma", key="stone.block_sigma", kind="unif", lo=0.3, hi=0.9,
          old="0.3-0.9", changed="no",
-         why="28 Oct run (29 Oct note): 0.3-0.9 uniform (= TOST ends). Kept; DERIVED 0.41-0.72 (PARAM_AUDIT B3) inside."),
+         why="Range kept: 0.3-0.9 uniform (= TOST ends); DERIVED 0.41-0.72 (PARAM_AUDIT B3) inside."),
     dict(name="load_unload_h", key="transport.load_unload_h", kind="logunif", lo=0.1, hi=1.0,
          old="0.1-1.0 log", changed="no",
-         why="28 Oct run (29 Oct note): 0.1-1.0 log. Kept; sourced 0.25 / 0.33 / 0.5 h per block inside. Engine B still charges "
+         why="Range kept: 0.1-1.0 log; sourced 0.25 / 0.33 / 0.5 h per block inside. Engine B charges "
              "it per land trip (add4 L3 1.2 ph/t acts only in the season engine)."),
     dict(name="hours_per_day", key="hours_per_day", kind="unif", lo=6.0, hi=10.0,
          old="6-10", changed="no",
-         why="28 Oct run (29 Oct note): 6-10 uniform (= TOST ends). Kept; sourced 5-10 h (Boswinkel 2021: 145-146). Since v11 "
+         why="Range kept: 6-10 uniform (= TOST ends); sourced 5-10 h (Boswinkel 2021: 145-146). "
              "Webster's man-days use their source day (5/8/8 h), so this is the simulated working day."),
     dict(name="min_haul_flatm", key="transport.min_haul_flatm", kind="logunif", lo=10.0, hi=20.0,
          old="50-300 log", changed="YES",
-         why="Sourced range, PI approval 10 Nov: the PI's stated 10-20 m (5 Nov), as Sobol run 2; the old "
-             "50-300 excluded the headline 15. 69% of sites sit on their outcrop (haul 0 -> this value)."),
+         why="Sourced range, approved by the authors: 10-20 m, as in the headline Sobol analysis; the stage-2 "
+             "range 50-300 excluded the headline 15. 69% of sites sit on their outcrop (haul 0 -> this value)."),
     dict(name="household_size", key="scenarios.household_size", kind="int", lo=3, hi=8,
          old="U(2.5, 8.5) rounded = 3..8", changed="no",
-         why="28 Oct run (29 Oct note): 2.5-8.5 uniform, rounded -> 3..8 with equal probability; here as equal-probability "
+         why="Range kept: 2.5-8.5 uniform, rounded -> 3..8 with equal probability; here as equal-probability "
              "integer bins (same distribution). Headline 5 (Webster 1991: 852-854); TOST ends 3 / 8."),
 ]
 NAMES = [f["name"] for f in FACTORS]
@@ -463,8 +463,8 @@ def cmd_eval(a):
 
 
 def compare_ref(df, scen, seed):
-    """Per-site identity of a baseline evaluation against the v16_final engine-B run parts of the same scenario and
-    seed (inventory item 24: engine B is unchanged by v17, so the final-model engine-B output = these parts)."""
+    """Per-site identity of a baseline evaluation against the engine-B run parts of the queue for the same scenario and
+    seed (the queue ran engine B on the same code/, so the harness must reproduce these parts exactly)."""
     import model
     dirs = sorted(glob.glob(os.path.join(REF_PARTS, scen, "*")))
     assert len(dirs) == 1, dirs
@@ -475,7 +475,7 @@ def compare_ref(df, scen, seed):
     cols = [c for c in model.RES_COLS if c in ref.columns]
     mine = df.sort_values("gid").reset_index(drop=True)
     assert len(ref) == len(mine) and (ref.gid.to_numpy() == mine.gid.to_numpy()).all()
-    lines = [f"compare baseline {scen} seed {seed} (code_v17, in-process singleton) vs v16_final parts "
+    lines = [f"compare baseline {scen} seed {seed} (code/, in-process singleton) vs queue parts "
              f"{dirs[0]} ({nr} ranks)"]
     nbad = 0
     for c in cols:
@@ -486,7 +486,7 @@ def compare_ref(df, scen, seed):
         lines.append(f"  {c:14s} {'IDENTICAL' if same else f'DIFF (max abs {mx:.6g}, {int((a_ != b_).sum())} sites)'}")
     o_m, o_r = outputs(mine), outputs(ref.assign(TWR_N=mine.TWR_N.to_numpy()))
     for k in OUT_28OCT + ["island_days_max"]:
-        lines.append(f"  {k:28s} eval {o_m[k]!r:>22}  v16_final {o_r[k]!r:>22}  {'=' if o_m[k] == o_r[k] else '!='}")
+        lines.append(f"  {k:28s} eval {o_m[k]!r:>22}  queue {o_r[k]!r:>22}  {'=' if o_m[k] == o_r[k] else '!='}")
     lines.append(f"compare: {'PASS (all per-site columns bit-identical)' if nbad == 0 else f'{nbad} columns differ'}")
     txt = "\n".join(lines)
     print(txt)

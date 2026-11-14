@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sobol run 2 analysis (10 Nov 2026): first-order S1 and total-order ST with 95% bootstrap confidence intervals
+"""Sobol analysis of the headline scenario: first-order S1 and total-order ST with 95% bootstrap confidence intervals
 (SALib 1.6.0 sobol.analyze, calc_second_order=False, 1,000 resamples, conf 0.95, seed 1) per output, on the 3-seed
 mean of each evaluation; convergence check: the same indices on the first 256 base rows (a valid N=256 Saltelli
 sample: SALib rows are grouped by base row and the scrambled Sobol sequence is balanced at every power of two) vs all
@@ -7,7 +7,7 @@ sample: SALib rows are grouped by base row and the scrambled Sobol sequence is b
 
 Refuses to run until all 14,336 evaluations have a result (no partial results), unless --partial (then it writes
 only *_PARTIAL files, never SOBOL2_RESULTS.md). Base rows with an unfinished / error evaluation are dropped whole
-(lowers N; reported), as Sobol run 1 did.
+(lowers N; reported).
 
   python analyse.py [--partial]
 """
@@ -110,7 +110,7 @@ def write_md(P, E, I, conv, n_eff, bad_rows, unf, err):
         except Exception:
             pass
     L = []
-    L.append("# Sobol run 2 on the headline MOST_REALISTIC_AUDITED_LIT_P10\n")
+    L.append("# Sobol analysis of the headline MOST_REALISTIC_AUDITED_LIT_P10\n")
     L.append(f"Code `code_variant` (= code/, CODE_VERSION {P['code_version']}, plus "
              f"the flag `sobol.lift_learning`; default off = code/ exactly). Config "
              f"`configs/config_full_audited.yaml` read-only, factors applied in memory.\n")

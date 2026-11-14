@@ -1,6 +1,6 @@
-"""Tests of the lift rule (9 Nov 2026; SP-22 ruling): lift priced at the undiscounted rate.
+"""Tests of the lift rule (SP-22 ruling): lift priced at the undiscounted rate.
 
-Ruling (specified by the authors, 9 Nov 2026: no discount on lift, long-term rates; spec addendum k):
+Ruling (specified by the authors: no discount on lift, long-term rates; spec addendum k):
 "Lift (all lift rules) is priced at the undiscounted rate: the learning factor (PM:23) and skill (PM:173) apply to
 quarrying, dressing and building only, never to lift."
 Fake models only (no kbest / raster loading, no simulation); engine B via lit.stage_hours with a real config.
@@ -95,7 +95,7 @@ def test_lift_equal_every_tower_under_learning():
         assert approx(l, l0), (t, l, l0)                                   # lift undiscounted
         assert approx(b, b0 * (1 - RATE) ** t), (t, b)                     # build still discounted
         if t:
-            assert not approx(l, l0 * (1 - RATE) ** t)                     # v16_final would have discounted it
+            assert not approx(l, l0 * (1 - RATE) ** t)                     # a discounted lift would differ
     assert approx(m.acc["mh_total"][0], m.acc["mh_build"][0] + m.acc["mh_lift"][0])   # columns add up
 
 

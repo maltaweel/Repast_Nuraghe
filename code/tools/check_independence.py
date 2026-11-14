@@ -1,5 +1,5 @@
 """Empirical check that sites are independent in the post hoc scenarios: a site's days / man-hours in a 302-site
-subset run (scratch/ref, the delivered v5 code, seeds 1-5, 4 ranks) must equal the same (seed, UID) in the delivered
+subset run (scratch/ref, seeds 1-5, 4 ranks) must equal the same (seed, UID) in the
 full-island 7,167-site run. If a scenario couples sites (high: inter-site help) the values differ.
 
   python tools/check_independence.py

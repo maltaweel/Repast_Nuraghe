@@ -33,49 +33,49 @@ from repast4py import core, schedule
 import lit
 import phasing
 
-CODE_VERSION = lit.CODE_VERSION     # bump whenever a code change alters results: part of every run signature
-#   (code_v16_final: "2026-11-05-v16_final", set in lit.py so model.run_signature hashes the same string; was
-#   "2026-10-29-bugfix" in every code from 29 Oct to code_v16_flags, so those signatures never covered code changes)
+CODE_VERSION = lit.CODE_VERSION     # code version of the model: part of every run signature
+#   (set in lit.py so that model.run_signature and alliance.signature hash the same string)
+#
 TECH_VERSION = "2026-10-30-fix1030"   # tech_rules code path only (MOST_REALISTIC); hashed only when tech_rules is set
-#   (was "2026-10-29-merged-1"; bumped 30 Oct for NEW-1 lift/hoist per piece + the sea payload split)
-SEA_VERSION = "2026-10-30-payload"    # S9 sea faces: 2,000 kg craft payload split (30 Oct); hashed only when sea_kn is set
-# 1 Nov 2026 scenario gaps (S10-S14, NEW_SCENARIOS_1101.md): hashed only when one of these keys is set, so every
-# earlier scenario keeps its signature and its code path (identity test: outputs/identity/)
+#   (covers NEW-1 lift/hoist per piece and the sea payload split)
+SEA_VERSION = "2026-10-30-payload"    # S9 sea faces: 2,000 kg craft payload split; hashed only when sea_kn is set
+# scenario gaps (S10-S14, specified by the authors): hashed only when one of these keys is set, so a scenario
+# without these keys keeps its signature and its code path
 GAPS_VERSION = "2026-11-01-gaps-1"
 GAPS_KEYS = ("phase_order", "type_cost", "food_cap", "extra_units", "maintenance")
-# 1 Nov 2026 (b) wider-literature scenarios (C1-C3, M1-M4; WIDER_LIT_1101.md): hashed only when one of these keys is
-# set (or phase_order.rule == emulation), so every earlier scenario keeps its signature and code path
+# wider-literature scenarios (C1-C3, M1-M4; specified by the authors): hashed only when one of these keys is
+# set (or phase_order.rule == emulation), so a scenario without them keeps its signature and code path
 WL_VERSION = "2026-11-01-widerlit-2"
-V11_VERSION = "2026-11-02-v11"         # Webster man-day hours by source (lit.md_hours); hashed only when the fix is on   # -2: M4 walk choice per hauled leg
+V11_VERSION = "2026-11-02-v11"         # Webster man-day hours by source (lit.md_hours); hashed only when the rule is on (WL_VERSION: M4 walk choice per hauled leg)
 WL_KEYS = ("haul_profile", "stage_rates", "carry", "masons")
-# 2 Nov 2026 (v12) census scenarios (census/TESTABLE_PLAN.md; code/CENSUS_V12.md): each is OFF unless its key is set in
-# the scenario; hashed only when one of these keys is set, so every earlier scenario keeps its signature and its code
-# path (identity test: outputs/identity/IDENTITY.txt)
+# census scenarios (specified by the authors; census_scenarios.py): each is OFF unless its key is set in
+# the scenario; hashed only when one of these keys is set, so a scenario without these keys keeps its signature and its code
+# path
 CENSUS_VERSION = "2026-11-02-census-1"
 CENSUS_KEYS = ("lift_graded", "lintel", "found", "fill", "vault_dress", "demog", "lift_ramp", "mortar", "rifascio",
                "bichrome", "levy", "mason_regions", "feast_attract", "mudbrick", "clearance", "carts", "size_draw",
                "lift_override")
-# 2 Nov 2026 (v13) social mechanisms (ODD 7.15, git history): reputation (indirect reciprocity with
+# social mechanisms (ODD 7.15): reputation (indirect reciprocity with
 # standing, third-party shunning), partner choice (assortment), imitation along help ties; social_log = bookkeeping only.
 # Each is OFF unless its key is set in the scenario. They make no random draws of their own. Hashed (with
 # cfg['scenarios'] minus its list, whose split_cost_mh acts on every alliance run) only when one of these keys is set, so
-# every earlier scenario keeps its signature and its code path (identity test: ODD 7.15, git history). CODE_VERSION is
-# deliberately NOT bumped: with the keys off the outputs are identical to the frozen v12 code (tested), and a bump would move every
+# a scenario without these keys keeps its signature and its code path (identity test: ODD 7.15). CODE_VERSION does
+# not include them: with the keys off the outputs are identical to the code path without them (tested), and including them would move every
 # existing scenario's cache folder.
-SOCIAL_VERSION = "2026-11-02-v13-social-2"   # -2: partner order = exchange partners first (both directions)
-SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log", "trusted_nodist")   # v13kd: end of file
-# v14 (5 Nov 2026, specified by the authors; change notes, git history): config
+SOCIAL_VERSION = "2026-11-02-v13-social-2"   # partner order = exchange partners first (both directions)
+SOCIAL_KEYS = ("reputation", "partner_choice", "tie_imitation", "social_log", "trusted_nodist")   # trusted_nodist: end of file
+# Near-site face rule (specified by the authors): config
 # key quarry.near_site_fixed_face_m. A site whose dry-ground (mu 0.38) route (haul table mu0.38, haul_m) is <= this
 # many metres always quarries from face 0: no epsilon draw, no Q choice, no imitation of the face (the draws are
-# skipped, not drawn and discarded). Off (absent / none / 0) = the v12 code path; hashed only when on, so every run
-# with the key off keeps its signature (identity test: v14_nearface/identity/).
+# skipped, not drawn and discarded). Off (absent / none / 0) = the code path without the rule; hashed only when on, so every run
+# with the key off keeps its signature (identity tested).
 NEARFACE_VERSION = "2026-11-05-nearface-1"
-# v16 (5 Nov 2026; addendum 4 of the specification; change notes, git history). Always hashed: v16 also
-# changes reporting (S1 relay_made in the strategy parts) and the S3 ceiling basis, so no v16 run reuses v15b parts.
-# The addendum-4 rules L1-L4 sit behind config flags add4.* (code_v16_final defaults: L2, L3 ON; L1, L4 OFF; lit.py).
-# code_v16_final: their effective settings are ALWAYS hashed (code_v16_flags hashed them only when one was on).
-V16_VERSION = "2026-11-05-v16-flags-2"   # -2: relay leg-1 nearer-than-owner filter removed (-1 = the test runs)
-# code_v16_final (change notes, git history): D3 no dress work = no dress task traffic, D6 join parties at their own skill,
+# Addendum 4 of the specification. Always hashed: it also
+# changes reporting (S1 relay_made in the strategy parts) and the S3 ceiling basis, so no run reuses parts without them.
+# The addendum-4 rules L1-L4 sit behind config flags add4.* (defaults: L2, L3 ON; L1, L4 OFF; lit.py).
+# Their effective settings are ALWAYS hashed.
+V16_VERSION = "2026-11-05-v16-flags-2"   # no relay leg-1 nearer-than-owner filter
+# Rules D3 no dress work = no dress task traffic, D6 join parties at their own skill,
 # D11 the site's stone = the class of its gated face 0. Always on (no flag); covered by CODE_VERSION.
 ADD4_VERSION = "2026-11-05-add4-1"
 
@@ -206,7 +206,7 @@ class Static:
                                           "sea": True, "trip_h": seamod.trip_h(row, cfg, sea_kn),
                                           "land_h": seamod.trip_h(row, cfg, 1e300),   # trip without the boat leg
                                           "hoist_ph": seamod.hoist_ph_per_block(row, cfg)})
-        self.near = None                                  # v14: per site, True = always face 0 (rule off: None)
+        self.near = None                                  # near-site rule: per site, True = always face 0 (rule off: None)
         nf = near_face_m(cfg)
         if nf is not None:
             t38 = pd.read_csv(lit.haul_csv(cfg, {"haul": "mu0.38"}), usecols=["UID", "haul_m"]).set_index("UID")
@@ -245,11 +245,11 @@ class Static:
         k38 = np.load(os.path.join(cfg["paths"]["cache_dir"], "alliance", "kbest_mu038.npz"))
         self.mv_c038 = k38["mv_c038"].astype(np.float64)
         use_long = None
-        if F["rails_cost_choice"]:                        # v16 L1: rails vs dry ground by total cost, per site
+        if F["rails_cost_choice"]:                        # L1: rails vs dry ground by total cost, per site
             use_long = self._l1_choice(cfg, L, load, F)
         mh = lit.mixed_haul(cfg, L, load, use_long=use_long)
         assert mh.on_outcrop.notna().all(), "tech_rules: a site is missing from the short-haul table"
-        # code_v16_final D11: the site's stone (S6 density -> block mass, hardness -> quarry / dress) is the class of
+        # D11: the site's stone (S6 density -> block mass, hardness -> quarry / dress) is the class of
         # the face it hauls from: face 0 of the gated mu 0.3 table (self.haul = cache sites_haul.csv, the table whose
         # rows are face 0 of kbest.npz; stone rule = the set actually quarried incl. fallback). The mixed table's own
         # quarry_stone came from separate least-cost searches on the mu 0.38 / mu 0.1 rasters and could name another
@@ -267,10 +267,10 @@ class Static:
                         boat = fc["trip_h"] - fc["land_h"]
                         fc["boat_h"] = boat
         self.tech["n_long"] = int((self.tech["rule"] == "long").sum())
-        self.lay_len = None                               # v16 L1: rail-laying length (m) of face 0, rails sites
+        self.lay_len = None                               # L1: rail-laying length (m) of face 0, rails sites
         if F["rails_cost_choice"]:
             self.lay_len = np.where(self.tech["rule"] == "long", self.l1_len, 0.0)
-        if self.sea_kn and F["sea_priced_as_charged"]:    # v16 L4: sea faces chosen on the charged cost
+        if self.sea_kn and F["sea_priced_as_charged"]:    # L4: sea faces chosen on the charged cost
             self._l4_sea_faces(cfg, F)
         self.info = {"n_rails_sites": self.tech["n_long"], "n_sites": int(self.N),
                      "n_sea_faces": int(sum(any(fc.get("sea") for fc in fl) for fl in self.faces)),
@@ -280,13 +280,13 @@ class Static:
             self.info.update(self.l4_info)
 
     def _face0_stone(self, tab):
-        """code_v16_final D11: per row of `tab` (UID column, this run's sites in order), the quarry_stone of the gated
+        """D11: per row of `tab` (UID column, this run's sites in order), the quarry_stone of the gated
         face-0 table self.haul (the class of the outcrop the site's face 0 starts at)."""
         st = self.haul.set_index("UID").quarry_stone.reindex(tab.UID.to_numpy())
         assert st.notna().all(), "D11: a site has no face-0 stone in sites_haul.csv"
         return st.to_numpy()
 
-    # ------------------------------------------------------------------ v16 addendum-4 static choices (L1, L4)
+    # ------------------------------------------------------------------ addendum-4 static choices (L1, L4)
     def _face0_costs(self, i):
         """Face-0 (cheapest land face) drag costs exactly as _leg_mh_tech0 charges a whole route: (C on dry ground
         mu 0.38 moves, C on rails mu 0.1 moves, L real length)."""
@@ -296,7 +296,7 @@ class Static:
         return float(self.mv_c038[f["a"]:f["b"]].sum()), float(self.mv_c01[f["a"]:f["b"]].sum()), f["L"]
 
     def _l1_choice(self, cfg, L, load, F):
-        """v16 L1 (addendum 4): every site takes the cheaper of dry ground (mu 0.38 crews and moves) and rails (mu 0.1
+        """L1 (addendum 4): every site takes the cheaper of dry ground (mu 0.38 crews and moves) and rails (mu 0.1
         crews and moves + rail_lay_mh_per_m x real route length, paid once per site) for ALL its towers on face 0,
         computed once before the run: crews = expected crews per tonne of the block draw (lit.crews_per_tonne, S6
         density of that rule's stone) x the site's tonnes; trip = the model's whole-route trip (min haul floor), with
@@ -313,7 +313,7 @@ class Static:
         p_l = lit.transport(cfg, dict(L, **m["long"]))[0]
         tpt = float(cfg["stone"]["tonnes_per_tower"])
         tw = self.haul.TWR_N.to_numpy().astype(np.float64)
-        st0 = self._face0_stone(short)                    # code_v16_final D11: one stone per site, face 0's class
+        st0 = self._face0_stone(short)                    # D11: one stone per site, face 0's class
         use = np.zeros(self.N, bool)
         self.l1_len = np.zeros(self.N)
         self.l1_cost = np.zeros((self.N, 2))
@@ -333,8 +333,8 @@ class Static:
         return use
 
     def _l4_sea_faces(self, cfg, F):
-        """v16 L4 (addendum 4): the choice between land and sea is made on the cost the model charges. Every sea route
-        the v16 table builder found (r_* columns) is a candidate; per site, before the run, with expected crews per
+        """L4 (addendum 4): the choice between land and sea is made on the cost the model charges. Every sea route
+        the table builder (tools/sea_routes.py) found (r_* columns) is a candidate; per site, before the run, with expected crews per
         tonne (lit.crews_per_tonne): land legs at the site's own rule (L1 on: each leg takes rails or dry ground by its
         own cost incl. laying x leg length; L1 off: the site's rule, rails if 'long'), loading per crew at each landing
         (sea.transfer_h) or, under L3, load_ph_per_t x tonnes per land leg; boat crews at 100 kg/person x boat time
@@ -425,13 +425,13 @@ class AllianceModel:
         Ls = cfg["lit_scenarios"]
         self.pull03 = tp["pull_kg_per_person"]
         self.pull01 = Ls["f_person_kgf"] / float(A["track_mu"])
-        # v16 addendum-4 flags (tech rules only; lit.add4): None / False = the v15b code paths
+        # addendum-4 flags (tech rules only; lit.add4): None / False = the code paths without the rule
         self.F = getattr(S, "add4", None) if S.tech is not None else None
         self.L3 = bool(self.F and self.F["load_per_tonne"])
         self.L4 = bool(self.F and self.F["sea_priced_as_charged"] and S.sea_kn)
         self.lp = float(self.F["load_ph_per_t"]) if self.F else 0.0
         self.tw_n = S.haul.TWR_N.to_numpy().astype(np.float64)
-        self.c01 = [None] * N if self.L4 else None       # v16 L4: rails crews per tower (land legs of sea faces)
+        self.c01 = [None] * N if self.L4 else None       # L4: rails crews per tower (land legs of sea faces)
         st = lit.stage_hours(cfg, lit.scenario(cfg, "webster"), 1, "", 0)      # Webster stages per tower
         self.base_stage = {"quarry": st["quarry"], "dress": st["dress"], "build": st["build"] + st["lift"]}
         self.lift_share = st["lift"] / (st["build"] + st["lift"])
@@ -440,23 +440,23 @@ class AllianceModel:
         # ---- per-site seeded draws: builders + blocks exactly as model.Site (webster), then towers
         b, s = cfg["builders"], cfg["stone"]
         self.B = np.zeros(N, np.int64)
-        # S10 / S11 (1 Nov): ordered build units instead of random site cohorts (phase_order; off -> None)
+        # S10 / S11: ordered build units instead of random site cohorts (phase_order; off -> None)
         self.phase_frac = sc.get("phase_frac")
         self.units = None
         if sc.get("phase_order"):
             assert self.phase_frac, "phase_order needs a phased scenario (_P10 / _P20)"
             self.units, self.staged = self._unit_cohorts(S, sc, seed)
         pre_B = self._population_ceiling(S, sc, seed) if sc.get("population_ceiling") else None
-        # S12 (1 Nov): food-limited crews (work feasts): per-site cap on the hands working a stage (food_cap)
+        # S12: food-limited crews (work feasts): per-site cap on the hands working a stage (food_cap)
         self.food_cap = self._food_caps(S, sc) if sc.get("food_cap") else None
-        # S11 (1 Nov): per-type volume / height factors (type_cost), e.g. protonuraghi
+        # S11: per-type volume / height factors (type_cost), e.g. protonuraghi
         tc = sc.get("type_cost")
         if tc:
             assert S.tech, "type_cost needs tech_rules"
             ttypes = S.tech["table"].lit_type.to_numpy()
             self.vol_f = np.array([float(tc.get(t, {}).get("volume", 1.0)) for t in ttypes])
             self.hgt_f = np.array([float(tc.get(t, {}).get("height", 1.0)) for t in ttypes])
-        # v12 census switches (census_scenarios.py); self.cz is None when every census key is off (original code path)
+        # census switches (census_scenarios.py); self.cz is None when every census key is off (code path without them)
         self.cz = None
         if any(sc.get(k) for k in CENSUS_KEYS):
             assert S.tech, "census switches need tech_rules"
@@ -470,7 +470,7 @@ class AllianceModel:
         self.unit_ls = {}                      # (site, tower) -> lift share of the build stage (accounting only)
         self.n_real = None                     # per site: number of real towers (S13: extra units come after)
         self.add_B = None                      # S10: work party of the additions (later generation), per site
-        xu = sc.get("extra_units") or sc.get("rifascio")      # v12 S13_rifascio: an extra unit too
+        xu = sc.get("extra_units") or sc.get("rifascio")      # S13_rifascio: an extra unit too
         if xu or (self.units is not None and float(sc["phase_order"].get("addition_crew_factor", 1.0)) != 1.0):
             assert S.tech, "extra_units / addition_crew_factor need tech_rules"
             self.unit_stage = [None] * N
@@ -479,7 +479,7 @@ class AllianceModel:
                 self.add_B = np.zeros(N, np.int64)            # filled per staged site in _gaps_units
         self.towers = []                     # per site: list of (tonnes, S03, S01)
         self.tower_nblk = []                 # per site: pieces per tower (= blocks unless split; S9 hoist, join hands cap)
-        # S9 sea faces (30 Oct): blocks carried by boat are split to the craft payload as in model.py. Per site: None
+        # S9 sea faces: blocks carried by boat are split to the craft payload as in model.py. Per site: None
         # (no sea face, or no block above the payload) or per tower {S03, S01, nblk, split_mh, tech, xlift}, used
         # only when the tower's chosen face is a sea face
         self.tower_sea = []
@@ -487,7 +487,7 @@ class AllianceModel:
         cap_sea = float(cfg["sea"]["payload_kg"]) if S.sea_kn else math.inf
         scm = float(cfg["scenarios"]["split_cost_mh"])
         tech = S.tech
-        # 1 Nov (b) wider literature: haul profiles (C1 / M3 / M4), stage rates (C2 / C3), carrying (C2), masons (M2)
+        # wider literature: haul profiles (C1 / M3 / M4), stage rates (C2 / C3), carrying (C2), masons (M2)
         hp = sc.get("haul_profile")
         self.hp_site = [None] * N if hp else None
         self.walk_info = np.zeros((N, 2)) if (hp and hp.get("walk")) else None   # M4: walked pieces, walked tonnes
@@ -523,7 +523,7 @@ class AllianceModel:
             tpt = s["tonnes_per_tower"] * 1000.0 * mf         # kg of stone per tower (tower split of the blocks)
             if tc:                                            # S11: volume of this building type vs a tholos tower
                 target, tpt = target * self.vol_f[i], tpt * self.vol_f[i]
-            if self.cz is not None:                           # v12 S17 fill / S19 mudbrick: share drawn as blocks
+            if self.cz is not None:                           # S17 fill / S19 mudbrick: share drawn as blocks
                 kp = self.cz.keep_share()
                 if kp != 1.0:
                     self.cz.tpt_full[i] = tpt
@@ -543,7 +543,7 @@ class AllianceModel:
             for t in range(tw):
                 mt = m[tid == t]
                 tl.append((mt.sum() / 1000.0, int(np.ceil(mt / self.pull03).sum()), int(np.ceil(mt / self.pull01).sum())))
-            if self.cz is not None and self.cz.fill_f > 0.0:  # v12 S17: the rubble core counts in the tower's tonnes
+            if self.cz is not None and self.cz.fill_f > 0.0:  # S17: the rubble core counts in the tower's tonnes
                 tl = [(x[0] + self.cz.fill_tonnes(i), x[1], x[2]) for x in tl]
             self.towers.append(tl)
             sea_i = bool(S.sea_kn) and any(fc.get("sea") for fc in S.faces[i])
@@ -567,7 +567,7 @@ class AllianceModel:
                 self.tower_sea.append(ts)
             if tech:
                 d = tech["site"][i]
-                if self.cz is not None and sc.get("lift_override"):   # v12 X_nurtime: lift technique forced
+                if self.cz is not None and sc.get("lift_override"):   # X_nurtime: lift technique forced
                     d = dict(d, lift=sc["lift_override"])
                 pull_i = lit.transport(cfg, d)[0]                  # 30 kgf / mu: 78.9 kg (mu 0.38) or 300 kg (mu 0.1)
                 pull38 = Ls["f_person_kgf"] / 0.38
@@ -596,13 +596,13 @@ class AllianceModel:
                             int(np.ceil(mp[tp_ == t] / self.pull03).sum()), scm * float(cuts[t]))
                 mp, tp_, cuts = pieces(math.inf)
                 self.tower_tech.append([tech_t(mp, tp_, cuts, t) for t in range(tw)])
-                if self.c01 is not None:                       # v16 L4: rails crews of the same pieces
+                if self.c01 is not None:                       # L4: rails crews of the same pieces
                     self.c01[i] = [int(np.ceil(mp[tp_ == t] / self.pull01).sum()) for t in range(tw)]
                 if prof_i is not None:                         # crews per profile and tower; hands = their sum
                     self._profile_crews(i, prof_i[1], mp, tp_, tw)
                 npc = np.bincount(tp_, minlength=tw)
                 self.tower_nblk.append([int(x) for x in npc])      # NEW-1: pieces per tower (hoist, hands cap)
-                # NEW-1 (30 Oct): lever/stair lift per lifted piece (mp.size = sum of the per-tower piece counts;
+                # NEW-1: lever/stair lift per lifted piece (mp.size = sum of the per-tower piece counts;
                 # stage_hours is linear in it, so this equals the sum of per-tower calls); k only fixes the mass
                 st_i = lit.stage_hours(cfg, dict(d, learning=False), tw, tech["stone"][i], int(mp.size))   # S8 per tower
                 if srates:                                    # C2 / C3: literature stage rates swapped in
@@ -611,7 +611,7 @@ class AllianceModel:
                     st_i = {"quarry": st_i["quarry"] * self.vol_f[i], "dress": st_i["dress"] * self.vol_f[i],
                             "build": st_i["build"] * self.vol_f[i],       # the lift (per piece, already x volume via the
                             "lift": st_i["lift"] * self.hgt_f[i]}         # piece count) with the mean course height
-                if self.cz is not None:                       # v12 census stage changes (lift, dressing, mortar, fill...)
+                if self.cz is not None:                       # census stage changes (lift, dressing, mortar, fill...)
                     st_i = self.cz.site_stages(i, st_i, d, tw, mp, tp_, npc, pull_i, pull38)
                 self.site_stage.append({"quarry": st_i["quarry"] / tw, "dress": st_i["dress"] / tw,
                                         "build": (st_i["build"] + st_i["lift"]) / tw})
@@ -627,20 +627,20 @@ class AllianceModel:
                         lift_pp *= self.hgt_f[i]
                     ts = [{"S03": None, "S01": None, "nblk": int(nps[t]), "split_mh": scm * float(cs[t]),
                            "tech": tech_t(ms, tps, cs, t), "xlift": lift_pp * float(nps[t] - npc[t])} for t in range(tw)]
-                    if self.L4:                                # v16 L4: rails crews of the payload-split pieces
+                    if self.L4:                                # L4: rails crews of the payload-split pieces
                         for t in range(tw):
                             ts[t]["c01"] = int(np.ceil(ms[tps == t] / self.pull01).sum())
                 self.tower_sea.append(ts)
                 if self.unit_stage is not None:                # S10 smaller addition crews / S13 extra units
                     self._gaps_units(i, seed, rec, tw, m, tid, mf, (mu, sg, lo, hi), d, pieces, tech_t, pull_i,
                                      st_i, mp, npc, sea_i, cap_sea, scm)
-                if self.cz is not None:                       # v12 per-tower haul mixes (S18, S23), lintel crews (S20)
+                if self.cz is not None:                       # per-tower haul mixes (S18, S23), lintel crews (S20)
                     self.cz.site_towers(i, d, tw, pull_i, pull38)
         self.cap = (self.B * H).astype(np.float64)
         self.masons = sc.get("masons")
         if self.masons:                                    # M2: master masons are extra performers N .. N + M_max - 1
             self._init_masons(S, sc, H)
-        if self.cz is not None:                            # v12: lintel wait clock (a performer with no capacity)
+        if self.cz is not None:                            # lintel wait clock (a performer with no capacity)
             self.cz.init_performers(H)
         if self.add_B is not None:
             self.add_B = np.where(self.add_B > 0, self.add_B, self.B)
@@ -686,7 +686,7 @@ class AllianceModel:
         self.asks = {}                                        # (asker, asked) -> [asked, refused] (a Nurnet collaborator; bookkeeping only)
         self.asks_stage = {}                                  # (asker, asked, pair-stage) -> [asked, refused]
         self.help_log = {}                                    # (season, helper, owner) -> man-hours (a Nurnet collaborator; bookkeeping)
-        self.soc = None                                       # v13 social mechanisms: None when every SOCIAL_KEYS key is off
+        self.soc = None                                       # social mechanisms: None when every SOCIAL_KEYS key is off
         if any(sc.get(k) for k in SOCIAL_KEYS):
             self._init_social(sc, N)
         # pre-existing ties (pre_networks.py): adjacency per stage set, copied so tie loss (D8) stays within a run
@@ -708,7 +708,7 @@ class AllianceModel:
         self.track_use = {}                                   # cell -> use count
         self.handoff_use = {}                                 # (x, y) -> count
         self.strategy_log = []
-        self.relay_made = []                                  # v16 S1: per logged tower, 1 = relay hand-off executed
+        self.relay_made = []                                  # S1: per logged tower, 1 = relay hand-off executed
         # ---- tasks (grow as needed)
         self.nt = 0
         cap0 = 4096
@@ -723,9 +723,9 @@ class AllianceModel:
         z = lambda: np.zeros(N)
         self.acc = {k: z() for k in ["mh_total", "mh_own", "mh_received", "mh_given", "mh_quarry", "mh_dress",
                                      "mh_transport", "mh_build", "mh_lift", "mh_setup", "mh_track", "mh_walk"]}
-        if self.cz is not None:                               # v12 census accounting columns (only when a switch is on)
+        if self.cz is not None:                               # census accounting columns (only when a switch is on)
             self.cz.init_acc()
-        self.maint = sc.get("maintenance")                    # S14 (1 Nov): collapses and repairs during the build
+        self.maint = sc.get("maintenance")                    # S14: collapses and repairs during the build
         if self.maint:
             self.acc["mh_repair"] = np.zeros(N)              # repair labour, NOT in mh_total (construction)
             self.m_rng = np.random.default_rng([seed, 1401])  # own stream: every other draw is untouched
@@ -740,7 +740,7 @@ class AllianceModel:
         self.current = [None] * N                              # current tower: dict
         self.n_started = 0
         # alliance.help_only_if_started (robustness check, Appendix S2; default false = the headline behaviour): when true
-        # a community whose own nuraghe has not started yet (start not reached / cohort not yet fired) is never a help
+        # a community whose own nuraghe has not started (start not reached / cohort not fired) is never a help
         # candidate (requests, relays, lintel helpers) nor a levy helper. help_ok marks the started communities; a
         # season's whole start batch (cohort / units / rate starts) is marked BEFORE its start_tower calls, so members
         # of the same batch can help one another with their first towers (start_tower asks for help as it runs).
@@ -771,8 +771,8 @@ class AllianceModel:
         tws = S.haul.TWR_N.to_numpy().astype(int)
         res = np.array([lit.draw_residents(rule, int(tws[i]), np.random.default_rng([seed, int(S.haul.uid_int[i])]))
                         for i in range(N)])
-        # v16 S3 (addendum 4): the ceiling is checked against all residents of the communities that exist at that time,
-        # started or waiting, i.e. every community of the run (was: the active cohort only; v15b code below for the
+        # S3 (addendum 4): the ceiling is checked against all residents of the communities that exist at that time,
+        # started or waiting, i.e. every community of the run (not the active cohort only, which is the rule below, kept for the
         # record). The redraw rule is unchanged.
         #   frac = sc.get("phase_frac"); groups = phasing.cohorts(N, frac, seed) if frac else [np.arange(N)]
         #   (S10 / S11: groups = the sites with a unit in each cohort)
@@ -792,7 +792,7 @@ class AllianceModel:
                          "ceiling_binding": bool(k > 0 or scaled < 1.0), "ceiling_basis": "all_communities_v16_S3"}
         return np.array([lit.builders_of(rule, r) for r in res], np.int64)
 
-    # ------------------------------------------------------------------ 1 Nov 2026 scenario gaps (S10-S14)
+    # ------------------------------------------------------------------ scenario gaps (S10-S14)
     def _unit_cohorts(self, S, sc, seed):
         """S10 / S11: phased construction over ordered BUILD UNITS (site, first tower, stop tower) instead of random
         site cohorts. The base order is phasing.cohorts' own permutation (default_rng([seed, 4242])), so with nothing
@@ -899,7 +899,7 @@ class AllianceModel:
             circ = math.pi * (float(v["hut_diam_m"]) + float(v["wall_thick_m"]))     # centre line of the hut wall
             out.append(("village", nh * circ * float(v["wall_height_m"]) * float(v["wall_thick_m"]) * float(v["fill"]),
                         float(v["wall_height_m"])))
-        if self.cz is not None and self.sc.get("rifascio"):     # v12 S13_rifascio: casing wall around the bastion
+        if self.cz is not None and self.sc.get("rifascio"):     # S13_rifascio: casing wall around the bastion
             out += self.cz.rifascio_units(i, tw)
         return [u for u in out if u[1] > 0]
 
@@ -989,7 +989,7 @@ class AllianceModel:
                                "xlift": L["lever_ph_per_block_course"] * (n_c - 1) / 2.0 * float(ms.size - n_x)})
         self.unit_stage[i] = per
 
-    # ------------------------------------------------------------------ 1 Nov (b) wider-literature scenarios
+    # ------------------------------------------------------------------ wider-literature scenarios
     def _wl(self, key):
         """One array of kbest_wl.npz (tools/wl_inputs.py: extra move costs, stream / sand shares), loaded once per Static
         and only if a scenario uses it (memory: 6 ranks). Move costs stay int32 (sums are exact integers)."""
@@ -1024,7 +1024,7 @@ class AllianceModel:
                 base["mv"] = S.mv_c03 if o["moves"] == "c03" else self._wl("mv_" + o["moves"])
             if "load_ph_per_t" in o:                       # C3: lever loading per tonne replaces the crew's 0.25 h
                 base["load"], base["load_ph_t"] = 0.0, float(o["load_ph_per_t"])
-        if self.L3 and base["load_ph_t"] <= 0.0:          # v16 L3 also on the profile path (fix 6 Nov, model docking
+        if self.L3 and base["load_ph_t"] <= 0.0:          # L3 also on the profile path (model docking
             base["load"], base["load_ph_t"] = 0.0, self.lp # F3/F4): rows without their own loading rate get per-tonne
         profs, split = [base], base["pull"]
         w = hp.get("wet")
@@ -1124,7 +1124,7 @@ class AllianceModel:
         if "build_ph_m3" in R:
             st["build"] = float(R["build_ph_m3"]) * vol
         wdh = R.get("webster_dress_hours")                 # C2: Webster's man-days read as 5-h (Erasmus) days
-        Hd = lit.md_hours(cfg, "dress")                    # v11: Webster's dressing man-day (Abrams, 8 h); H when off
+        Hd = lit.md_hours(cfg, "dress")                    # Webster's dressing man-day (Abrams, 8 h); H when off
         if wdh and d["dress"] == "webster":
             st["dress"] *= float(wdh) / Hd
         elif wdh and d["dress"] == "fine" and tw >= L["fine_min_towers"]:
@@ -1158,7 +1158,7 @@ class AllianceModel:
         self.m_queue = []
         self.m_vaults = 0
         self.m_wait = np.zeros(S.N); self.m_travel_h = np.zeros(S.N); self.m_nvault = np.zeros(S.N, np.int64)
-        if self.cz is not None and sc.get("mason_regions"):   # v12 M2_regional: pools confined to regions
+        if self.cz is not None and sc.get("mason_regions"):   # M2_regional: pools confined to regions
             self.cz.init_masons_regional(tw, need, H)
 
     def _mason_event(self, i, day):
@@ -1210,9 +1210,9 @@ class AllianceModel:
             self.m_loc[self.m_n] = self.S.xy[i]          # apprenticeship: a new master trained at this site
             self.m_n += 1
 
-    # ------------------------------------------------------------------ v13 social mechanisms (ODD 7.15, git history)
+    # ------------------------------------------------------------------ social mechanisms (ODD 7.15)
     def _init_social(self, sc, N):
-        """State of the v13 switches. reputation: per community, the log of its acts as an ASKED community, (requester,
+        """State of the social switches. reputation: per community, the log of its acts as an ASKED community, (requester,
         good) in time order; an observer k sees the act iff k is the requester or within R of it (R = the run's
         interaction radius, S.R). partner_choice: `cheated` = {(a, b): b refused a after having received help from a,
         and has not helped a since}. tie_imitation / social_log: help adjacency (help actually given or received,
@@ -1225,7 +1225,7 @@ class AllianceModel:
                     "n_bad": np.zeros(N, np.int64), "n_good": np.zeros(N, np.int64),
                     "n_pc_refused": np.zeros(N, np.int64), "n_pc_refuse_given": np.zeros(N, np.int64),
                     "n_cheat": np.zeros(N, np.int64)}
-        self.soc["R"], self.soc["gentle"] = float(self.S.R), reputation_rule(sc) == "gentle"; _init_kd(self, sc)   # v13g, v13kd (end of file)
+        self.soc["R"], self.soc["gentle"] = float(self.S.R), reputation_rule(sc) == "gentle"; _init_kd(self, sc)   # reputation_rule, trusted_nodist (end of file)
 
     def _bad(self, k, i):
         """Reputation: does observer k see community i in bad standing? i's most recent act (as an asked community) that
@@ -1238,7 +1238,7 @@ class AllianceModel:
         return False
 
     def _social_gate(self, i, j, ok):
-        """v13: j has been asked by i and its decision `ok` is drawn (the draw is always made, so the random streams stay
+        """Social switches: j has been asked by i and its decision `ok` is drawn (the draw is always made, so the random streams stay
         aligned with the switches off). Partner choice: j declines a requester that cheated it (refused j after receiving
         j's help). Reputation: a non-defector j declines a requester it sees in bad standing (third-party shunning). Such
         refusals are JUSTIFIED: they give j no bad standing and do not count as cheating. Returns the decision."""
@@ -1255,7 +1255,7 @@ class AllianceModel:
         if so["rep"]:
             if ok:
                 so["log"][j].append((i, True)); so["n_good"][j] += 1
-            elif not just and (not so["gentle"] or self.defector[j] or (j, i) in self.received_from):   # v13g
+            elif not just and (not so["gentle"] or self.defector[j] or (j, i) in self.received_from):   # reputation_rule gentle
                 so["log"][j].append((i, False)); so["n_bad"][j] += 1
         if so["pc"]:
             if ok:
@@ -1305,7 +1305,7 @@ class AllianceModel:
         if self.unit_stage is not None and self.unit_stage[i] is not None:      # S10 / S13 per-tower stages
             return self.unit_stage[i][int(self.tower_idx[i])][name]
         if self.cz is not None and self.cz.q_tower is not None and name == "quarry" and self.cz.q_tower[i] is not None:
-            return self.cz.q_tower[i][int(self.tower_idx[i])]        # v12 S18: per-tower quarry (clearance stone first)
+            return self.cz.q_tower[i][int(self.tower_idx[i])]        # S18: per-tower quarry (clearance stone first)
         return self.base_stage[name] if self.S.tech is None else self.site_stage[i][name]
 
     def T(self, a, b):
@@ -1344,17 +1344,17 @@ class AllianceModel:
 
     def _lift_share(self, i):
         """Lift share of owner i's current build stage (Webster island-wide, the site's own under tech rules, or the
-        S10 / S13 per-tower share). code_v17: used to split the build stage into build (discounted) and lift
-        (undiscounted, SP-22) at pricing time; before code_v17 only the accounting used it."""
+        S10 / S13 per-tower share). Used to split the build stage into build (discounted) and lift
+        (undiscounted, SP-22) at pricing time."""
         ls = self.lift_share if self.S.tech is None else self.site_lift_share[i]
         if self.unit_ls:                                  # S10 / S13 per-tower lift share
             ls = self.unit_ls.get((i, int(self.tower_idx[i])), ls)
         return ls
 
     def charge(self, owner, perf, mh, stage, walk=0.0, lift=None):
-        """Labour mh (incl. walk) by perf, spent on owner's nuraghe. code_v17: lift = the lift man-hours inside mh
+        """Labour mh (incl. walk) by perf, spent on owner's nuraghe. lift = the lift man-hours inside mh
         (build stage, booked to mh_lift exactly; the rest of mh - walk to mh_build). lift=None (no build work, e.g.
-        broker walks): the old split of mh - walk by the lift share."""
+        broker walks): mh - walk split by the lift share."""
         A = self.acc
         A["mh_total"][owner] += mh
         A["mh_walk"][owner] += walk
@@ -1369,10 +1369,10 @@ class AllianceModel:
             hs[0] += mh; hs[1] += 1
             k = (self.season, perf, owner)
             self.help_log[k] = self.help_log.get(k, 0.0) + mh
-            if self.soc is not None and mh > 0.0:              # v13: help ties (imitation along ties, logging)
+            if self.soc is not None and mh > 0.0:              # social: help ties (imitation along ties, logging)
                 self.soc["adj"][perf].add(owner); self.soc["adj"][owner].add(perf)
         w = mh - walk
-        if stage == "build" and lift is not None:          # code_v17 SP-22: lift priced apart, booked exactly
+        if stage == "build" and lift is not None:          # SP-22: lift priced apart, booked exactly
             A["mh_build"][owner] += w - lift; A["mh_lift"][owner] += lift
         elif stage == "build":
             ls = self._lift_share(owner)
@@ -1410,11 +1410,11 @@ class AllianceModel:
                 ok = self.rng[j].random() < float(fixed)
             else:
                 x = (A["beta0"] + A["beta1"] * self.T(j, i) - A["beta2"] * self.backlog_days(j)
-                     - (0.0 if self.soc is not None and self.soc["kd"] and _kd_pair(self, i, j) else A["beta3"] * dij / 1000.0))   # v13kd
-                if self.cz is not None and self.cz.feast is not None:   # v12 S12b: the host's surplus attracts help
+                     - (0.0 if self.soc is not None and self.soc["kd"] and _kd_pair(self, i, j) else A["beta3"] * dij / 1000.0))   # trusted_nodist
+                if self.cz is not None and self.cz.feast is not None:   # S12b: the host's surplus attracts help
                     x += self.cz.feast[i]
                 ok = self.rng[j].random() < sigmoid(x)
-            if self.soc is not None:                     # v13 partner choice / reputation (no random draws)
+            if self.soc is not None:                     # partner choice / reputation (no random draws)
                 ok = self._social_gate(i, j, ok)
             # ask/refusal counters (a Nurnet collaborator's patch, all decision branches; no random draws)
             ak = self.asks.setdefault((i, j), [0, 0]); ak[0] += 1
@@ -1489,7 +1489,7 @@ class AllianceModel:
         return out
 
     def candidates(self, i, stage, quarry_xy=None, nearer_than=None):
-        if self.soc is not None and self.soc["pc"]:     # v13 partner choice: reorder the existing list
+        if self.soc is not None and self.soc["pc"]:     # partner choice: reorder the existing list
             return self._partner_order(i, self._candidates(i, stage, quarry_xy, nearer_than))
         return self._candidates(i, stage, quarry_xy, nearer_than)
 
@@ -1508,7 +1508,7 @@ class AllianceModel:
         out = []
         for j, dij in zip(nb, d):
             j = int(j)
-            if self.help_only_started and not self.help_ok[j]:   # help_only_if_started: not yet started
+            if self.help_only_started and not self.help_ok[j]:   # help_only_if_started: has not started
                 continue
             if nearer_than is not None:
                 dq = math.hypot(self.S.xy[j, 0] - quarry_xy[0], self.S.xy[j, 1] - quarry_xy[1])
@@ -1525,24 +1525,24 @@ class AllianceModel:
         A = self.A
         rng = self.rng[i]
         strat, imit = {}, False
-        near = self.S.near is not None and bool(self.S.near[i])   # v14: near site -> face 0, no face draw
+        near = self.S.near is not None and bool(self.S.near[i])   # near-site rule: near site -> face 0, no face draw
         if self.sc.get("imitation", True) and rng.random() < float(A["p_imit"]):
             own = self.last_strategy[i][1] if self.last_strategy[i] else math.inf
             best = None
             src = -1
-            for j in (self.S.nb[i][0] if self.soc is None else self._imit_pool(i)):   # v13: help ties (tie_imitation)
+            for j in (self.S.nb[i][0] if self.soc is None else self._imit_pool(i)):   # social: help ties (tie_imitation)
                 ls = self.last_strategy[int(j)]
                 if ls and ls[1] < own and (best is None or ls[1] < best[1]):
                     best = ls
                     src = int(j)
-            if self.soc is not None:                      # v13 bookkeeping: imitated source, and is it a help tie?
+            if self.soc is not None:                      # social bookkeeping: imitated source, and is it a help tie?
                 self.soc["src"] = src if best is not None else -1
                 self.soc["linked"] = int(best is not None and src in self.soc["adj"][i])
             if best is not None:
                 imit = True
                 for dname, vals in dims_values.items():
                     if dname == "quarry_face":
-                        if near:                          # v14: the face is never imitated by a near site
+                        if near:                          # near-site rule: the face is never imitated by a near site
                             continue
                         regs = [f["region"] for f in self.S.faces[i]]
                         if best[0].get("quarry_region") in regs:
@@ -1555,7 +1555,7 @@ class AllianceModel:
             if self.sc.get("fixed_actions") and dname in self.sc["fixed_actions"]:
                 strat[dname] = self.sc["fixed_actions"][dname]
                 continue
-            if near and dname == "quarry_face":           # v14: face 0, no epsilon draw, no Q choice (draw skipped)
+            if near and dname == "quarry_face":           # near-site rule: face 0, no epsilon draw, no Q choice (draw skipped)
                 strat[dname] = 0
                 continue
             q = self.Q[i][dname]
@@ -1600,7 +1600,7 @@ class AllianceModel:
             return self._leg_mh_tech(i, face, a, b, S03, part, nblk)
         if face.get("sea"):                               # S9: whole sea chain, no tracks / relays on it
             sv = self._sea_variant()
-            if sv is not None:                            # payload split: the pieces' crews and hoists (30 Oct)
+            if sv is not None:                            # payload split: the pieces' crews and hoists
                 S03, nblk = sv["S03"], sv["nblk"]
             return S03 * face["trip_h"] + nblk * face["hoist_ph"], 0
         if face["route"] < 0 or a == b:
@@ -1617,7 +1617,7 @@ class AllianceModel:
     def _leg_mh_tech(self, i, face, a, b, S03, part, nblk):
         if self.cz is None or face.get("sea"):
             return self._leg_mh_tech0(i, face, a, b, S03, part, nblk)
-        return self.cz.leg_mh(i, face, a, b, S03, part, nblk)        # v12: carts (S24), haul mixes (S18, S23)
+        return self.cz.leg_mh(i, face, a, b, S03, part, nblk)        # carts (S24), haul mixes (S18, S23)
 
     def _leg_mh_tech0(self, i, face, a, b, S03, part, nblk):
         """Tech rules: the site's own friction on every land face (rails mu 0.1 = kbest mu0.1 move costs and
@@ -1631,10 +1631,10 @@ class AllianceModel:
         if face.get("sea"):
             sv = self._sea_variant()
             c01 = None
-            if sv is not None:                            # payload split: the pieces' crews and hoists (30 Oct)
+            if sv is not None:                            # payload split: the pieces' crews and hoists
                 (Ssite, S038, S03p, _), nblk = sv["tech"], sv["nblk"]
                 c01 = sv.get("c01")
-            if "legs" in face:                            # v16 L4: land legs at the site's rule, loading per L3
+            if "legs" in face:                            # L4: land legs at the site's rule, loading per L3
                 return self._sea_l4_mh(o, face, Ssite, S038, S03p, nblk, c01), 0
             return S038 * face["land_h"] + S03p * face["boat_h"] + nblk * face["hoist_ph"], 0
         if self.carry is not None and part == "whole" and face["L"] <= float(self.carry["max_m"]):
@@ -1657,7 +1657,7 @@ class AllianceModel:
                 if n <= 0 and p["sel"] == "sledge" and p["load_ph_t"] > 0.0 and p["w"] > 0.0:
                     tn = self._load_t(o, t_o)             # M4 + L3: loading per tonne of the tower is booked on the sledge
                     mh += p["w"] * tn * p["load_ph_t"] * (1.0 if part == "whole" else 0.5)   # profile even if every
-                    continue                              # piece is eligible for walking (fix 6 Nov)
+                    continue                              # piece is eligible for walking
                 if n <= 0 or p["w"] <= 0.0:
                     continue
                 if face["route"] < 0 or a == b:
@@ -1686,7 +1686,7 @@ class AllianceModel:
 
     def _load_t(self, o, t):
         """Tonnes of tower t of site o that are loaded on sledges (L3, C3, M4, sea legs): the tower's tonnes minus
-        the S17 rubble core, which goes by basket with no loading term (spec 14.7, addendum 8b; fix 7 Nov, model
+        the S17 rubble core, which goes by basket with no loading term (spec 14.7, addendum 8b; model
         docking R013)."""
         tn = float(self.towers[o][t][0])
         if self.cz is not None and self.cz.fill_f > 0.0:
@@ -1694,8 +1694,8 @@ class AllianceModel:
         return tn
 
     def _crew_trip_mh(self, crews, C, L, part, o):
-        """Man-hours of a land trip (whole route or relay leg) for `crews` person-trips. v15b: crews x trip, the trip
-        including load_unload_h per crew member (half per relay leg). v16 L3 (add4.load_per_tonne): crews x (drag +
+        """Man-hours of a land trip (whole route or relay leg) for `crews` person-trips. L3 off: crews x trip, the trip
+        including load_unload_h per crew member (half per relay leg). L3 on (add4.load_per_tonne): crews x (drag +
         walk) + load_ph_per_t x tonnes of the tower (half per relay leg), independent of crew size and friction."""
         if not self.L3:
             return crews * self.trip(C, L, part)
@@ -1704,7 +1704,7 @@ class AllianceModel:
             tn * self.lp * (1.0 if part == "whole" else 0.5)
 
     def _lay_share(self, i, face):
-        """v16 L1: the site's rail-laying cost (rail_lay_mh_per_m x face-0 real route length, paid once per site) in
+        """L1: the site's rail-laying cost (rail_lay_mh_per_m x face-0 real route length, paid once per site) in
         equal parts per tower; land faces of rails sites only (sea faces carry their own legs' laying, L4). 0 when off."""
         S = self.S
         if S.tech is None or S.lay_len is None or face.get("sea"):
@@ -1712,7 +1712,7 @@ class AllianceModel:
         return self.F["rail_lay_mh_per_m"] * float(S.lay_len[i]) / self.tw_n[i]
 
     def _sea_l4_mh(self, o, face, Ssite, S038, S03p, nblk, c01):
-        """v16 L4: man-hours of a sea face: each land leg by its static rule (Static._l4_sea_faces: rails or dry
+        """L4: man-hours of a sea face: each land leg by its static rule (Static._l4_sea_faces: rails or dry
         ground) with its crews (rails = the site's crews if the site is on rails, else the rails crews of the same
         pieces; dry = S038), drag + walk with the min-haul floor per leg, loading per crew per landing (sea.transfer_h)
         or under L3 load_ph_per_t x tonnes per land leg, rail laying per rails leg (L1: x leg length / towers); boat
@@ -1763,7 +1763,7 @@ class AllianceModel:
         MH / (B_owner + B_helper_eff) with B_helper_eff = min(B_helper, hands cap - B_owner) >= 0."""
         cap = self._hands_cap(i, stage, nblk)
         bh = float(self.B[helper])
-        if self.cz is not None and self.cz.levy_cur == helper:   # v12 S21: a levied community sends levy_share of its party
+        if self.cz is not None and self.cz.levy_cur == helper:   # S21: a levied community sends levy_share of its party
             bh = self.cz.levy_hands(helper)
         h_eff = max(0.0, min(bh, cap - float(self.B[i])))
         if self.food_cap is not None:                     # S12: the owner feeds every hand on its stage
@@ -1773,8 +1773,8 @@ class AllianceModel:
     def _join_task(self, i, helper, stage, mh, loc, up, final, nblk, parts=None, lifts=(None, None)):
         """Owner part (owner) + helper part (helper, + its walk), both downstream of `up`; the next task waits for
         both (t_up2). Returns the owner part's id. parts=None: the stage's man-hours mh split by the hands share f
-        (relay leg 1); parts=(f, owner mh, helper mh): already priced per party (code_v16_final D6, skill stages).
-        lifts (code_v17, build stage): the lift man-hours inside the owner's / helper's part (booked to mh_lift)."""
+        (relay leg 1); parts=(f, owner mh, helper mh): already priced per party (D6, skill stages).
+        lifts (build stage): the lift man-hours inside the owner's / helper's part (booked to mh_lift)."""
         if parts is None:
             f = self._join_split(i, helper, stage, nblk)
             mo, mhp = mh * (1.0 - f), mh * f
@@ -1791,14 +1791,14 @@ class AllianceModel:
         return to
 
     def _build_lift(self, i, xlift=0.0):
-        """code_v17, SP-22 ruling (9 Nov; spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate:
+        """SP-22 ruling (spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate:
         the learning factor (PM:23) and skill (PM:173) apply to quarrying, dressing and building only, never to lift."
-        Until code_v16_final the build skill stage was build + lift, all of it x min(skill, (1 - rate)^t) (and x the
-        helper's skill); the report split it by the lift share only afterwards. Now the current tower's build stage
-        (before skill) is split by its lift share into build (still discounted) and lift (stair, lever, ramps incl.
+        The current tower's build stage (before skill) is split by its lift share into build (discounted by skill /
+        S8 learning: x min(skill, (1 - rate)^t), x the helper's skill) and lift, priced at factor 1
+        (stair, lever, ramps incl.
         the 14.3 earth ramp, spiral, lift_override, graded: whatever stage_hours / census put in st['lift']) plus
-        xlift (lever / stair lift of the extra sea-payload pieces, all lift; was inside the discounted stage and split
-        by the share in the report). -> (build base, lift)."""
+        xlift (lever / stair lift of the extra sea-payload pieces, all lift).
+        -> (build base, lift)."""
         b = self._stage(i, "build")
         ls = self._lift_share(i)
         return b * (1.0 - ls), b * ls + xlift
@@ -1812,10 +1812,10 @@ class AllianceModel:
         return sk
 
     def _handover_mh(self, i, p, stage, base, extra, t_s8, lift=0.0):
-        """Handover pricing of one stage of owner i's tower performed by p (code_v17: moved out of perform(),
-        unchanged except lift). base x skill(p) (owner: the larger discount of A3 skill and S8 learning, never both;
+        """Handover pricing of one stage of owner i's tower performed by p (called by perform();
+        lift priced apart). base x skill(p) (owner: the larger discount of A3 skill and S8 learning, never both;
         MOST_REALISTIC_NOTES.md "learning") + extra (not discounted) + lift.
-        code_v17, SP-22 ruling (specified by the authors, 9 Nov 2026: no discount on lift, long-term
+        SP-22 ruling (specified by the authors: no discount on lift, long-term
         rates; spec addendum k): "Lift (all lift rules) is priced at the undiscounted rate: the learning factor
         (PM:23) and skill (PM:173) apply to quarrying, dressing and building only, never to lift." So lift is added
         at factor 1, whoever performs it."""
@@ -1825,13 +1825,13 @@ class AllianceModel:
         return (base * sk if base is not None else 0.0) + extra + lift
 
     def _perform_join(self, i, helper, stage, loc, up, final, base, extra, t_i, nblk, cur, credit=True, lift=0.0):
-        """Join mode for a skill stage. code_v16_final D6 (PM:23 "A helper uses its own skill"): each party's share of
+        """Join mode for a skill stage. D6 (PM:23 "A helper uses its own skill"): each party's share of
         the stage is priced at that party's own factor: the owner's share (1 - f) at _owner_skill (min of A3 skill and
-        S8), the helper's share f at the helper's A3 skill (was: the main performer's factor for the whole stage).
-        `extra` (setup, cuts, soil) is not skill-discounted and is split by f as before. The learning credit is
-        unchanged: the main performer (the party contributing more hands, f > 0.5 = helper) gets it (specialisation
+        S8), the helper's share f at the helper's A3 skill.
+        `extra` (setup, cuts, soil) is not skill-discounted and is split by f. The learning credit:
+        the main performer (the party contributing more hands, f > 0.5 = helper) gets it (specialisation
         rule as in handover).
-        code_v17 (SP-22 ruling): `lift` (build stage only) is priced at the undiscounted rate, like `extra`, and split
+        SP-22 ruling: `lift` (build stage only) is priced at the undiscounted rate, like `extra`, and split
         by f; each party's lift part is booked to mh_lift."""
         f = self._join_split(i, helper, stage, nblk)
         p = helper if f > 0.5 else i
@@ -1841,7 +1841,7 @@ class AllianceModel:
         else:
             mo, mhp = extra * (1.0 - f), extra * f
         lifts = (None, None)
-        if stage == "build":                              # code_v17 SP-22: lift undiscounted, never x skill / S8
+        if stage == "build":                              # SP-22: lift undiscounted, never x skill / S8
             lifts = (lift * (1.0 - f), lift * f)
             mo, mhp = mo + lifts[0], mhp + lifts[1]
         t = self._join_task(i, helper, stage, mo + mhp, loc, up, final, nblk, parts=(f, mo, mhp), lifts=lifts)
@@ -1851,12 +1851,12 @@ class AllianceModel:
         return t
 
     def _no_work_task(self, i, stage, up, final=False):
-        """code_v16_final D3: a stage with no work (PM:20 "Dressing: none for 1 tower"; any skill stage whose labour
+        """D3: a stage with no work (PM:20 "Dressing: none for 1 tower"; any skill stage whose labour
         before skill is 0 with no extra) is the owner's 0-man-hour task, kept only so the chain order is unchanged. No
         help is asked (no ask counters, no acceptance draw, no trust change, no alliance), no levy, no helper walk, no
         skill credit (SC:169 counts work performed). The Q-learning dimension (e.g. req_dress) is still drawn (the
-        strategy draw is unchanged; the choice has no effect on such a tower); the acceptance draws that the old
-        zero-work asks took from the asked communities' streams are no longer made, so later draws shift."""
+        choice has no effect on such a tower); no acceptance draws are taken
+        from the asked communities' streams for such a stage."""
         return self.add_task(i, 0.0, stage, up, final)
 
     def start_tower(self, i):
@@ -1889,13 +1889,13 @@ class AllianceModel:
             pool = sum(self.base_stage.values()) if S.tech is None else sum(self.site_stage[i].values())
             for qi, fc in enumerate(faces):
                 m, _ = self.leg_mh(i, fc, fc["a"], fc["b"], S03, S01, "whole", nblk=nblk)
-                m += self._lay_share(i, fc)                       # v16 L1: rail laying share (0 when off)
+                m += self._lay_share(i, fc)                       # L1: rail laying share (0 when off)
                 qd[qi] = -(m + pool + float(sc.get("setup_mh", A["setup_mh"]))) / tonnes
         strat, imit = self.choose(i, dims)
         q = int(strat["quarry_face"])
         face = faces[q]
         sea_x = {"split_mh": 0.0, "xlift": 0.0}
-        if face.get("sea") and self.tower_sea[i] is not None:   # S9 payload split applies to this tower (30 Oct)
+        if face.get("sea") and self.tower_sea[i] is not None:   # S9 payload split applies to this tower
             self.cur_sea = True
             sea_x = self.tower_sea[i][t_i]
             nblk = sea_x["nblk"]
@@ -1910,19 +1910,19 @@ class AllianceModel:
                                   strat.get("track", 0), int(imit)))
         k_log = len(self.relay_made)
         self.relay_made.append(0)
-        if self.soc is not None:                          # v13: who started, imitated source (-1 none), help-tie source
+        if self.soc is not None:                          # social: who started, imitated source (-1 none), help-tie source
             self.soc["strat"].append((i, self.soc["src"] if imit else -1, self.soc["linked"] if imit else 0))
             self.soc["src"], self.soc["linked"] = -1, 0
 
         join = sc.get("help_mode") == "join"              # MOST_REALISTIC: helpers add hands, they do not take over
 
         def perform(stage, want_help, loc, up, final=False, base=None, extra=0.0, credit=True, lift=0.0):
-            """Create the task; returns task id. base: labour before skill (for skill stages). lift (code_v17, build
+            """Create the task; returns task id. base: labour before skill (for skill stages). lift (build
             stage): lift man-hours, priced at the undiscounted rate (SP-22), booked to mh_lift."""
-            if base is not None and base <= 0.0 and extra <= 0.0 and lift <= 0.0:   # code_v16_final D3: no work
+            if base is not None and base <= 0.0 and extra <= 0.0 and lift <= 0.0:   # D3: no work
                 return self._no_work_task(i, stage, up, final)
             helper = -1
-            if self.cz is not None and self.cz.levy is not None:   # v12 S21: a seat levies a community of its canton
+            if self.cz is not None and self.cz.levy is not None:   # S21: a seat levies a community of its canton
                 helper = self.cz.levy_helper(i)
                 if helper >= 0:
                     assert join, "levy needs help_mode join"
@@ -1961,7 +1961,7 @@ class AllianceModel:
         if self.cur_sea:                                  # sea face: cuts of the payload split (incl. any crew cuts)
             split_mh = sea_x["split_mh"]
         found = 0.0
-        if self.cz is not None and t_i == 0:              # v12 S15: soil stripping before the first tower
+        if self.cz is not None and t_i == 0:              # S15: soil stripping before the first tower
             found = self.cz.found_ph(i)
         tq = perform("quarry", strat.get("req_quarry", 0) == 1, qxy, -1, base=self._stage(i, "quarry"),
                      extra=setup + split_mh + found)
@@ -1991,17 +1991,17 @@ class AllianceModel:
                 for c in new:
                     self.track_owner[c] = i
                 up = tt
-        # 4 transport: whole route, or relay leg 1 (a helper from the ordinary candidate list; the v15b "nearer the
-        # quarry than the owner" filter is removed, code_v15c / code_v16) + leg 2 (self)
+        # 4 transport: whole route, or relay leg 1 (a helper from the ordinary candidate list, with no
+        # "nearer the quarry than the owner" filter) + leg 2 (self)
         f = float(strat.get("relay", 0.0))
         a, b = face["a"], face["b"]
-        lay = self._lay_share(i, face)                    # v16 L1: rail laying share, booked to the owner's transport
+        lay = self._lay_share(i, face)                    # L1: rail laying share, booked to the owner's transport
         relay_ok = f > 0 and face["route"] >= 0 and face["C"] >= float(A["relay_min_flatm"]) and f in face["handoff"]
         helper = -1
         if relay_ok:
-            # v16 (specified by the authors, 5 Nov 2026): the leg-1 "nearer the quarry than the owner" candidate filter is
-            # REMOVED; leg-1 candidates = the ordinary candidate list (as code_v15c_norelayfilter). v15b passed
-            # nearer_than=dself. Measured before removal (change notes, git history).
+            # specified by the authors: no leg-1 "nearer the quarry than the owner" candidate filter;
+            # leg-1 candidates = the ordinary candidate list.
+            #
             helper = self.request(i, "leg1", qxy, self.candidates(i, "leg1", qxy))
             self.charge_brokers(i, "leg1")
             cur["helpers"]["leg1"] = helper
@@ -2040,7 +2040,7 @@ class AllianceModel:
             m += lay
             ttr = self.add_task(i, m, "transport", up)
             self.charge(i, i, m, "transport")
-        if self.cz is not None:                           # v12 S17 fill carrying, S20 lintel (may wait for hands)
+        if self.cz is not None:                           # S17 fill carrying, S20 lintel (may wait for hands)
             ttr = self.cz.after_transport(i, t_i, face, ttr)
         if self.track_owner and face["route"] >= 0:
             for c in S.mv_cell[a:b]:
@@ -2050,7 +2050,7 @@ class AllianceModel:
         if self.masons and self.m_need[i] and (self.n_real is None or t_i < self.n_real[i]):
             # M2: the upper courses / vault (vault_share of the build stage) wait for a master mason; lower part now,
             # the vault as a second build task once a master has arrived (help asked again, no second skill credit)
-            bb, lb = self._build_lift(i, sea_x["xlift"])   # code_v17 SP-22: build (discounted) | lift (undiscounted)
+            bb, lb = self._build_lift(i, sea_x["xlift"])   # SP-22: build (discounted) | lift (undiscounted)
             v = float(self.masons["vault_share"])
             want_b = strat.get("req_build", 0) == 1
             loc_b = (S.xy[i, 0], S.xy[i, 1])
@@ -2059,7 +2059,7 @@ class AllianceModel:
             cur["vault_fn"] = lambda: perform("build", want_b, loc_b, -1, final=True, base=v * bb, credit=False,
                                               lift=v * lb)
         else:
-            bb, lb = self._build_lift(i, sea_x["xlift"])   # code_v17 SP-22: build (discounted) | lift (undiscounted)
+            bb, lb = self._build_lift(i, sea_x["xlift"])   # SP-22: build (discounted) | lift (undiscounted)
             tb = perform("build", strat.get("req_build", 0) == 1, (S.xy[i, 0], S.xy[i, 1]), ttr, final=True,
                          base=bb, lift=lb)
         cur["final_task"] = tb
@@ -2068,7 +2068,7 @@ class AllianceModel:
         self._order_dirty = True
 
     def _final_day(self, cur):
-        """Day the tower's final task finished (-1 if not yet); join mode: the later of the two build parts."""
+        """Day the tower's final task finished (-1 if not finished); join mode: the later of the two build parts."""
         if cur.get("mphase") == "wait":                   # M2: waiting for a master mason
             return -1
         t = cur["final_task"]
@@ -2108,7 +2108,7 @@ class AllianceModel:
     def season_step(self):
         A, N = self.A, self.N
         self.season += 1
-        if self.cz is not None:                            # v12: levy budgets, lintel waits
+        if self.cz is not None:                            # levy budgets, lintel waits
             self.cz.season_start()
         # new starts this season
         if self.maint:                                     # S14: collapses of finished towers, repaired by the owner
@@ -2128,7 +2128,7 @@ class AllianceModel:
                         self.cap[i] = float(self.B[i]) * self.Hh
                     self.stop_at[i] = t1
                     self.start_tower(i)
-        elif self.phase_frac:                              # phased: the next cohort starts once ALL earlier ones are built
+        elif self.phase_frac:                              # phased: the next cohort starts once ALL preceding ones are built
             if all(c is None for c in self.current) and self.cur_phase + 1 < len(self.cohorts):
                 self.cur_phase += 1
                 self.help_ok[np.asarray(self.cohorts[self.cur_phase], np.int64)] = True   # help_only_if_started
@@ -2139,7 +2139,7 @@ class AllianceModel:
                     self.start_season[i] = self.season
                     self.start_tower(i)
         else:
-            if self.cz is not None and self.cz.demog is not None:   # v12 S22: starts follow population growth
+            if self.cz is not None and self.cz.demog is not None:   # S22: starts follow population growth
                 tgt = self.cz.demog_target(self.season)
             else:
                 self.start_acc += float(self.sc.get("start_rate", A["start_rate"])) * N
@@ -2236,17 +2236,17 @@ class AllianceModel:
             rows["masons_final"] = self.m_n
         if self.wet_site is not None:                      # M3
             rows["wet_haul"] = self.wet_site.astype(int)
-        if self.cz is not None:                            # v12 census columns
+        if self.cz is not None:                            # census columns
             rows = self.cz.result_cols(rows)
         if self.walk_info is not None:                     # M4
             rows["walk_pieces"] = self.walk_info[:, 0]
             rows["walk_tonnes"] = self.walk_info[:, 1]
-        if self.soc is not None:                           # v13 social counters (appended; only when a switch is on)
+        if self.soc is not None:                           # social counters (appended; only when a switch is on)
             for k in ("n_shunned", "n_shun_given", "n_bad", "n_good", "n_pc_refused", "n_pc_refuse_given", "n_cheat"):
                 rows["soc_" + k] = self.soc[k]
             rows["soc_bad_final"] = [int(self.soc["rep"] and bool(self.soc["log"][g]) and not self.soc["log"][g][-1][1])
                                      for g in range(self.N)]    # last logged act an unjustified refusal
-            rows["soc_help_ties"] = [len(a) for a in self.soc["adj"]]; _kd_cols(self, rows)   # v13kd: soc_n_kd if on
+            rows["soc_help_ties"] = [len(a) for a in self.soc["adj"]]; _kd_cols(self, rows)   # trusted_nodist: soc_n_kd if on
         pairs = []
         keys = set(self.help_mh) | set(self.trust)
         und = {}
@@ -2279,8 +2279,8 @@ class AllianceModel:
         lg = pd.DataFrame(self.strategy_log, columns=["season", "quarry_face", "req_quarry", "req_dress", "req_build",
                                                       "relay", "track", "imitated"])
         lg["seed"] = self.seed
-        lg["relay_made"] = np.array(self.relay_made, np.int64)   # v16 S1 (appended column)
-        if self.soc is not None:                           # v13: starter, imitated source, source a help tie (0/1)
+        lg["relay_made"] = np.array(self.relay_made, np.int64)   # S1 (appended column)
+        if self.soc is not None:                           # social: starter, imitated source, source a help tie (0/1)
             ex = np.array(self.soc["strat"], np.int64).reshape(-1, 3)
             lg["gid"], lg["imit_src"], lg["imit_tie"] = ex[:, 0], ex[:, 1], ex[:, 2]
         spec = pd.DataFrame(self.given_stage, columns=["given_" + s for s in STAGES])
@@ -2336,8 +2336,8 @@ def scenario(cfg, name):
         sc.update(A["verify_scenarios"][name] or {})
     elif name in (cfg.get("alliance_extra") or {}) or name in (cfg.get("alliance_gaps") or {}) or \
             name in (cfg.get("alliance_wl") or {}) or name in (cfg.get("alliance_census") or {}):
-        # MOST_REALISTIC family (top-level key: not in any hash); 1 Nov S10-S14 in alliance_gaps; 1 Nov (b) alliance_wl;
-        # 2 Nov (v12) census scenarios in alliance_census
+        # MOST_REALISTIC family (top-level key: not in any hash); S10-S14 in alliance_gaps; wider literature in alliance_wl;
+        # census scenarios in alliance_census
         sc.update((cfg.get("alliance_extra") or {}).get(name) or (cfg.get("alliance_gaps") or {}).get(name) or
                   (cfg.get("alliance_wl") or {}).get(name) or cfg["alliance_census"][name] or {})
         assert not (sc.get("tech_rules") and sc.get("tracks")), "tech_rules: trackways are not modelled (rails are)"
@@ -2363,11 +2363,11 @@ def signature(cfg, sc, haul):
     if not al.get("help_only_if_started", True):         # an explicit false = the default: same signature as no key
         del al["help_only_if_started"]
     h = hashlib.sha1(json.dumps({**{k: cfg[k] for k in keys}, "alliance": al}, sort_keys=True, default=str).encode())
-    h.update(json.dumps(_sig_sc(sc), sort_keys=True).encode())   # v13g: = sc unless reputation_rule "all" is explicit
+    h.update(json.dumps(_sig_sc(sc), sort_keys=True).encode())   # = sc unless reputation_rule "all" is explicit
     h.update(haul[["UID", "TWR_N", "haul_flatm", "haul_m"]].to_csv(index=False).encode())
     h.update(json.dumps(cfg["lit_scenarios"]["webster_md_per_tower"]).encode())
     h.update(json.dumps(cfg["lit_scenarios"]["lift_share_of_build"]).encode())          # B3: build/lift split
-    if (cfg.get("v11") or {}).get("webster_day_fix"):    # v11 (2 Nov 2026): Webster's man-days at source day lengths
+    if (cfg.get("v11") or {}).get("webster_day_fix"):    # Webster's man-days at source day lengths
         h.update(json.dumps(cfg["v11"], sort_keys=True).encode())
         h.update(V11_VERSION.encode())
     if "tie_spec" in sc:                                 # B3: tie_spec names groups; hash their definitions too
@@ -2383,37 +2383,37 @@ def signature(cfg, sc, haul):
         h.update(json.dumps(cfg["lit_scenarios"]["list"][sc["tech_rules"]], sort_keys=True).encode())
         h.update(TECH_VERSION.encode())
     if sc.get("sea_kn"):
-        h.update(SEA_VERSION.encode())                   # 30 Oct: payload split on sea faces
-    if any(sc.get(k) for k in GAPS_KEYS):                # 1 Nov scenario gaps: their code version and inputs
+        h.update(SEA_VERSION.encode())                   # payload split on sea faces
+    if any(sc.get(k) for k in GAPS_KEYS):                # scenario gaps: their code version and inputs
         h.update(GAPS_VERSION.encode())
         if sc.get("food_cap"):
             h.update(open(os.path.join(cfg["paths"]["cache_dir"], sc["food_cap"]["catchment_file"]), "rb").read())
     po = sc.get("phase_order") or {}
-    if any(sc.get(k) for k in WL_KEYS) or po.get("rule") == "emulation":   # 1 Nov (b) wider-literature scenarios
+    if any(sc.get(k) for k in WL_KEYS) or po.get("rule") == "emulation":   # wider-literature scenarios
         h.update(WL_VERSION.encode())
         if sc.get("haul_profile"):
             h.update(open(os.path.join(cfg["paths"]["cache_dir"], "alliance", "kbest_wl.npz"), "rb").read())
-    if any(sc.get(k) for k in CENSUS_KEYS):              # v12 census scenarios: their code version and inputs
+    if any(sc.get(k) for k in CENSUS_KEYS):              # census scenarios: their code version and inputs
         h.update(CENSUS_VERSION.encode())
         h.update(json.dumps(cfg.get("census_v12") or {}, sort_keys=True, default=str).encode())
         if sc.get("bichrome"):
             h.update(open(os.path.join(cfg["paths"]["cache_dir"], "census", "bichrome_dist.csv"), "rb").read())
-    if any(sc.get(k) for k in SOCIAL_KEYS):              # v13 social mechanisms: their code version and cfg['scenarios']
-        h.update((SOCIAL_VERSION + _rule_tag(sc)).encode())   # (split_cost_mh acts on every alliance run; was never hashed)
+    if any(sc.get(k) for k in SOCIAL_KEYS):              # social mechanisms: their code version and cfg['scenarios']
+        h.update((SOCIAL_VERSION + _rule_tag(sc)).encode())   # (split_cost_mh acts on every alliance run; not hashed here)
         h.update(json.dumps({k: v for k, v in cfg["scenarios"].items() if k != "list"}, sort_keys=True,
                             default=str).encode())
     nf = near_face_m(cfg)
-    if nf is not None:                                   # v14 near-site face rule: hashed only when on
+    if nf is not None:                                   # near-site face rule: hashed only when on
         h.update(NEARFACE_VERSION.encode())
         h.update(json.dumps({"near_site_fixed_face_m": nf}).encode())
-    h.update(V16_VERSION.encode())                       # v16: always (S1 parts column, S3 ceiling basis)
-    h.update(ADD4_VERSION.encode())                      # code_v16_final: the effective add4 settings, always
+    h.update(V16_VERSION.encode())                       # always (S1 parts column, S3 ceiling basis)
+    h.update(ADD4_VERSION.encode())                      # the effective add4 settings, always
     h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
     if lit.add4_any(cfg):
         if sc.get("sea_kn") and lit.add4(cfg)["sea_priced_as_charged"]:
             import sea as seamod
             h.update(seamod.load_routes(haul.reset_index(drop=True), cfg, sc["sea_kn"]).to_csv(index=False).encode())
-    h.update(CODE_VERSION.encode())                      # stale part files from older code are never reused
+    h.update(CODE_VERSION.encode())                      # part files of another code version are never reused
     return h.hexdigest()[:12]
 
 
@@ -2451,7 +2451,7 @@ def run(a, cfg, haul, names, seeds, out_root=None):
         run_dir = os.path.join(a.parts_dir or os.path.join(cfg["paths"]["cache_dir"], "runs"), tag, signature(cfg, sc, haul))
         if rank == 0:
             os.makedirs(run_dir, exist_ok=True)
-            if getattr(S, "info", None):                  # v16: static per-site choices (rails sites, sea faces)
+            if getattr(S, "info", None):                  # static per-site choices (rails sites, sea faces)
                 with open(os.path.join(run_dir, "static_info.json"), "w") as fh:
                     json.dump(S.info, fh, indent=1)
                 print(f"[{tag}] v16 static: {json.dumps(S.info)}", flush=True)
@@ -2519,18 +2519,18 @@ class _Light:
         self.xy, self.T, self.H, self.W = S.xy.copy(), S.T.copy(), S.H, S.W
 
 
-# ------------------------------------------------------------------ v13g reputation rule (2 Nov 2026)
-# Appended at the end of the file so that every earlier line keeps its number (the ODD cites them); the three call
+# ------------------------------------------------------------------ reputation rule
+# Appended at the end of the file so that every line above keeps its number (the ODD cites them); the three call
 # sites are one-line edits: _init_social (soc["gentle"]), _social_gate (which refusals are logged as bad) and
 # signature (_sig_sc, _rule_tag). reputation_rule: which refusals count as bad acts in the reputation log.
-#   "all" (default) = every unjustified refusal (the rule of the five v13 runs);
+#   "all" (default) = every unjustified refusal (the rule of the social-switch runs);
 #   "gentle" = only a refusal by a defector, or by a community that has received help from the requester
 #   (ingratitude: (j, i) in received_from, the same condition as the delta_down trust update and as cheating under
 #   partner choice). Other refusals (backlog, distance, capacity, by a community that owes the requester nothing) are
 #   not logged, so they cost no standing; helps and justified refusals are treated as before.
 # No numeric parameter and no random draws. The key acts only when a SOCIAL_KEYS key is set. The signature changes only
 # when the rule is not "all" (REPUTATION_RULE_VERSION and the rule are appended to SOCIAL_VERSION; an explicit "all"
-# is dropped from the hashed scenario), so every v13 run keeps its signature.
+# is dropped from the hashed scenario), so a run with the default rule keeps its signature.
 REPUTATION_RULES = ("all", "gentle")
 REPUTATION_RULE_VERSION = "2026-11-02-v13g-gentle-1"
 
@@ -2544,20 +2544,20 @@ def reputation_rule(sc):
 
 
 def _rule_tag(sc):
-    """Signature tag of the reputation rule: empty for "all", so the hash of every earlier v13 run is unchanged."""
+    """Signature tag of the reputation rule: empty for "all", so the hash of a run with the default rule is unchanged."""
     r = reputation_rule(sc)
     return ("" if r == "all" else "|" + REPUTATION_RULE_VERSION + ":" + r) + \
-        ("|" + TRUSTED_NODIST_VERSION + ":on" if sc.get("trusted_nodist") else "")   # v13kd: empty when off
+        ("|" + TRUSTED_NODIST_VERSION + ":on" if sc.get("trusted_nodist") else "")   # trusted_nodist: empty when off
 
 
 def _sig_sc(sc):
     """The scenario as hashed: sc itself, minus an explicit default reputation_rule ("all")."""
     return {k: v for k, v in sc.items() if not (k == "reputation_rule" and v == "all")
-            and not (k == "trusted_nodist" and not v)}   # v13kd: an explicit false is not hashed
+            and not (k == "trusted_nodist" and not v)}   # trusted_nodist: an explicit false is not hashed
 
 
-# ------------------------------------------------------------------ v13kd trusted partners: no distance penalty (3 Nov 2026)
-# Appended at the end of the file (as v13g) so that every earlier line keeps its number; the call sites are one-line
+# ------------------------------------------------------------------ trusted partners: no distance penalty
+# Appended at the end of the file (as the reputation rule) so that every line above keeps its number; the call sites are one-line
 # edits: SOCIAL_KEYS (line 64), _init_social (line 1027), the acceptance logit in request (line 1201), results (line 1891).
 # trusted_nodist: in the asked community's acceptance logit the distance term beta3 * d_km is set to 0 when requester i
 # and asked community j form a RECIPROCAL dyad: help has flowed in both directions between them so far in the run
@@ -2572,7 +2572,7 @@ TRUSTED_NODIST_VERSION = "2026-11-03-v13kd-1"
 
 
 def _init_kd(m, sc):
-    """v13kd state: the switch, and per requester the number of asks in which the distance term was dropped."""
+    """trusted_nodist state: the switch, and per requester the number of asks in which the distance term was dropped."""
     m.soc["kd"] = bool(sc.get("trusted_nodist"))
     m.soc["n_kd"] = np.zeros(m.N, np.int64)
 

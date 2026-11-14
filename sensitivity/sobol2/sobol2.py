@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Sobol sensitivity run 2 (10 Nov 2026; approved by the authors 9 Nov) on the v17 headline
+"""Sobol sensitivity analysis (approved by the authors) on the headline
 MOST_REALISTIC_AUDITED_LIT_P10 (lift undiscounted, SP-22).
 
-Model code: full_audited/code_variant = copy of code_v17 (CODE_VERSION 2026-11-09-v17) plus ONE config flag,
-sobol.lift_learning (default False = code_v17 exactly; True = v16_final lift discount); proofs in checks/.
-Config: full_audited/v16_final/configs/config_full_audited.yaml, read-only; every factor value is applied to an
-in-memory deep copy (no config or code file is written). Harness = the Morris v16f harness
-(the Morris screen's harness, not published: same factor keys, ranges, apply rules, run and outputs), with:
-  - 26 factors: the 24 Morris "Candidates for Sobol run 2" (same ranges as its factors.csv), R_m (A1; range of Sobol
-    run 1: 5-15 km, scenario R_m -> Static neighbour radius) and lift_learning (2 levels: undiscounted = v17 headline,
-    level 0; discounted by learning / skill = v16_final, level 1).
+Model code: code_variant = copy of code/ (same CODE_VERSION) plus ONE config flag (code_variant.patch),
+sobol.lift_learning (default False = code/ exactly; True = lift discounted with the build stage).
+Config: configs/config_full_audited.yaml, read-only; every factor value is applied to an
+in-memory deep copy (no config or code file is written). Harness = the Morris
+harness (the Morris screen's harness, not published: same factor keys, ranges, apply rules, run and outputs), with:
+  - 26 factors: the 24 Morris "Candidates for Sobol" (same ranges as its factors.csv), R_m (A1; 5-15 km,
+    scenario R_m -> Static neighbour radius) and lift_learning (2 levels: undiscounted = headline,
+    level 0; discounted by learning / skill, level 1).
   - FIXED at headline values (not touched): the 8 Morris drop candidates (relay_fractions, delta_up, setup_mh, alpha,
     relay_min_flatm, block_min_kg, transfer_h, delta_down) and A5 alliance_threshold.
   - Design: Saltelli, SALib 1.6.0 sobol.sample(N=512, calc_second_order=False, scramble=True, seed 20261110):
     N (k + 2) = 512 x 28 = 14,336 evaluations; rows in SALib order (per base row j: A, AB_1..AB_k, B).
   - Seeds per evaluation: 1, 2, 3 (common random numbers); the evaluation's output = the mean over the 3 seeds.
-  - Outputs (as Morris / Sobol run 1): island years = (max finish_day + 1) / season_days (the run's own),
+  - Outputs (as Morris): island years = (max finish_day + 1) / season_days (the run's own),
     island man-hours = sum mh_total, transport share = sum mh_transport / sum mh_total.
   - Level mapping of the uniform sample u in [0, 1): unif lo + u (hi - lo); binary: u < 0.5 -> level 0 (headline),
     else level 1 (threshold at 0.5, SALib practice for discrete factors: equal probability); int: equal-probability
@@ -24,9 +24,9 @@ in-memory deep copy (no config or code file is written). Harness = the Morris v1
 
   python sobol2.py design            -> factors.csv, problem.json, design.csv (refuses to overwrite)
   python sobol2.py check             -> dry mapping check (no simulation)
-  python sobol2.py ids               -> pending eval ids (no evals/NN/eval_NNNNN.ok), one per line
+  python sobol2.py ids               -> unfinished eval ids (no evals/NN/eval_NNNNN.ok), one per line
   python sobol2.py eval --id N       -> one design row x seeds 1-3 -> evals/NN/eval_NNNNN.csv + .ok
-  python sobol2.py eval --id headline [--seeds 1,2,3]  -> all factors at headline (= code_v17 headline)
+  python sobol2.py eval --id headline [--seeds 1,2,3]  -> all factors at headline (= code/ headline)
   analyse.py                             -> S1, ST (+ 95% CI), N=256 vs 512 convergence, SOBOL2_RESULTS.md
 """
 import argparse
@@ -89,12 +89,12 @@ def _morris_factors():
 FACTORS = _morris_factors() + [
     dict(name="R_m", row="A1", kind="unif", lo=5000.0, hi=15000.0, headline=10000.0,
          key="sc.R_m (alliance.Static neighbour radius for requests, relays, imitation; alliance.R_m 10000 unchanged)",
-         why="range of Sobol run 1 (params.csv): 5-15 km = the 3 Nov radius runs R5 / R15; no help-distance source",
-         src="Sobol run 1 params.csv"),
+         why="5-15 km = the radius scenarios R5 / R15; no help-distance source",
+         src="radius scenarios R5 / R15"),
     dict(name="lift_learning", row="SP-22", kind="binary", levels=[False, True], headline=False,
          key="cfg.sobol.lift_learning (code variant flag)",
-         why="lift undiscounted (v17, SP-22 ruling 9 Nov, headline) vs discounted with the build stage by S8 learning "
-             "and A3 skill (v16_final behaviour)", src="authors 9 Nov"),
+         why="lift undiscounted (SP-22 ruling, headline) vs discounted with the build stage by S8 learning "
+             "and A3 skill", src="authors (SP-22)"),
 ]
 NAMES = [f["name"] for f in FACTORS]
 FBY = {f["name"]: f for f in FACTORS}
@@ -143,7 +143,7 @@ def load_base():
 
 def apply(cfg0, sc0, values):
     """Deep copies of the headline config / scenario with the factor values set (only the factor keys change).
-    Rules = the Morris harness's apply() for the 24 Morris factors; R_m as Sobol run 1; lift_learning -> cfg['sobol']."""
+    Rules = the Morris harness's apply() for the 24 Morris factors; R_m -> scenario R_m; lift_learning -> cfg['sobol']."""
     cfg, sc = copy.deepcopy(cfg0), copy.deepcopy(sc0)
     mixed = cfg["lit_scenarios"]["list"]["REALISTIC"]["mixed"]
     for k, x in values.items():
@@ -195,7 +195,7 @@ def apply(cfg0, sc0, values):
                 sc.pop("join_hands_per_block", None)
         elif k == "specialisation":
             sc["specialisation"] = bool(x)
-        elif k == "R_m":                                 # as Sobol run 1 (scenario R_m -> Static radius); the
+        elif k == "R_m":                                 # scenario R_m -> Static radius; the
             if float(x) != float(cfg["alliance"]["R_m"]):  # headline value leaves the scenario untouched
                 sc["R_m"] = float(x)
         elif k == "lift_learning":

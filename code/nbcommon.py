@@ -146,7 +146,7 @@ def multi_source_dijkstra(cost, seeds, steplen, dist, origin, plen):
 
 
 def snapped_cell(rec, valid_window, R, H, W, res):
-    """BUGFIX_REPORT item 11 (fixed in v12): the search start cell of a site = its SNAPPED cell. sites_haul.csv keeps
+    """The search start cell of a site = its SNAPPED cell. sites_haul.csv keeps
     the unsnapped row/col plus snap_status and snap_dist_m; for a snapped site the snapped cell is recovered as in
     preprocess.py (nearest cell, by cell-centre distance, within R cells; ties: first in row order) among the cells
     of the cost raster that hold data (valid_window(ra, rb, ca, cb) -> bool array), at exactly snap_dist_m. For

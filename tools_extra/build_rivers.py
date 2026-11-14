@@ -10,7 +10,7 @@ Output (data/README.md, section 6): EPSG:25832, fields ID (= idFeature) and LEN_
 rounded to 0.1 m), rows in ID order. Deterministic; about 250 MB of memory.
 
 Comparison with the copy used for the runs (notebooks/inputs_manifest.csv): NOT byte-identical. That copy was
-exported on 14 Oct 2026 from the same RAS layer as held in a project database ('fiumitorrenti'): same 41,877
+exported from the same RAS layer as held in a project database ('fiumitorrenti'): same 41,877
 segments, same IDs, same vertices (the .shp and .shx have the same size), coordinates within 5 mm of this
 reprojection (a different datum transformation at import) and rows in database order. The .cpg is byte-identical.
 tools/wl_inputs.py only rasterises the distance to the nearest stream on the 30 m grid, so the difference is

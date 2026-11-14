@@ -1,6 +1,6 @@
-"""Tests of the addendum-4 flags (5 Nov 2026; add4 defaults L2, L3 ON): flags L1-L4 (off = v15b, on = the new rule), L5, S1-S3 and the v16 summary
-columns. Light unit tests (no kbest / raster loading); the whole-run identity (all flags off vs v15b) and the
-flag-on runs are in the run's v16_test/ folder (not published).
+"""Tests of the addendum-4 flags (add4 defaults L2, L3 ON): flags L1-L4 (off = the rule without the flag, on = the flag's rule), L5, S1-S3 and
+the summary columns. Light unit tests (no kbest / raster loading); whole-run checks with all flags off and with each
+flag on are not part of the repository.
 
   cd code && NURAGHE_TEST_CONFIG=/path/to/config.yaml PYTHONDONTWRITEBYTECODE=1 python tests/test_add4_flags.py      (or python -m pytest -q ...)
 """
@@ -56,7 +56,7 @@ def with_flags(cfg, **kw):
 
 # --------------------------------------------------------------------------- flags
 def test_flags_default_off(cfg):
-    """code_v16_final: defaults L2, L3 ON, L1, L4 OFF (was all OFF in code_v16_flags); explicit False switches off."""
+    """Defaults L2, L3 ON, L1, L4 OFF; explicit False switches off."""
     assert "add4" not in cfg
     F = lit.add4(cfg)
     assert {k: F[k] for k in lit.ADD4_FLAGS} == {"rails_cost_choice": False, "bedrock_everywhere": True,
@@ -73,10 +73,10 @@ def test_L2_bedrock(cfg):
     L = lit.scenario(cfg, "REALISTIC")
     off = {"TWR_N": 1, "on_outcrop": False, "lit_haul_rule": "short", "lit_type": ""}
     on = dict(off, on_outcrop=True)
-    assert lit.resolve_site(cfg, L, off)["quarry"] == "joints_low"          # code_v16_final: L2 ON by default
+    assert lit.resolve_site(cfg, L, off)["quarry"] == "joints_low"          # L2 ON by default
     c2 = with_flags(cfg, bedrock_everywhere=True)
-    cfg = with_flags(cfg, bedrock_everywhere=False)                         # explicit OFF = v15b
-    assert lit.resolve_site(cfg, L, off)["quarry"] == "scree"               # v15b: loose stone off the outcrop
+    cfg = with_flags(cfg, bedrock_everywhere=False)                         # explicit OFF
+    assert lit.resolve_site(cfg, L, off)["quarry"] == "scree"               # L2 off: loose stone off the outcrop
     assert lit.resolve_site(cfg, L, on)["quarry"] == "joints_low"
     assert lit.resolve_site(c2, L, off)["quarry"] == "joints_low"           # L2: bedrock along joints everywhere
     assert lit.resolve_site(c2, L, on)["quarry"] == "joints_low"
@@ -102,7 +102,7 @@ def test_L1_mixed_haul_override(cfg, monkeypatch):
     short, lng = _tables()
     L = lit.scenario(cfg, "REALISTIC")
     load = lambda p: (lng if p.endswith("mu0.1.csv") else short).copy()   # noqa: E731
-    old = lit.mixed_haul(cfg, L, load)                                     # v15b threshold (1,000 m)
+    old = lit.mixed_haul(cfg, L, load)                                     # threshold rule (1,000 m)
     assert list(old.lit_haul_rule) == ["short", "long", "short"]           # c: no rails route -> short
     new = lit.mixed_haul(cfg, L, load, use_long=[True, False, True])
     assert list(new.lit_haul_rule) == ["long", "short", "short"]
@@ -117,7 +117,7 @@ def _fake_static(cfg, L_m, tw=1):
     ns.mv_c038 = np.array([1.2 * L_m]); ns.mv_c01 = np.array([1.1 * L_m])
     ns.haul = pd.DataFrame({"UID": ["a"], "TWR_N": [tw], "quarry_stone": ["basalt"]})
     ns._face0_costs = lambda i: alliance.Static._face0_costs(ns, i)
-    ns._face0_stone = lambda t: alliance.Static._face0_stone(ns, t)        # code_v16_final D11
+    ns._face0_stone = lambda t: alliance.Static._face0_stone(ns, t)        # D11
     return ns
 
 
@@ -129,7 +129,7 @@ def _load_one(stone="basalt"):
 
 def test_L1_choice_by_cost(cfg):
     L = lit.scenario(cfg, "REALISTIC")
-    F = lit.add4(with_flags(cfg, rails_cost_choice=True, load_per_tonne=False))   # code_v16_final: L3 default ON
+    F = lit.add4(with_flags(cfg, rails_cost_choice=True, load_per_tonne=False))   # L3 default ON
     tp = cfg["transport"]
     for Lm in (0.0, 300.0, 5000.0):
         ns = _fake_static(cfg, Lm)
@@ -158,7 +158,7 @@ def _fake_model(cfg, L3, tn=1350.0):
     m.tp = cfg["transport"]; m.L3 = L3; m.lp = 1.2
     m.towers = [[(tn, 0, 0)]]; m.tower_idx = np.array([0])
     m.trip = lambda C, L, part, v=None, ld=None: alliance.AllianceModel.trip(m, C, L, part, v, ld)
-    m.cz = None                                            # 2026-11-09: fake updated for alliance._load_t (fix 7 Nov,
+    m.cz = None                                            # fake for alliance._load_t (
     m._load_t = lambda o, t: alliance.AllianceModel._load_t(m, o, t)   # S17 fill tonnes); no S17 fill here
     return m
 
@@ -185,7 +185,7 @@ def _sea_face(row, cfg, kn, rails=(False, False)):
 
 
 def test_L4_pricing_matches_s9_when_same_rules(cfg):
-    """L4 pricing with dry legs and per-crew loading = the v15b charge S038 x land_h + S03 x boat_h + hoist."""
+    """L4 pricing with dry legs and per-crew loading = the S9 charge S038 x land_h + S03 x boat_h + hoist."""
     row = {"haul_flatm_1": 400.0, "haul_m_1": 350.0, "haul_flatm_2": 10.0, "haul_m_2": 5.0, "sea_km": 12.0, "hoist_m": 3.0}
     kn = 2.0
     m = _fake_model(cfg, False)
@@ -217,7 +217,7 @@ def test_S3_ceiling_all_communities(cfg):
     N = 20
     S = types.SimpleNamespace(N=N, haul=pd.DataFrame({"TWR_N": [1] * N, "uid_int": np.arange(N)}))
     m = types.SimpleNamespace(units=None)
-    # 2,000 residents in all; every P10 cohort holds 200: v15b (cohort basis) never binds at 1,500, v16 does
+    # 2,000 residents in all; every P10 cohort holds 200: a cohort basis would never bind at 1,500, the S3 basis does
     sc = {"builders_rule": rule, "population_ceiling": 1500, "phase_frac": 0.1}
     B = alliance.AllianceModel._population_ceiling(m, S, sc, 1)
     assert m.pop_info["ceiling_binding"] and m.pop_info["binding"] and m.pop_info["scale"] < 1.0
@@ -288,7 +288,7 @@ def test_signature_flags(cfg):
     sc = {k: v for k, v in sc.items() if k != "sea_kn"}        # no sea table read in this unit test
     haul = pd.DataFrame({"UID": ["a"], "TWR_N": [1], "haul_flatm": [1.0], "haul_m": [1.0]})
     s0 = alliance.signature(cfg, sc, haul)
-    # code_v16_final: the effective settings are hashed, so an explicit block equal to the defaults = no block
+    # the effective settings are hashed, so an explicit block equal to the defaults = no block
     s_def = alliance.signature(with_flags(cfg, rails_cost_choice=False, bedrock_everywhere=True, load_per_tonne=True),
                                sc, haul)
     assert s0 == s_def
@@ -302,7 +302,7 @@ def test_signature_flags(cfg):
 
 
 def test_summary_columns_in_stats(tmp_path):
-    """write_scenario's stats.json keeps the v15b keys and adds sd / p5 / p95 (and the L5 / stage spreads)."""
+    """write_scenario's stats.json has the mean keys and sd / p5 / p95 (and the L5 / stage spreads)."""
     src = open(report_alliance.__file__).read()
     for k in ("island_years_p95", "island_mh_", "relay_share_chosen", "relay_share_made", "island_by_seed.csv"):
         assert k in src

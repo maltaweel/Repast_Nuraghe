@@ -1,7 +1,7 @@
-# sensitivity/sobol2: Sobol run 2 (headline scenario)
+# sensitivity/sobol2: Sobol analysis of the headline scenario
 
 Sobol sensitivity analysis of the headline scenario `MOST_REALISTIC_AUDITED_LIT_P10` on the model's code. Results:
-[`outputs/sensitivity/sobol2/`](../../outputs/sensitivity/sobol2/). Placeholders and the run-folder layout:
+[`outputs/sensitivity/sobol2/`](../../outputs/sensitivity/sobol2/). Path tokens and the run-folder layout:
 [`sensitivity/README.md`](../README.md).
 
 ## What it runs
@@ -10,7 +10,7 @@ Sobol sensitivity analysis of the headline scenario `MOST_REALISTIC_AUDITED_LIT_
   k = 26 factors, N (k + 2) = 14,336 evaluations. Rows in SALib order (per base row: A, AB_1..AB_26, B).
 - **Factors:** the 24 candidates retained by the Morris screen (ranges from `morris/factors.csv`, the screen's
   factor table), the neighbour radius `R_m` (5-15 km) and `lift_learning` (two levels: lift undiscounted = the
-  headline; lift discounted by learning and skill = an earlier rule). Fixed at the headline: the eight factors
+  headline; lift discounted by learning and skill = the alternative). Fixed at the headline: the eight factors
   the Morris screen dropped and the A5 alliance threshold. `python sobol2.py design` writes the full list
   (`factors.csv`, `problem.json`).
 - **Level mapping** of the uniform sample u: continuous lo + u (hi - lo); binary u < 0.5 -> the headline level,
@@ -22,20 +22,19 @@ Sobol sensitivity analysis of the headline scenario `MOST_REALISTIC_AUDITED_LIT_
 - **Code:** `code_variant` = `code/` + one configuration flag, `sobol.lift_learning`, for the factor
   `lift_learning` (`code_variant.patch`). With the flag absent or false the variant is `code/` exactly (same
   CODE_VERSION; the flag is hashed into the run signature only when on). On the project's machine the flag-off variant
-  gave byte-identical per-site results to `code/` on the headline (seeds 1-2), and the flag-on variant reproduced the
-  earlier lift rule.
+  gave byte-identical per-site results to `code/` on the headline (seeds 1-2), and the flag-on variant discounted
+  lift with the build stage as intended.
 
 ## Files
 
 | file | what |
 |---|---|
-| `sobol2.py` | the harness: `design`, `check` (dry mapping check, no simulation), `ids` (pending evaluations), `eval --id N` (one evaluation -> `evals/NN/eval_NNNNN.csv` + `.ok`), `eval --id headline [--seeds 1,2,3]` |
+| `sobol2.py` | the harness: `design`, `check` (dry mapping check, no simulation), `ids` (unfinished evaluations), `eval --id N` (one evaluation -> `evals/NN/eval_NNNNN.csv` + `.ok`), `eval --id headline [--seeds 1,2,3]` |
 | `analyse.py` | S1 and ST with 95% bootstrap confidence intervals (SALib `sobol.analyze`, 1,000 resamples, seed 1) per output, and the same on the first 256 base rows (convergence check); refuses to run before all evaluations are done unless `--partial` |
 | `morris/factors.csv` | the Morris screen's factor table, read by the harness (ranges and justifications) |
 | `code_variant.patch` | patch that turns a copy of `code/` into `code_variant` (`alliance.py`, `lit.py`, `model.py`) |
 
-The driver script of the project's machine and the unit tests of the flag (which compare it with an earlier code
-version) are in the git history.
+The commands below do what the driver script of the project's machine did.
 
 ## How to run
 
@@ -43,7 +42,7 @@ version) are in the git history.
 # code variant (from the repository root)
 cp -r code $RUN/code_variant && (cd $RUN/code_variant && git apply $REPO/sensitivity/sobol2/code_variant.patch)
 
-# harness (after copying this folder to $WORK and replacing the placeholders, see ../README.md)
+# harness (after copying this folder to $WORK and replacing the path tokens, see ../README.md)
 cd $WORK
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMBA_NUM_THREADS=1 OMPI_MCA_btl=self
 python sobol2.py design                     # design.csv, factors.csv, problem.json
@@ -54,7 +53,7 @@ python sobol2.py ids | xargs -P 4 -I{} python sobol2.py eval --id {}   # all eva
 python analyse.py                               # indices_sobol2.csv, indices_sobol2_N256.csv, per_eval_means.csv
 ```
 
-Evaluations with an `.ok` file are skipped, so the `xargs` line can be rerun after an interruption. Regenerating the
+Evaluations with an `.ok` file are skipped, so the `xargs` line can be run again after an interruption. Regenerating the
 design from the published files gives a `design.csv` identical to `outputs/sensitivity/sobol2/design.csv.gz`
 (checked).
 

@@ -1,12 +1,12 @@
 # Scenario configuration config_full_audited_alt_pull181.yaml (queue: config/queue.tsv; cache_dir / output_dir relative to this file,
 # in a run folder laid out as in the README).
-# GAPS config MOST_REALISTIC_ALT_pull181_P10 (specified by the authors) = config_full_audited.yaml with audited 100 -> 60.333 (= 18.1 kgf / mu 0.3); audited 30 -> 18.1; own cache; run --alliance MOST_REALISTIC_ALT_pull181_P10 (made by make_gaps.py; GAPS 52: alt 16, Hertzberg 1972: 552 via Boswinkel 2021: 52)
+# GAPS config MOST_REALISTIC_ALT_pull181_P10 (specified by the authors) = config_full_audited.yaml with audited 100 -> 60.333 (= 18.1 kgf / mu 0.3); audited 30 -> 18.1; own cache; run --alliance MOST_REALISTIC_ALT_pull181_P10 (GAPS 52: alt 16, Hertzberg 1972: 552 via Boswinkel 2021: 52)
 # Prepared tables: those of config_full_audited.yaml, except its own sea tables (tools/sea_routes.py with this file); check: config/check_sea_meta.py with config/sea_expect/config_full_audited_alt_pull181.json (README, "Run the queue").
 # Nuraghe build ABM - single configuration file.
 # All input paths are relative to data_dir. Change data_dir (one line) to move the inputs.
 # cache_dir / output_dir are relative to the folder holding this config file (or absolute).
 
-data_dir: /ABSOLUTE/PATH/TO/data   # PLACEHOLDER: absolute folder holding the inputs (layout: data/README.md)
+data_dir: /ABSOLUTE/PATH/TO/data   # SET THIS: absolute folder holding the inputs (layout: data/README.md)
 paths:
   sites: sites/nurnet_nuraghi.shp
   cost_raster: costsurface/sardinia_drag_cost_8dir_mu03_25832_int.tif
@@ -40,7 +40,7 @@ materiale:
     Tufo (Ignimbrite): [acid volcanic, trachyte, tuff]
     Ignimbrite: [acid volcanic, trachyte, tuff]
     Andesite: [andesite]
-    Scisto: [schist, metamorphic]     # schist allowed for these sites only (general list excludes it, pending the authors)
+    Scisto: [schist, metamorphic]     # schist allowed for these sites only (the general list excludes it)
 rasterize_all_touched: false   # false = an outcrop claims a cell only if it covers the cell centre
 
 # --- Site fields
@@ -69,22 +69,22 @@ stone:
 transport:
   pull_kg_per_person: 60.333   # GAPS: audited 100 -> 60.333 (= 18.1 kgf / mu 0.3)
                                 #   (Harris 2016, Public Archaeology 15: 148-156, AAM p. 1, 4) gives only "approximately half" of stone 93
-                                #   and a minimum crew of 10 (plus 14 slipway relayers), no tonnage. Value unchanged.
-  drag_speed_ms: 0.27           # ASSUMPTION (v12 relabel): sustained mean below the reported 1 m/s peak (Harris 2016, AAM p. 4);
-                                #   press reports ~0.6 m/s ("10 feet every 5 seconds"). Value unchanged; 1.0 = sensitivity MR_P10_v12_drag10.
+                                #   and a minimum crew of 10 (plus 14 slipway relayers), no tonnage.
+  drag_speed_ms: 0.27           # ASSUMPTION: sustained mean below the reported 1 m/s peak (Harris 2016, AAM p. 4);
+                                #   press reports ~0.6 m/s ("10 feet every 5 seconds"); 1.0 = sensitivity MR_P10_v12_drag10.
   return_walk_ms: 1.39
   load_unload_h: 0.25
-  min_haul_flatm: 15            # v15 (specified by the authors, SPEC_ADDENDUM_2026-11-05b_on_outcrop_haul.md): audited 100 -> 15
+  min_haul_flatm: 15            # specified by the authors: audited 100 -> 15
 other_mandays_per_tower: 2500   # Webster 1991: 852 Table 1: ~3,600 man-days/tower minus ~1,100 transport
-                                # (= quarry 500 + dressing 1,300 + walling 700; v11 converts each at its source day, see v11:)
+                                # (= quarry 500 + dressing 1,300 + walling 700; each converted at its source day length, key v11:)
 
-# --- v11 (2 Nov 2026, approved by the authors). Webster 1991: 852 (Table 1 and text) takes quarrying (2,700 kg per
+# --- Webster's man-days (key v11, approved by the authors). Webster 1991: 852 (Table 1 and text) takes quarrying (2,700 kg per
 # man-day, Erasmus 1965: 286) and man-hauling with tumpline and sled (1,200 kg per man-day, Erasmus 1965: 286-7) from
 # Erasmus, whose working day is ~5 h (Erasmus 1965: 283, via Boswinkel 2021: 145); dressing (0.40 m3 per man-day,
 # Abrams 1984: 165) and wall construction (0.80 m3 per man-day, Abrams 1984: 175-6) from Abrams, whose man-day is 8 h
 # (Abrams 1994: 46-47 via Boswinkel 2021: 109; Abrams & Bolland 1999 via Boswinkel 2021: 146; Devolder 2013's
 # 0.1 m3/ph "based on experiment by Abrams" = 0.8 m3 / 8 h, Boswinkel 2021: 125, Table 7.11). Webster himself states no
-# day length. webster_day_fix: false reproduces v10 (every man-day x hours_per_day). Webster's transport man-days
+# day length. webster_day_fix: false = every man-day x hours_per_day. Webster's transport man-days
 # (1,100) are never used as labour (hauling is simulated); the 5 h is listed for completeness and the calibration table.
 v11:
   webster_day_fix: true
@@ -143,10 +143,10 @@ lit_scenarios:
   # --- S1 procurement, person-hours per m3 of stone
   quarry_ph_m3: {scree: 2.0, joints_low: 11.1, joints_high: 17.5}   # GEN 48, 45, 200 (Boswinkel 2021 Table 7.2)
   # --- S2 dressing
-  # v11 citation fix (b): these are Boswinkel 2021's TOTAL construction costs per m3 (all stages: quarrying, transport,
+  # These are Boswinkel 2021's TOTAL construction costs per m3 (all stages: quarrying, transport,
   # dressing, assembly, ramps) of the conglomerate facades (96-167 ph/m3) and the cyclopean walls (6.7-75 ph/m3),
   # Table 8.3, p. 144 (midpoints) - NOT dressing rates. The model adds their difference (90.25 ph/m3) to the facing of
-  # fine-dressed complexes as the EXTRA total cost of facade masonry over cyclopean masonry (value unchanged in v11).
+  # fine-dressed complexes as the EXTRA total cost of facade masonry over cyclopean masonry.
   # Boswinkel's dressing rates proper (0.0162-0.0175 m3/ph = 57-62 ph/m3, pp. 120-121, Table 7.8) are the variant C3_dress.
   facade: {facade_ph_m3_mid: 131.2, cyclopean_ph_m3_mid: 40.95}     # GEN 57, 199: Boswinkel 2021: 144, Table 8.3 totals
   facing_thickness_m: 0.5       # FREE (plan)
@@ -169,7 +169,7 @@ lit_scenarios:
   # --- S3 transport
   f_person_kgf: 18.1   # GAPS: audited 30 -> 18.1
   oxen:
-    pull_N_per_ox: 515          # v11 citation fix (c): 481-549 N midpoint (350-400 kg ox x 14% x 9.81; Boswinkel 2021: 52 n. 37; the text's "491" is a misprint of 481). v10: 520 (491-549)
+    pull_N_per_ox: 515          # 481-549 N midpoint (350-400 kg ox x 14% x 9.81; Boswinkel 2021: 52 n. 37; the text's "491" is a misprint of 481)
     yoke_efficiency: [0.95, 0.80, 0.63]   # GEN 203: 1, 2, 3 pairs (Barwell & Ayre 1982); >3 pairs keep 0.63 (FREE)
     speed_ms: 0.75              # GEN 69, 203: 0.7-0.8 m/s
     return_speed_ms: 0.75       # FREE: team walks back at ox pace
@@ -380,10 +380,10 @@ sea:
 #   max_seasons 20000: small work parties alone under P10 can exceed the default 3,000-season safety stop.
 mr_work_party: &mr_work_party
   residents_by_towers: [[5, 40], [40, 110], [110, 185], [185, 260], [260, 330], [330, 400], [330, 400]]
-  adult_share: 0.4             # FULL AUDITED (specified by the authors): 0.5 -> 0.4 (Webster 1991: 854, Table 2 n. 4, x 2; AUDITED_LIT_SPEC #2)
+  adult_share: 0.4             # FULL AUDITED (specified by the authors): 0.5 -> 0.4 (Webster 1991: 854, Table 2 n. 4, x 2)
 #   help_mode join (specified by the authors): a helper adds its work party's hands to the requester's stage (quarry, dress, relay
 #     leg 1, build/lift) instead of taking it over; duration = MH / (own + helper hands), hands capped per block
-#     (join_hands_per_block: FREE; transport: each block's own crew). MOST_REALISTIC_handover = the 11:30 behaviour.
+#     (join_hands_per_block: FREE; transport: each block's own crew). MOST_REALISTIC_handover = the helper takes the stage over.
 #   population_ceiling (specified by the authors): <= 300,000 inhabitants on the island (Calo et al. 2008: 41, second-hand
 #     via Day 1988) - a CEILING on the residents of simultaneously active communities, not a baseline.
 alliance_extra:
@@ -395,9 +395,9 @@ alliance_extra:
   MOST_REALISTIC_alone: {tech_rules: REALISTIC, sea_kn: 2, builders_rule: *mr_work_party, max_seasons: 20000,
                          population_ceiling: 300000}   # A0 rules: network-need baseline
 
-# --- 1 Nov 2026 scenario gaps (specified by the authors; NEW_SCENARIOS_1101.md): S10-S14, each = MOST_REALISTIC + ONE switch,
+# --- Scenario gaps (specified by the authors): S10-S14, each = MOST_REALISTIC + ONE switch,
 # run as NAME_P10 so they compare with the headline MOST_REALISTIC_P10. Every value: source or ASSUMPTION in
-# NEW_SCENARIOS_1101.md and the report section "New scenarios S10-S14".
+# the authors' specification and the report section "New scenarios S10-S14".
 #   S10 staged complexes (phase_order.rule staged): keeps / single towers / unitary complexes first, additions of the
 #       staged complexes as later units (keeps before additions); staged_share = share of complexes built in stages
 #       (no count exists: Melis 2017: 40-41, Vanzetti et al. 2013 'rari casi' of single-build masonry -> ASSUMPTION).
@@ -451,9 +451,9 @@ alliance_gaps:   # merged into alliance_extra by alliance.scenario(); names end 
   MOST_REALISTIC_S14_central:  {<<: *mr, maintenance: {p_collapse: 0.003, repair_frac: 0.5, occupation_years: 450}}
   MOST_REALISTIC_S14_high:     {<<: *mr, maintenance: {p_collapse: 0.005, repair_frac: 1.0, occupation_years: 700}}
 
-# --- 1 Nov 2026 (b) wider-literature scenarios (specified by the authors; WIDER_LIT_1101.md): each = MOST_REALISTIC + ONE switch,
+# --- Wider-literature scenarios (specified by the authors): each = MOST_REALISTIC + ONE switch,
 # run as NAME_P10 so they compare with the headline MOST_REALISTIC_P10. Every value: source (page) or ASSUMPTION in
-# WIDER_LIT_1101.md and the report chapter "Scenarios from the wider literature".
+# the authors' specification and the report chapter "Scenarios from the wider literature".
 #   haul_profile (C1, C3 loading, M3, M4): land-haul crews / speed / friction / loading per site rule (short = sledge on
 #       dry ground mu 0.38, long = rails mu 0.1); wet = sledge on wetted sand; walk = walked blocks. Sea faces unchanged.
 #   stage_rates (C2, C3): stage person-hours per m3 swapped (quarry by S1 rule, walling, facade dressing).
@@ -502,10 +502,10 @@ alliance_wl:     # merged by alliance.scenario(); names end in _P10 when run
   MOST_REALISTIC_M4_1t:        {<<: *mr, haul_profile: {walk: {<<: *walk, min_kg: 1000}}}
   MOST_REALISTIC_M4_any:       {<<: *mr, haul_profile: {walk: {<<: *walk, min_kg: 0}}}
 
-# --- 2 Nov 2026 (v12) census scenarios (census/TESTABLE_PLAN.md; code/CENSUS_V12.md; census_scenarios.py). Each = MOST_REALISTIC +
+# --- Census scenarios (param_audit/census.csv; census_scenarios.py). Each = MOST_REALISTIC +
 # ONE switch, run as NAME_P10 (S22 and X_nurtime unphased). Shared rates below: page or ASSUMPTION / FREE.
 census_v12:
-  lift_ref_kg: 450              # S4_graded: 0.37 ph per course x piece mass / 450 kg (TESTABLE_PLAN D07; 450 = model block median)
+  lift_ref_kg: 450              # S4_graded: 0.37 ph per course x piece mass / 450 kg (census D07; 450 = model block median)
   vault_dress_ph_m3: 59.5       # S2c: Boswinkel 2021: 120-121, Table 7.8 (0.0162-0.0175 m3/ph = 57-62 ph/m3, midpoint)
   mortar_ph_m3: 6.91            # S16: dig 4.2 (GEN 68, Turner 2018) + mixing and water 2.0 (ASSUMPTION) + carry 0.71 (GEN 78)
   rubble_ph_m3: 2.0             # S17: rubble collection, Boswinkel 2021: 108 (Table 7.2, scree)
@@ -524,8 +524,8 @@ cz_carts: &cz_carts {min_towers: 2, payload_t: 5.0, men_per_wagon: 6, loaded_ms:
 #   S24: 1.67 km/h loaded, 2.5 km/h empty, 12 oxen per 5 t (Boswinkel 2021: 114-118, App. 4 p. 210); one driver per yoke
 #   (DeLaine via GEN 69); loading 1.2 ph/t (Boswinkel, as C3_load)
 alliance_census:
-# --- 2 Nov 2026 population family (param_audit/POPULATION_SCENARIOS.md): MOST_REALISTIC + ONE population override.
-# Run each as NAME_P10. Sources and status: param_audit/POPULATION.md.
+# --- Population family: MOST_REALISTIC + ONE population override.
+# Run each as NAME_P10. Sources: ODD and param_audit/.
   MOST_REALISTIC_POP_lilliu30:
     {<<: *mr, builders_rule: {residents_by_towers: [[30,30],[30,30],[30,30],[30,30],[30,30],[30,30],[30,30]], adult_share: 0.5}}
   MOST_REALISTIC_POP_webster_household:
@@ -611,15 +611,15 @@ alliance_census:
   MOST_REALISTIC_X_nurtime_spiralfull_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: spiral, h_m: 14.0, slope: 0.12, width0_m: 3.0, width1_m: 1.5}}
   MOST_REALISTIC_X_nurtime_laner3_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: straight, h_m: 3.0, slope: 0.2, width_m: 3.0}}
   MOST_REALISTIC_X_nurtime_laner4_c40: {<<: *mr, population_ceiling: null, start_rate: 1.0, builders_rule: {base: 40, per_extra_tower: 0, rand_min: 1.0, rand_max: 1.0, min: 40, max: 40}, lift_override: stair, lift_ramp: {kind: straight, h_m: 4.0, slope: 0.2, width_m: 3.0}}
-# --- 2 Nov 2026 audited parameter checks (param_audit/AUDITED_LIT_SPEC.md): single-change runs and the combined run.
+# --- Audited parameter checks (param_audit/PARAM_AUDIT.md): single-change runs and the combined run.
 # Entries marked [config copy] are identical to MOST_REALISTIC in this file; run them ONLY with the named config copy.
-  MOST_REALISTIC_AUD_drag:      {<<: *mr}    # [config copy config_v12_aud_drag.yaml]      transport.drag_speed_ms 0.27 (de Haan 2009: 7, calculated, comparative)
-  MOST_REALISTIC_AUD_density:   {<<: *mr}    # [config copy config_v12_aud_density.yaml]   basalt 3000 (Lilliu 1955), granite 2700 (Sanna & Atzeni, Table 6.2 p. 96)
-  MOST_REALISTIC_AUD_geometry:  {<<: *mr}    # [config copy config_v12_aud_geometry.yaml]  tower_height_m 14 (Webster 1991), top_diam_m 6.8 (Contu 2002 batter)
-  MOST_REALISTIC_AUD_facade:    {<<: *mr}    # [config copy config_v12_aud_facade.yaml]    facade 131.2 / 40.95 (Boswinkel 2021: 144; negligible)
-  MOST_REALISTIC_AUD_walk:      {<<: *mr}    # [config copy config_v12_aud_walk.yaml]      return_walk_ms 1.39 (Tobler 1993; negligible)
-  MOST_REALISTIC_AUD_joints:    {<<: *mr, stage_rates: {quarry_ph_m3: {joints_low: 11.1}}}   # on config_v12.yaml itself (Boswinkel 2021: 108; negligible)
-  MOST_REALISTIC_AUDITED_LIT:   {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}}   # [config copy config_v12_audited.yaml]
+  MOST_REALISTIC_AUD_drag:      {<<: *mr}    # [single-change config copy, not included]      transport.drag_speed_ms 0.27 (de Haan 2009: 7, calculated, comparative)
+  MOST_REALISTIC_AUD_density:   {<<: *mr}    # [single-change config copy, not included]   basalt 3000 (Lilliu 1955), granite 2700 (Sanna & Atzeni, Table 6.2 p. 96)
+  MOST_REALISTIC_AUD_geometry:  {<<: *mr}    # [single-change config copy, not included]  tower_height_m 14 (Webster 1991), top_diam_m 6.8 (Contu 2002 batter)
+  MOST_REALISTIC_AUD_facade:    {<<: *mr}    # [single-change config copy, not included]    facade 131.2 / 40.95 (Boswinkel 2021: 144; negligible)
+  MOST_REALISTIC_AUD_walk:      {<<: *mr}    # [single-change config copy, not included]      return_walk_ms 1.39 (Tobler 1993; negligible)
+  MOST_REALISTIC_AUD_joints:    {<<: *mr, stage_rates: {quarry_ph_m3: {joints_low: 11.1}}}   # on the pre-audit configuration (Boswinkel 2021: 108; negligible)
+  MOST_REALISTIC_AUDITED_LIT:   {<<: *mr, builders_rule: {residents_by_towers: [[5,40],[40,110],[110,185],[185,260],[260,330],[330,400],[330,400]], adult_share: 0.4}}   # [run with config_full_audited.yaml]
 
 # --- FULL AUDITED companion (specified by the authors): AUDITED_LIT with residents FIXED at the midpoint of each MR tower-class
 # range (U[m, m] = m; lit.draw_residents still makes its one uniform draw, so block draws are unchanged), adult_share 0.4.
@@ -627,6 +627,6 @@ alliance_census:
 # --- GAPS (specified by the authors): run ONLY with config_full_audited_alt_pull181.yaml
   MOST_REALISTIC_ALT_pull181: {<<: *mr}
 
-# --- v14 near-site face rule (specified by the authors; SPEC_ADDENDUM_2026-11-05_near_face.md). none / 0 = v12 behaviour.
+# --- Near-site face rule (specified by the authors). none / 0 = rule off.
 quarry:
   near_site_fixed_face_m: 1000

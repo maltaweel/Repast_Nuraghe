@@ -1,15 +1,15 @@
-"""Every scenario run to date, with its realism rating, ranked (executive summary of the 1 Nov (b) edition).
+"""Every scenario run to date, with its realism rating, ranked (executive summary).
 
   python tools/all_scenarios.py PRIOR_CSV WL_SUMMARY_CSV WL_RATINGS_MD OUT_CSV
 
 PRIOR_CSV   outputs/summary_all/all_scenarios_prior.csv (built by outputs/summary_all/build_inventory.py from the
-            29 Oct - 1 Nov output CSVs; one row per scenario run; checks in checks.csv / INVENTORY_NOTES.md)
+            scenario output CSVs; one row per scenario run; checks in checks.csv / INVENTORY_NOTES.md)
 WL_SUMMARY  outputs/summary/wl_summary.csv (the 28 wider-literature variants; 100 seeds each)
-WL_RATINGS  code/REALISM_RATINGS_WL_1101.md
+WL_RATINGS  the realism ratings of the wider-literature scenarios (table)
 Adds the 28 rows, recomputes for EVERY row rating_overall = min(rule rating, schedule rating) where a schedule rating
-exists (the 29 Oct convention: a scenario is only as realistic as its least realistic part), and ranks by
+exists (convention: a scenario is only as realistic as its least realistic part), and ranks by
 rating_overall (desc), then rule rating (desc), then island man-hours closeness to MR_P10 (abs % change, asc), then
-name. Superseded runs are kept, flagged, and ranked after the current ones.
+name. Superseded rows are kept, flagged, and ranked after the others.
 """
 import re
 import sys
@@ -17,7 +17,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-FAM_WL = "Wider literature C1-C3, M1-M4 (1 Nov b, on MR_P10)"
+FAM_WL = "Wider literature C1-C3, M1-M4 (on MR_P10)"
 
 
 def wl_ratings(p):
@@ -51,7 +51,7 @@ def main(prior_p, wl_p, rt_p, out_p):
             "pct_mh_vs_MR_P10": r.island_mh_pct_vs_ref, "comparable": "yes", "comparable_mh": "yes",
             "comparable_note": "MR_P10 plus one rule, same seeds/ranks; wl_summary.csv gives paired per-seed % ranges",
             "rating": RT[c][0], "rating_source": "REALISM_RATINGS_WL_1101.md", "rating_reason": RT[c][1],
-            "schedule_rating": 4, "schedule_rating_source": "REALISM_RATINGS.md (29 Oct)", "basis": RT[c][2],
+            "schedule_rating": 4, "schedule_rating_source": "REALISM_RATINGS.md", "basis": RT[c][2],
             "source_file": "runs/2026-11-01-wider-lit/outputs/summary/wl_summary.csv", "source_row": n,
             "check": f"identity row MR_P10 = {ref.island_mh_mean / 1e6:.4f} M / {ref.years_max_mean:.4f} yr"})
     a = pd.concat([d, pd.DataFrame(rows)], ignore_index=True)

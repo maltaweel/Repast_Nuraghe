@@ -11,11 +11,11 @@ results package).
 
 | # | notebook | what it does | expected result |
 |---|---|---|---|
-| 1 | `01_setup.ipynb` | installs OpenMPI and the pinned Python packages, checks the versions, runs a 2-rank MPI smoke test, imports the model code, checks the code version and runs the lift unit tests | `pinned packages: 35; mismatches: 0`, `rank 0 of 2` / `rank 1 of 2`, `model code imports OK`, `code version 2026-11-09-v17`, `9 tests passed` |
+| 1 | `01_setup.ipynb` | installs OpenMPI and the pinned Python packages, checks the versions, runs a 2-rank MPI smoke test, imports the model code, checks the code version and runs the lift unit tests | `pinned packages: 35; mismatches: 0`, `rank 0 of 2` / `rank 1 of 2`, `model code imports OK`, `code version` with the value of `CODE_VERSION` in `code/lit.py`, `9 tests passed` |
 | 2 | `02_inputs.ipynb` | gets every input (section 0: `fetch_data.py`), checks it against `inputs_manifest.csv`, sets the stone rule, gets the derived inputs (pack or rebuild), writes the work folder | a fetch table with `0 failed/differing`; `derived inputs ...: 68 of 68 present`; `work folder ready` |
 | 3 | `03_scenarios.ipynb` | runs scenarios with `code/model.py` (repast4py + MPI), including the headline `MOST_REALISTIC_AUDITED_LIT_P10`: presets `demo` (30 sites, seed 1, about a minute), `quick` (300 sites, seeds 1-3), `full`, `custom` | island totals per scenario |
 | 4 | `04_analysis_report.ipynb` | tables per tower class, maps of man-hours, centrality of the help networks, network need | tables and maps |
-| 5 | `05_audit.ipynb` | the step-by-step audit: (a) code vs its checksums (`CODE_SHA256SUMS`), (b) inputs vs the manifest, (c) configuration vs the parameter trace (every value equal), (d) a fixed rerun vs a fingerprint, (e) the headline numbers from the per-seed tables of the results | (a)-(c) PASS; (d), (e) NOT YET AVAILABLE until the fingerprint and the tables are supplied, then PASS |
+| 5 | `05_audit.ipynb` | the step-by-step audit: (a) code vs its checksums (`CODE_SHA256SUMS`), (b) inputs vs the manifest, (c) configuration vs the parameter trace (every value equal), (d) a fixed rerun vs a fingerprint, (e) the headline numbers from the per-seed tables of the results | (a)-(c) PASS; (d), (e) NOT INCLUDED (the fingerprint and the tables are not in the repository), PASS when they are supplied |
 | 6 | `06_sensitivity.ipynb` | the sensitivity steps at demo size: the A5 alliance grid (27 cells + A0_alone, `sensitivity.csv`), a Morris screen and a Sobol design / analysis of the headline (`notebooks/sensitivity.py`, SALib); regenerates the full designs (Morris 330 evaluations, Sobol 14,336) for comparison with the design files of the results package | a 27-row `sensitivity.csv`, mu* per factor and output, S1 / ST per factor and output (demo values: they only show that the chain works) |
 
 Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in-jupyter-on-your-own-machine) -
@@ -39,12 +39,11 @@ Contents: [Run in Google Colab](#run-in-google-colab) - [Run in Jupyter](#run-in
    (a package changed version after it was imported): Runtime > Restart session, then run all again.
 4. 02 downloads the public inputs into `DATA_DIR` on your Drive (about 400 MB) and copies the Nurnet files there; the
    next notebooks reuse them.
-5. **Derived inputs (first time only, no setting needed):** the prebuilt pack (`DERIVED_URL`) is not public yet, so
+5. **Derived inputs (first time only, no setting needed):** the prebuilt pack (`DERIVED_URL`) is not included in this repository, so
    02 (section 0b) prints a note and rebuilds them automatically when they are missing from `DERIVED_DIR` (about
    30-45 min; see [Derived inputs](#derived-inputs)). Later runs reuse `DERIVED_DIR` on Drive. If 03 or 06 is opened
    in a runtime that does not see them (no Drive), it gets the inputs the same way before it starts.
 
-Clean-room test: 01-06 pass with derived inputs supplied (commit a2010ed); the automatic rebuild path is being tested end to end.
 
 Colab gives 2 vCPUs and about 12 GB of RAM: enough for the `demo` and `quick` presets, the audit, the demo
 sensitivity designs and the derived-input rebuild; the `full` preset (7,167 sites, 100 seeds per scenario) takes
@@ -111,7 +110,7 @@ python notebooks/fetch_data.py --check-only        # only report what is there a
 ```
 
 It copies the Nurnet files from `data/nurnet/`, downloads every public input from its official source (streamed to
-`DATA_DIR/_downloads/`, each download checked against the SHA-256 the provider served on 2 November 2026), rebuilds
+`DATA_DIR/_downloads/`, each download checked against the SHA-256 recorded in `fetch_data.py` for the provider's file), rebuilds
 the files the model reads, compares each file with `notebooks/inputs_manifest.csv` and writes
 `DATA_DIR/fetch_provenance.json`. It needs about 1.5 GB of RAM for the DEM (`--no-rasters` skips the DEM, cost and
 slope builds).
@@ -127,16 +126,16 @@ slope builds).
 | `soils/soils250k.geojson` | AGRIS WFS (24 MB) | download | **yes** |
 | `water/sardinia_rivers_25832.*` | RAS PPR 2006 rivers (zip, 10 MB) | download + `tools_extra/build_rivers.py` | `.prj`, `.cpg` yes; `.shp/.shx/.dbf` no (see below) |
 
-Why some files are not byte-comparable (all checked on 2 November 2026):
+Why some files are not byte-comparable:
 
-- **Lithology and rivers**: the run's copies were exported on 14 October 2026 from the same official layers as held in
+- **Lithology and rivers**: the run's copies were exported from the same official layers as held in
   a project database. The rebuild has the same features (47,780 polygons / 41,877 segments), the same IDs, map units
   and vertex counts (the `.shp` and `.shx` files have exactly the same size), but the coordinates differ by up to
   5 mm (a different datum transformation at import) and the rows are in database order in the run's copies. On the
   30 m grid of the model this is immaterial. `--compare RUN_COPY.shp` in the two build scripts reports it.
 - **DEM**: rebuilt with the run's recipe (mosaic, reprojection to EPSG:25832 at 30 m, bilinear) on exactly the run's
   grid (4808 x 9080 cells, checked). The run masked the sea with the regional river catchments as held in a project
-  database, which are not public; the public mask is the RAS regional boundary. Both masks (buffered by 300 m) differ
+  database, which are not distributed; the public mask is the RAS regional boundary. Both masks (buffered by 300 m) differ
   in about 75 km2, mostly coastal sea cells with z ~ 0 that the model treats as sea anyway (land = z > 0). With the
   run's mask (`fetch_data.py --basins FILE`) and the same GDAL the file should be byte-identical.
 - **Soils**: GeoServer writes the time of the request into the file (`"timeStamp"`); `fetch_data.py` writes back the
@@ -261,7 +260,7 @@ rasters per friction; 68 files, listed in `notebooks/inputs_manifest.csv`, group
 `data/derived/README.md`). Two ways to get them into `DERIVED_DIR`:
 
 1. **Prebuilt pack** of the model's runs: `DERIVED_URL` in 02 (or `python notebooks/fetch_data.py --derived-url
-   URL`). Placeholder: the pack is part of the results package, which is not public yet (DOI pending).
+   URL`). The pack is part of the results package, which is not included in this repository.
 2. **Rebuild** from the raw inputs: automatic in 02 (section 0b, `REBUILD_DERIVED = "auto"`, the default) when any
    derived input is missing and no pack is available; `REBUILD_DERIVED = True` always rebuilds, `False` never; or
    `python notebooks/fetch_data.py --rebuild-derived [--stone-rule hybrid|stones7]`. It runs the commands of
@@ -271,7 +270,7 @@ rasters per friction; 68 files, listed in `notebooks/inputs_manifest.csv`, group
    tables 192 s, 1.1 GB; bichrome distances 15 s; food catchments not timed. **Total about 30-45 min with hybrid,
    15-20 min with stones7** (estimated from the component logs; the sequence has not been timed end to end).
 
-The full audited run reused derived inputs built by earlier runs of the project (provenance note in
+The derived inputs of the full audited run were built in several steps of the project (provenance note in
 `data/derived/README.md`), so a rebuild is not guaranteed byte-identical to the pack; the rerun check of
 `05_audit.ipynb` (step d) is defined on the pack.
 
@@ -283,7 +282,7 @@ The full audited run reused derived inputs built by earlier runs of the project 
 - *WRONG ... SHA-256 differs*: a truncated download or another version; delete the file and fetch it again. Files
   rebuilt by `fetch_data.py` are reported as *REBUILT* (not an error).
 - *Out of memory* during a run: fewer MPI ranks (`RANKS`), or the `demo` / `quick` preset.
-- *code version ... expected 2026-11-09-v17*: `code/` is not the code of this repository; check out the repository again. Part
+- *code version ... expected ...*: `code/` is not the code of this repository; check out the repository again. Part
   files of other code versions are never reused (the code version is part of every run signature).
 - *stone_rule = stones7 needs the stones7 derived-input cache* (06): set `STONES7_CACHE`, or leave it unset (the
   factor is then fixed at hybrid).

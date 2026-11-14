@@ -1,4 +1,4 @@
-"""Tests of the fixes of 5 Nov 2026: D3 (no dress work = no dress task traffic), D6 (join parties priced at their own
+"""Tests of the rules D3 (no dress work = no dress task traffic), D6 (join parties priced at their own
 skill), D11 (the site's stone = the class of its gated face 0), run signature (CODE_VERSION + add4 settings).
 Unit tests use fake models (no kbest / raster loading); test_D11_tables reads the real headline cache tables (kbest
 meta + outcrop_code.tif + haul csvs, < 300 MB). The run-level checks (test_D3_parts) read the part files of the
@@ -55,7 +55,7 @@ def _fake(f=0.3, sk=None, s8_rate=0.15, tech=True):
         m.tasks.append((perf, total, stage, up, final))
         return len(m.tasks) - 1
 
-    def charge(owner, perf, mh, stage, walk=0.0, lift=None):     # code_v17: lift kwarg (build stage)
+    def charge(owner, perf, mh, stage, walk=0.0, lift=None):     # lift kwarg (build stage)
         m.charges.append((owner, perf, mh, stage, walk))
     m.add_task, m.charge = add_task, charge
     for n in ("_owner_skill", "_join_task", "_perform_join", "_no_work_task"):

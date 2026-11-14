@@ -1,4 +1,4 @@
-"""Fix of 9 Nov 2026: addendum-4 L2 (bedrock_everywhere) acts in the season engine only.
+"""Addendum-4 L2 (bedrock_everywhere) acts in the season engine only.
 
 Addendum 4 of the specification, scope clarification (lines 41-42): L2 and L3 apply to the
 season-based community engine (alliance.py); day-based engine-B rows (model.py, SCENARIOS section 19) keep their own

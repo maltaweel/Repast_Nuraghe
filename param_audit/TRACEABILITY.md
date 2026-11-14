@@ -1,16 +1,16 @@
-# Traceability matrix: literature ideas, audited parameters and literature alternatives -> FULL AUDITED queue (2 Nov 2026)
+# Traceability matrix: literature ideas, audited parameters and literature alternatives -> FULL AUDITED queue
 
-Requested by the authors: every parameter auditable, every literature idea linked to at least one scenario. No model was run for this matrix. Built by `param_audit/_build/traceability.py` (data tables in `_build/trace_data.py`) and `_build/render_trace.py`; scenario dicts are resolved with the frozen code's `alliance.scenario()` (runs/2026-11-02-v12-census/full_audited/code).
+Requested by the authors: every parameter auditable, every literature idea linked to at least one scenario. No model was run for this matrix. Built by `param_audit/_build/traceability.py` (data tables in `_build/trace_data.py`) and `_build/render_trace.py`; scenario dicts are resolved with the code's `alliance.scenario()`.
 
-Queue snapshot: queue_full.tsv  + queue_full_p23.tsv : 313 entries, 507 distinct scenario names (comma lists, `--alliance sensitivity` = 27 SENS cells, config copies as NAME@config). 140 names are MOST_REALISTIC-family runs (tech_rules set). Files written: IDEA_TRACE.csv, PARAM_TRACE.csv, PARAM_NOT_IN_AUDIT.csv, LIT_ALT_COVERAGE.csv, SCENARIO_PROVENANCE_v2.csv, GAPS.md.
+Queue snapshot: queue_full.tsv  + queue_full_p23.tsv : 313 entries, 507 distinct scenario names (comma lists, `--alliance sensitivity` = 27 SENS cells, config copies as NAME@config). 140 names are MOST_REALISTIC-family runs (tech_rules set). Files written: IDEA_TRACE.csv, PARAM_TRACE.csv, PARAM_NOT_IN_AUDIT.csv, LIT_ALT_COVERAGE.csv, the scenario provenance table, GAPS.md.
 
-## 0. Findings that need a decision
+## 0. Findings on the queue
 
 1. **Duplicate runs.** In config_full_audited.yaml `*mr_work_party.adult_share` is 0.4, so `MOST_REALISTIC_P10` and `MOST_REALISTIC_POP_adult04_P10` resolve to exactly the same scenario dict as `MOST_REALISTIC_AUDITED_LIT_P10` (alliance.scenario, all keys; the block and work-party draws are seeded by seed and site, not by name). They are queued as MOST_REALISTIC_P10, MOST_REALISTIC_POP_adult04_P10: about 12 min of identical output. MR_P10's P20 / P100 twins are the audited schedule twins, which is what they should be.
-2. **Population family is no longer one-at-a-time.** The queued POP entries (lilliu30, webster_household, webster_density, calo_6km2, ugas_high, ugas400, ugas700, anchored) set `adult_share: 0.5` with their residents rule, so each differs from the audited baseline (0.4) in TWO keys; men_only (0.2) and adult06 (0.6) are one change. PARAM_TRACE lists them under both P1 and P2. Twins at 0.4: GAPS.md rank 4.
+2. **Population family is not one-at-a-time.** The queued POP entries (lilliu30, webster_household, webster_density, calo_6km2, ugas_high, ugas400, ugas700, anchored) set `adult_share: 0.5` with their residents rule, so each differs from the audited baseline (0.4) in TWO keys; men_only (0.2) and adult06 (0.6) are one change. PARAM_TRACE lists them under both P1 and P2. Twins at 0.4: GAPS.md rank 4.
 3. **drag10 / pull125 sea tables.** `tools/sea_routes.py` reads transport.drag_speed_ms, return_walk_ms, load_unload_h, min_haul_flatm, pull_kg_per_person, the lever rate, course height and the block draw (sea_params, code/tools/sea_routes.py:154-171) to choose sea vs land routes. The LOO_drag and LOO_walk runs get their own SEA_TABLES; `MR_P10_v12_drag10` and `MR_P10_v11_pull125` use the shared cache_dir (tables built at 0.27 m/s and 100 kg). Their trip times are recomputed from their own config at run time (code/sea.py:32-39), but the sea/land choice is the audited one. Worth stating in the report or giving them own tables (2 x 220 s).
-4. **Config value vs audit final value: no mismatch.** All 70 audited rows carry the AUDITED value in config_full_audited.yaml (the 9 changed values: drag 0.27, walk 1.39, basalt 3000, granite 2700, joints_low 11.1, facade 131.2 / 40.95, height 14, top 6.8, adult_share 0.4). Stale text only: the config comments at transport.pull_kg_per_person / drag_speed_ms ('Value unchanged') and lit_scenarios geometry ('15 m, 12 m -> 8 m'), and PARAM_AUDIT Part 2 rows 8a ('round(0.5 x residents)') and 11b ('1.4 m/s') still describe the pre-audit values. P2 is marked 'provisional; final from the population runs' in the audit.
-5. **Post hoc checks are not queue entries.** The 10 V_* checks (tools/pattern_checks.py) need re-running on the full_audited outputs after the chain; they are counted as LINKED through the queued runs they read.
+4. **Config value vs audit final value: no mismatch.** All 70 audited rows carry the AUDITED value in config_full_audited.yaml (the 9 changed values: drag 0.27, walk 1.39, basalt 3000, granite 2700, joints_low 11.1, facade 131.2 / 40.95, height 14, top 6.8, adult_share 0.4).
+5. **Post hoc checks are not queue entries.** The 10 V_* checks (tools/pattern_checks.py) are not run on the full_audited outputs (ODD Appendix D, D11); they are counted as LINKED through the queued runs they read.
 
 ## 1. Literature ideas -> scenarios -> queue (IDEA_TRACE.csv)
 
@@ -22,7 +22,7 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 |---|---|---|---|---|---|---|
 | Q01 | ALREADY TESTED | LINKED | run | 8 | S5a_onsite; S1b_joints_low; S1b_joints_high; REALISTIC; MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 | hybrid stone rule is in every run (preprocessing cache) |
 | Q02 | ALREADY TESTED | LINKED | run | 3 | S1b_joints_low; S1b_joints_high; MOST_REALISTIC_C3_quarry_P10 |  |
-| Q03 | ALREADY TESTED | LINKED | implicit | 2 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_C2_day5_P10 | every quarry rate is a non-metal rate; v11 5-h day in the baseline |
+| Q03 | ALREADY TESTED | LINKED | implicit | 2 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_C2_day5_P10 | every quarry rate is a non-metal rate; 5-h quarry day (`v11.webster_day_hours`) in the baseline |
 | Q04 | ALREADY TESTED | LINKED | run | 6 | S1a_scree; REALISTIC; MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 |  |
 | Q05 | TESTABLE NOW | LINKED | run | 4 | MOST_REALISTIC_S18_clearance_y10_P10; MOST_REALISTIC_S18_clearance_y50_P10; MOST_REALISTIC_S18_clearance_y200_P10; MOST_REALISTIC_AUDITED_LIT_P10 | V_density_stone is post hoc (inputs only) |
 | Q06 | ALREADY TESTED | LINKED | run | 3 | S1b_joints_low; S1b_joints_high; MOST_REALISTIC_AUDITED_LIT_P10 | hybrid stone rule |
@@ -45,7 +45,7 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 | T08 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | T09 | ALREADY TESTED | LINKED | run | 16 | A4_trust_track; S9_alliance_sea_6; PHASE_alliance_P10; PHASE_alliance_P20; A5_full; P_G20_kmesh4_track; S9_pre_sea_5; GRID10_sea_b3; GRID10_P10_b3; GR... |  |
 | T10 | ALREADY TESTED | LINKED | run | 1 | S5c_complex_far | hybrid stone rule (recorded stone) |
-| T11 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | hybrid-rule haul of San Gavino sites (MR summary); post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_a |
+| T11 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | hybrid-rule haul of San Gavino sites (MR summary); post hoc via tools/pattern_checks.py (not a queue entry) |
 | L01 | ALREADY TESTED | LINKED | run | 2 | S4b_ramp; HIGH |  |
 | L02 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S4e_laner_h3_P10; MOST_REALISTIC_S4e_laner_h4_P10 |  |
 | L03 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S4d_spiral_7m5_P10; MOST_REALISTIC_S4d_spiral_full_P10 |  |
@@ -86,14 +86,14 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 | W12 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | W13 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S22_demog_r035; MOST_REALISTIC_S22_demog_r042 | unphased by design |
 | W14 | ALREADY TESTED | LINKED | run | 4 | MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 | population_ceiling 300,000 in every MR run |
-| S01 | ALREADY TESTED | LINKED | run | 4 | MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 | 90-day season only; the 40/120/210-day runs are obsolete (pre-fix code) and no 40-day MR run is queued (gap) |
-| R01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R02 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R04 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
-| R05 | TESTABLE NOW | LINKED | posthoc | 3 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100 | needs MR P10, P20 and P100; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| S01 | ALREADY TESTED | LINKED | run | 4 | MOST_REALISTIC_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100; MOST_REALISTIC_AUDITED_LIT_P10 | 90-day season only; no 40-day MR run is queued (gap) |
+| R01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
+| R02 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
+| R03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
+| R04 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
+| R05 | TESTABLE NOW | LINKED | posthoc | 3 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_P20; MOST_REALISTIC_P100 | needs MR P10, P20 and P100; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
 | R06 | TESTABLE NOW | LINKED | run | 21 | X_nurtime | single-site predictions (unphased) |
-| R07 | TESTABLE NOW | LINKED | posthoc | 2 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_S20_lintels_3t0_P10 | also uses S20_lintels_3t0; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| R07 | TESTABLE NOW | LINKED | posthoc | 2 | MOST_REALISTIC_AUDITED_LIT_P10; MOST_REALISTIC_S20_lintels_3t0_P10 | also uses S20_lintels_3t0; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
 | U01 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | U02 | NOT TESTABLE | NO SCENARIO |  | 0 | - | partial (queued) |
 | U03 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
@@ -105,12 +105,12 @@ Matching: a mapped scenario X counts as queued when a queued `--alliance / --sce
 | Z01 | NOT TESTABLE | NO SCENARIO |  | 0 | - | no |
 | Z02 | ALREADY TESTED | LINKED | run | 16 | P_G3_canton_hub; GRID10_sea_b1; GRID10_P10_b1; GRID10_P20_b1; P_G20_system_hub; S9_pre_sea_5; GRID10_sea_b3; P_G20_system_hub_P10; GRID10_P10_b3; P_G2... |  |
 | Z03 | ALREADY TESTED | LINKED | run | 77 | MOST_REALISTIC_M1_s1_R5_P10; MOST_REALISTIC_M1_s01_R5_P10; MOST_REALISTIC_M1_s10_R5_P10; MOST_REALISTIC_M1_s1_R2500_P10; MOST_REALISTIC_M1_s1_R10_P10;... |  |
-| G01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| G01 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
 | G02 | ALREADY TESTED | LINKED | implicit | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | hybrid stone rule (preprocessing cache) in every run |
-| G03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| G03 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
 | G04 | ALREADY TESTED | LINKED | run | 1 | S5b_any_buildstone | stones7 is a stone_rule value (preprocess.py --rule), not a queued scenario |
 | G05 | TESTABLE NOW | LINKED | run | 2 | MOST_REALISTIC_S23_bichrome_b05_P10; MOST_REALISTIC_S23_bichrome_b15_P10 |  |
-| G06 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; re-run on full_audited outputs) |
+| G06 | TESTABLE NOW | LINKED | posthoc | 1 | MOST_REALISTIC_AUDITED_LIT_P10 | ; post hoc via tools/pattern_checks.py (not a queue entry; not run on the full_audited outputs) |
 | G07 | TESTABLE NOW | LINKED | run | 1 | MOST_REALISTIC_S25_size_P10 |  |
 
 ### NOT TESTABLE ideas: reason (census) and proxy
@@ -135,14 +135,14 @@ No config-only or small-code proxy is proposed for these: each would need a numb
 
 ## 2. Audited parameters -> config -> code -> queue (PARAM_TRACE.csv, PARAM_NOT_IN_AUDIT.csv)
 
-70 audited rows traced. Value in config_full_audited.yaml = audited final value: **70/70**. Read by the frozen code (file:line found): **70/70**. Acting on MR_P10: 69/70 (5 of them only through a cached preprocessing product or the SEA_TABLES entry: H10, H11, K1, K2, S5); not acting: P4 (no (cooperation family only)). Varied by at least one queued MR-family run: 30/70; acting on MR_P10 but varied by NO queued MR run: 39 (T3, T4, B2, B3, B4, B6, B9, B10, B11, Q3, Q7, G2, G4, G6, G7, G9, G10, H9, H10, H11, H12, H13, K1, K2, K3, A1, A2, A3, A5, A6, A7, A8, S1, S2, S3, S4, S5, X1, X2).
+70 audited rows traced. Value in config_full_audited.yaml = audited final value: **70/70**. Read by the code (file:line found): **70/70**. Acting on MR_P10: 69/70 (5 of them only through a cached preprocessing product or the SEA_TABLES entry: H10, H11, K1, K2, S5); not acting: P4 (no (cooperation family only)). Varied by at least one queued MR-family run: 30/70; acting on MR_P10 but varied by NO queued MR run: 39 (T3, T4, B2, B3, B4, B6, B9, B10, B11, Q3, Q7, G2, G4, G6, G7, G9, G10, H9, H10, H11, H12, H13, K1, K2, K3, A1, A2, A3, A5, A6, A7, A8, S1, S2, S3, S4, S5, X1, X2).
 
 Code locations are the first non-comment reads of the key in code/{alliance, lit, census_v12, sea, phasing, model, preprocess, pre_networks}.py and the cache tools (tools/sea_routes.py, kbest_quarries.py, build_cost_mu.py, wl_inputs.py). 'Queued MR scenarios varying' is computed by diffing every queued MR-family scenario dict (and config copy) against MOST_REALISTIC_AUDITED_LIT_P10.
 
 | id | config path | config value | audited | = | code reads | acts on MR_P10 | status after (PARAM_AUDIT) | MR runs varying | other families varying |
 |---|---|---|---|---|---|---|---|---|---|
 | P1 | MR:builders_rule.residents_by_towers | [[5, 40], [40, 110], [110, 185], [185, 2 | [5,40],[40,110],[110,185],[185 | yes | code/lit.py:223; code/lit.py:231 | yes | DERIVED | 30 |  |
-| P2 | MR:builders_rule.adult_share; mr_work_party.adult_share | [0.4, 0.4] | 0.4 (provisional; final from t | yes | code/lit.py:244 | yes | DERIVED | 32 |  |
+| P2 | MR:builders_rule.adult_share; mr_work_party.adult_share | [0.4, 0.4] | 0.4 | yes | code/lit.py:244 | yes | DERIVED | 32 |  |
 | P3 | MR:population_ceiling | 300000 | 300000 | yes | code/alliance.py:258; code/alliance.py:561 | yes | SOURCED | 26 |  |
 | P4 | scenarios.household_size | 5 | 5 | yes | code/model.py:237 | no (cooperation family only) | SOURCED | 0 | TOST household_size 3 / 8 on none, low, mixed, mostly, full, |
 | T1 | MR:phase_frac | 0.1 | 0.1 | yes | code/alliance.py:253; code/alliance.py:458; code/model.py:406 | yes | Authors' assumption (specified by M. Alt | 29 | PHASE_alliance_P10 / P20, P_*_P10 / P20, high_P10 / P20 |
@@ -183,7 +183,7 @@ Code locations are the first non-comment reads of the key in code/{alliance, lit
 | H3 | transport.pull_kg_per_person | 100 | 100 | yes | code/alliance.py:242; code/lit.py:150; code/sea.py:27 | yes | DERIVED | 5 | MR_P10_v11_pull125 (config copy, 42.49 kg) |
 | H4 | transport.return_walk_ms | 1.39 | 1.39 | yes | code/alliance.py:979; code/alliance.py:1008; code/lit.py:151 | yes | SOURCED | 1 |  |
 | H5 | transport.load_unload_h | 0.25 | 0.25 | yes | code/alliance.py:804; code/alliance.py:1268; code/sea.py:26 | yes | DERIVED | 2 |  |
-| H6 | transport.min_haul_flatm | 15 | 15 | yes | code/alliance.py:1263; code/alliance.py:1264; code/census_scenarios.py:227 | yes | Authors' assumption (specified by the authors; 100 m, SOURCED, in the audit of 2 Nov 2026) | 1 |  |
+| H6 | transport.min_haul_flatm | 15 | 15 | yes | code/alliance.py:1263; code/alliance.py:1264; code/census_scenarios.py:227 | yes | Authors' assumption (specified by the authors; 100 m, SOURCED, in the audit) | 1 |  |
 | H7 | lit_scenarios.list.REALISTIC.mixed.short.mu | 0.38 | 0.38 | yes | code/alliance.py:818; code/lit.py:186; code/lit.py:193; code/alliance. | yes | SOURCED | 6 | S3c_dry_ground, S3d_rough (lit family) |
 | H8 | lit_scenarios.list.REALISTIC.mixed.long.mu; alliance.track_m | [0.1, 0.1] | 0.1 | yes | code/alliance.py:243; code/alliance.py:1255 | yes | SOURCED | 4 | S3a_rails_tallow, S3b_rails_grease (lit family); A4/A5 track |
 | H9 | lit_scenarios.list.REALISTIC.mixed.long_min_haul_m | 1000 | 1000 | yes | code/lit.py:188; code/census_scenarios.py:229 | yes | Authors' assumption (agent's design choi | 0 |  |
@@ -195,7 +195,7 @@ Code locations are the first non-comment reads of the key in code/{alliance, lit
 | K1 | stone_rule; allowed_stones | ["hybrid", ["limestone/marble", "metamor | hybrid | yes | code/preprocess.py:34; code/preprocess.py:236; code/preprocess.py:333 | yes (via cache: sites_haul.csv | Authors' assumption (specified by M. Alt | 0 | S5b_any_buildstone (lit family) |
 | K2 | alliance.k_quarries | 5 | 5 | yes | code/tools/kbest_quarries.py:96 | yes (via cache: cache/alliance | Authors' assumption (agent's design choi | 0 |  |
 | K3 | alliance.setup_mh | 200 | 200 | yes | code/alliance.py:1448; code/alliance.py:1508 | yes | Authors' assumption (agent's design choi | 0 | A0_verify (setup 0) |
-| A1 | alliance.R_m | 10000 | 10000 | yes | code/alliance.py:181; code/alliance.py:1936 | yes | Authors' assumption (agent's design choi | 0 | A5_SENSITIVITY_27cells (R 5 / 10 / 20 km on A5_full); RAD (R 5 / 15 km on the audited headline; 10 km kept as headline 3 Nov) |
+| A1 | alliance.R_m | 10000 | 10000 | yes | code/alliance.py:181; code/alliance.py:1936 | yes | Authors' assumption (agent's design choi | 0 | A5_SENSITIVITY_27cells (R 5 / 10 / 20 km on A5_full); RAD (R 5 / 15 km on the audited headline; 10 km kept as headline) |
 | A2 | alliance.max_asks | 3 | 3 | yes | code/alliance.py:1100; code/alliance.py:1168 | yes | Authors' assumption (agent's design choi | 0 |  |
 | A3 | alliance.trust0; alliance.delta_up; alliance.delta_down | [0.5, 0.1, 0.2] | 0.5 / 0.1 / 0.2 | yes | code/alliance.py:1021; code/alliance.py:1125; code/alliance.py:1127 | yes | Authors' assumption (agent's design choi | 0 |  |
 | A4 | alliance.beta0; alliance.beta1; alliance.beta2; alliance.bet | [0.0, 2.0, 0.05, 0.2] | 0 / 2 / 0.05 / 0.2 | yes | code/alliance.py:1108; code/alliance.py:1109 | yes | Authors' assumption (agent's design choi | 2 | A1_ask (fixed acceptance 0.5) |
@@ -225,7 +225,7 @@ Scan of the resolved MOST_REALISTIC_AUDITED_LIT_P10 dict plus the global transpo
 | lit_scenarios.fine_min_towers = 2 | yes (non-binding) | code/alliance.py:917; code/alliance.py:919; code/lit.py:112 | gate for fine facing (tw >= 2) in lit.stage_hours / alliance._swap_stage_rates; REALISTIC already requires >= 3 towers (Q4), so it never binds in MR |
 | lit_scenarios.list.REALISTIC.density / learning = true | yes | code/alliance.py:312 | switch S6 density (B7-B11) and S8 learning (G9) on in MR |
 | lit_scenarios.list.REALISTIC.mixed.type_field = TYPE | yes | code/lit.py:194 | data field naming the site type used by the lift rule (G8) and S11 |
-| lit_scenarios.list.REALISTIC.mixed.short.haul / long.haul = mu0.38 / mu0.1 | yes (via cache) | (none found) | haul tables cache/haul/sites_haul_mu0.38.csv and _mu0.1.csv (runs/2026-10-29-bugfix); same mu as H7 / H8 |
+| lit_scenarios.list.REALISTIC.mixed.short.haul / long.haul = mu0.38 / mu0.1 | yes (via cache) | (none found) | haul tables cache/haul/sites_haul_mu0.38.csv and _mu0.1.csv; same mu as H7 / H8 |
 | v11.webster_day_fix = true | yes | code/alliance.py:1893; code/lit.py:87; code/model.py:297 | switch for T5 (Webster man-days at 5 h / 8 h); Part 2 B1 row 10c |
 | sea.extra_speeds_kn = [2] | yes (via SEA_TABLES) | code/tools/sea_routes.py:526 | makes tools/sea_routes.py build the 2-kn tables MR uses (S1 sea_kn 2) |
 | sea.sea_grid_factor = 3 | yes (via SEA_TABLES) | code/tools/sea_routes.py:229 | boats routed on 90 m blocks; block = water if >= 50% sea cells. NOT in the audit (S5 lists bands, beach, hoist, walk, embark only) |
@@ -249,7 +249,7 @@ Scan of the resolved MOST_REALISTIC_AUDITED_LIT_P10 dict plus the global transpo
 
 ## 3. Literature alternatives -> queue (LIT_ALT_COVERAGE.csv)
 
-146 alternatives. Covered by a queued entry now: **83** = COVERED 54 (on the MR family, incl. the audited baseline) + APPROX 4 + PARTIAL 14 (with a second change or another mechanism) + OTHER-FAMILY 11 (lit / cooperation / TOST / A5 sensitivity only). Not covered: **63** = UNCOVERED 57 + NOT-QUEUED 3 (only obsolete or v10 runs) + NEEDS-CODE 3. LIT_ALTERNATIVES.md counted 58 uncovered against the pre-audit queue; the audited values (now the baseline) and the 7 LOO runs (added later) changed the picture: drag 0.6 is now covered by LOO_drag, height 15 / top 8 only jointly by LOO_geometry.
+146 alternatives. Covered by a queued entry: **83** = COVERED 54 (on the MR family, incl. the audited baseline) + APPROX 4 + PARTIAL 14 (with a second change or another mechanism) + OTHER-FAMILY 11 (lit / cooperation / TOST / A5 sensitivity only). Not covered: **63** = UNCOVERED 57 + NOT-QUEUED 3 (no queued run) + NEEDS-CODE 3. Against the pre-audit queue LIT_ALTERNATIVES.md counts 58 uncovered; with the audited values as the baseline and the 7 LOO runs, drag 0.6 is covered by LOO_drag, height 15 / top 8 only jointly by LOO_geometry.
 
 | row | label | value | realism | coverage | queued | note |
 |---|---|---|---|---|---|---|
@@ -345,7 +345,7 @@ Scan of the resolved MOST_REALISTIC_AUDITED_LIT_P10 dict plus the global transpo
 | 90 | hard_current2 | 2 | 3 | COVERED | MOST_REALISTIC_AUDITED_LIT_P10 | S6 hardness in MR |
 | 91 | day_mixed5588 | {5, 5, 8, 8} | 4 | COVERED | MOST_REALISTIC_AUDITED_LIT_P10 | audited baseline |
 | 92 | day_all5 | 5 for dress and build | 2 | COVERED | MOST_REALISTIC_C2_day5_P10 |  |
-| 93 | day_all8 | 8 everywhere | 2 | NOT-QUEUED |  | v10 runs only (webster_day_fix false) |
+| 93 | day_all8 | 8 everywhere | 2 | NOT-QUEUED |  | no queued run (webster_day_fix false) |
 | 94 | wall_erasmus10.5 | 10.5 | 3 | COVERED | MOST_REALISTIC_C2_wall_P10 |  |
 | 95 | wall_hurst6.29 / wall_devolder10 / wall_devolder7.85 | 6.29 / 10.0 / 7.85 | 3 | COVERED | MOST_REALISTIC_C3_set_low_P10; MOST_REALISTIC_C3_set_high_P10; MOST_RE |  |
 | 96 | wall_mayes29 | 29.4 (blocks ≤ 0.2 m3) | 2 | UNCOVERED |  |  |
@@ -374,8 +374,8 @@ Scan of the resolved MOST_REALISTIC_AUDITED_LIT_P10 dict plus the global transpo
 | 119 | hours8 | 8 | 4 | COVERED | MOST_REALISTIC_AUDITED_LIT_P10 | audited baseline |
 | 120 | hours5 / hours10 | 5 / 10 | 3 / 2 | OTHER-FAMILY | *_TOST_hours_per_day_min / _max | cooperation family at 6 / 10 h; 5 h not run |
 | 121 | season90 | 90 | 4 | COVERED | MOST_REALISTIC_AUDITED_LIT_P10 | audited baseline |
-| 122 | season40 / 45 / 60-100 / 75 / 120 | 40; 45; 80 (60-100); 75; 120 | 3 | NOT-QUEUED |  | 40 / 120-day runs of 29 Oct are obsolete (pre-fix code) |
-| 123 | season220 / 290 / 328 | 220; 290; 328 | 1 | NOT-QUEUED |  | 210-day run of 29 Oct obsolete |
+| 122 | season40 / 45 / 60-100 / 75 / 120 | 40; 45; 80 (60-100); 75; 120 | 3 | NOT-QUEUED |  | no queued run |
+| 123 | season220 / 290 / 328 | 220; 290; 328 | 1 | NOT-QUEUED |  | no queued run |
 | 124 | sea_HF2kn | 2 | 3 | COVERED | MOST_REALISTIC_AUDITED_LIT_P10 | MR sea 2 kn; also S9_sea_2kn (cooperation) |
 | 125 | sea_HF_paddled0.67kn | 0.67 (0.54-0.81) | 3 | UNCOVERED |  | needs a 0.67-kn sea table |
 | 126 | sea_unladen5kn / sea_PI4-6kn / sea_doran10kn | 5; 4-6; 10 | 2 | OTHER-FAMILY | S9_sea_4kn; S9_sea_5kn; S9_sea_6kn; S9_alliance_sea_6; S9_pre_sea_5; G | cooperation / A* / pre-network families; 10 kn not run |
@@ -400,7 +400,7 @@ Scan of the resolved MOST_REALISTIC_AUDITED_LIT_P10 dict plus the global transpo
 | 145 | adult_abrams0.2-0.33 | 0.27 | 2 | APPROX | MOST_REALISTIC_POP_men_only_P10 | 0.2 = lower end of 0.2-0.33 |
 | 146 | adult_wunderlich0.6 | 0.6 | 2 | COVERED | MOST_REALISTIC_POP_adult06_P10 | one change vs audited baseline |
 
-## 4. Scenario provenance relabel (specified by the authors)
+## 4. Scenario provenance labels (specified by the authors)
 
-SCENARIO_PROVENANCE_v2.csv = SCENARIO_PROVENANCE.csv with every non-literature origin set to "Authors' idea" (specified by the authors), in `origin` and `idea_group_origin`; the old labels are kept in `origin_v1` / `idea_group_origin_v1`, and the former 'literature-anchored' qualifier in `origin_anchoring`. Rows: 502; origin now: Authors' idea 389, Literature (comparative) 36, Literature 77; literature-anchored 62. This includes MOST_REALISTIC, REALISTIC and S8_learning (previously 'Agent's design choice, accepted by the authors, literature-anchored'). Parameter labels in PARAM_AUDIT are unchanged.
+In the scenario provenance table of the results package every non-literature origin is "Authors' idea" (specified by the authors), in `origin` and `idea_group_origin`; the 'literature-anchored' qualifier is in `origin_anchoring`. Rows: 502; origin: Authors' idea 389, Literature (comparative) 36, Literature 77; literature-anchored 62. This includes MOST_REALISTIC, REALISTIC and S8_learning. Parameter labels in PARAM_AUDIT are unchanged.
 

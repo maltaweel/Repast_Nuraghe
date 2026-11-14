@@ -23,8 +23,8 @@ What each input needs (details: HOW_TO_USE.md and data/README.md)
 | dem/sardinia_dem_GLO30_25832.tif        | Copernicus GLO-30, 8 tiles (AWS)      | tools_extra/build_dem.py      | no with the public mask (yes with the run's mask) |
 | costsurface/*_mu03_*_int.tif, *_slope_* | from the DEM                          | code/tools/build_cost_mu.py, tools_extra/build_slope.py | only if the DEM is identical |
 
-Every download is streamed to disk (DOWNLOADS, default DATA_DIR/_downloads), checked against the SHA-256 observed
-on 2 November 2026 where the provider serves a fixed file, and kept so that a rerun downloads nothing. The result of
+Every download is streamed to disk (DOWNLOADS, default DATA_DIR/_downloads), checked against the SHA-256 of the copy
+the model's inputs were built from where the provider serves a fixed file, and kept so that a second run downloads nothing. The result of
 every input is written to DATA_DIR/fetch_provenance.json; notebooks/repro.py (preflight) reads it, so a file that
 was rebuilt from the official source and is not byte-comparable is reported as such instead of as "wrong".
 
@@ -52,10 +52,10 @@ REPO = os.path.dirname(HERE)
 MANIFEST = os.path.join(HERE, "inputs_manifest.csv")
 PROVENANCE = "fetch_provenance.json"
 
-# Prebuilt derived-input pack (the cached derived inputs of the full audited run). Placeholder until the results
-# package is public: set it here, with --derived-url, or with the environment variable NURAGHE_DERIVED_URL.
+# Optional prebuilt derived-input pack (the cached derived inputs of the full audited run; not included in the
+# repository): set its URL here, with --derived-url, or with the environment variable NURAGHE_DERIVED_URL.
 DERIVED_URL = os.environ.get("NURAGHE_DERIVED_URL") or None
-DERIVED_SHA256 = None            # to be filled together with DERIVED_URL
+DERIVED_SHA256 = None            # optional SHA-256 of the pack at DERIVED_URL
 
 # --------------------------------------------------------------------------------------------------- Nurnet files
 # Nurnet's data, published in this repository (data/nurnet/); copied to the names the configuration expects.
@@ -69,7 +69,7 @@ NURNET_NOTE = (
     "nurnet.presidente@gmail.com.")
 
 # --------------------------------------------------------------------------------------------------- sources
-# SHA-256 / size of the files the providers served on 2 November 2026 (checked when downloaded; a difference means
+# SHA-256 / size of the files the providers served for the model's inputs (checked when downloaded; a difference means
 # the provider changed the file and is reported, the result is then checked against the manifest as usual).
 DEM_TILES = {
     "Copernicus_DSM_COG_10_N38_00_E008_00_DEM": (2041115, "75af652dfb44c0394d1439bf646ae701728de734ef6fb034ae7d7166c4b5847c"),
@@ -153,7 +153,7 @@ def download(url, dest, size=None, sha=None, tries=3, timeout=120):
             got = h.hexdigest()
             ok = None if sha is None else (got == sha)
             log(f"  got  {os.path.basename(dest)} ({n:,d} B, {time.time() - t0:.0f} s)"
-                + ("" if ok is None else ("  SHA-256 OK" if ok else "  SHA-256 DIFFERS from the file served on 2 Nov 2026")))
+                + ("" if ok is None else ("  SHA-256 OK" if ok else "  SHA-256 DIFFERS from the file the inputs were built from")))
             return got, ok
         except Exception as e:                                   # network hiccup: retry
             last = e
@@ -283,7 +283,7 @@ def do_soils(data_dir, dl, **_):
     with open(os.path.join(data_dir, rel), "wb") as f:
         f.write(b)
     rows = check_files(data_dir, [rel], status_if_differs="differs",
-                       why="the provider's layer changed since 20 Oct 2026 (35 units expected); compare the features")
+                       why="the provider's layer changed since the run's copy was fetched (35 units expected); compare the features")
     for r in rows:
         r["source"] = "AGRIS WFS " + SOILS_WFS
         if r["status"] == "identical":
@@ -379,8 +379,8 @@ def fetch_derived(derived_dir, url=None, sha=None, downloads=None):
     """Download + unpack the prebuilt derived-input pack (zip or tar.gz) into DERIVED_DIR."""
     url = url or DERIVED_URL
     if not url:
-        log("DERIVED_URL is not set: the prebuilt derived-input pack is not public yet (results package, DOI "
-            "pending). Rebuild instead (--rebuild-derived; HOW_TO_USE.md, section Derived inputs) or set DERIVED_URL when it is.")
+        log("DERIVED_URL is not set: the prebuilt derived-input pack is not included in the repository. "
+            "Rebuild the derived inputs (--rebuild-derived; HOW_TO_USE.md, section Derived inputs) or set DERIVED_URL to a copy of the pack.")
         return derived_status(derived_dir)
     downloads = downloads or os.path.join(os.path.dirname(os.path.abspath(derived_dir)), "_downloads")
     name = os.path.basename(url.split("?")[0]) or "derived_pack"

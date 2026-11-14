@@ -1,4 +1,4 @@
-"""Summary of the 1 Nov 2026 (b) wider-literature runs (C1-C3, M1-M4) against MOST_REALISTIC_P10, from the per-seed
+"""Summary of the wider-literature runs (C1-C3, M1-M4) against MOST_REALISTIC_P10, from the per-seed
 part files. Copy of tools/gaps_summary.py (same definitions, so MOST_REALISTIC_P10 reproduces its row) plus:
   mh_<stage>       island man-hours per stage (quarry, dress, transport, build, lift, setup, walk)
   M1: cohort_cluster  mean over sites of the share of their neighbours within 5 km that are in the same P10 cohort

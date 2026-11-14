@@ -4,7 +4,7 @@ season_days,T3,unif,40.0,120.0,90.0,cfg.alliance.season_days,"communal-labour al
 block_min_kg,B4,unif,30.0,143.0,60.0,cfg.stone.block_min_kg,"lower = -50%; upper 143 kg = Webster 1991: 852 '< 0.06 m3' x 2,386 (lit_alternatives blockmin_webster143)",
 rho_limestone,B9,unif,2420.0,2711.0,2600.0,cfg.lit_scenarios.density_kg_m3.limestone/marble,"audit B9: textbook limestone 2,420 (REPORTED-ONLY) to Turner 2020 marble 2,711 (comparative)",
 hardness_hard,B11,unif,1.0,3.0,2.0,cfg.lit_scenarios.hardness.basalt = .granite (others stay 1.0),+/-50% of 2.0; 1.0 = no hard-stone penalty (physical floor); Hurst 1905 dressing ratio 1.83 inside,
-bedrock_everywhere,Q3,binary,,,True,cfg.add4.bedrock_everywhere,"PI rule L2 on (headline) vs off (v15b rule: off-outcrop sites collect scree, 2.0 ph/m3)","[true, false]"
+bedrock_everywhere,Q3,binary,,,True,cfg.add4.bedrock_everywhere,"rule L2 on (headline) vs off (off-outcrop sites collect scree, 2.0 ph/m3)","[true, false]"
 dress_rule,Q4,binary,,,by_towers,cfg.lit_scenarios.list.REALISTIC.mixed.dress_none_max_towers / dress_fine_min_towers,"rule (none 1 tower, Webster 2, fine >= 3) vs no rule (Webster dressing at every site: none_max 0, fine_min 99)","[""by_towers"", ""webster_all""]"
 lift_share_of_build,G6,unif,0.25,0.75,0.5,cfg.lit_scenarios.lift_share_of_build,+/-50% of 0.5 (no source),
 stair_lever_last_m,G7,unif,0.5,1.5,1.0,cfg.lit_scenarios.stair_lever_last_m,+/-50% of 1.0 m (Laner 1999 gives no time),

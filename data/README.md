@@ -80,8 +80,8 @@ The published layer has the original map units only. `lithology_STONE_classes.cs
 mapping of each map unit (`CODE`) to `STONE` and `BUILDSTONE` as used in the runs (36 units).
 `tools_extra/build_lithology.py ZIP OUT.shp` reads `Shapefile/carta_litologica2019.shp` inside the zip (EPSG:3003,
 47,780 polygons, fields `OBJECTID`, `LIV_2`), reprojects it to EPSG:25832 and writes `ID` (= `OBJECTID`), `CODE`
-(= `LIV_2`), `DESC_IT`, `DESC_EN`, `STONE`, `BUILDSTONE` and `AREA_KM2`. Compared with the run's copy (exported on
-14 Oct 2026 from the same map as held in a project database): same polygons, IDs, map units and vertex counts, `.prj`
+(= `LIV_2`), `DESC_IT`, `DESC_EN`, `STONE`, `BUILDSTONE` and `AREA_KM2`. Compared with the run's copy (exported
+from the same map as held in a project database): same polygons, IDs, map units and vertex counts, `.prj`
 and `.cpg` identical, coordinates within 5 mm, rows in another order; so `.shp/.shx/.dbf` are not byte-identical.
 
 ## 4. DEM
@@ -95,7 +95,7 @@ and `.cpg` identical, coordinates within 5 mm, rows in another order; so `.shp/.
 | Credit | **Copernicus DEM, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA** |
 | Licence | Copernicus DEM licence (see provider) |
 | Link | https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM ; open AWS bucket (no login): `https://copernicus-dem-30m.s3.amazonaws.com/<tile>/<tile>.tif` for the 8 tiles `Copernicus_DSM_COG_10_N{38,39,40,41}_00_E{008,009}_00_DEM` |
-| Rebuild | `tools_extra/build_dem.py TILES_DIR OUT.tif --mask region limiteAmministrRegionale_CTR.shp`: the run's recipe (mosaic, reprojection to EPSG:25832 at 30 m, bilinear, sea masked outside the land polygons buffered by 300 m, the run's 4808 x 9080 grid). The run masked with the regional river catchments as held in a project database (not public); the public mask is the RAS regional boundary (https://webgis.regione.sardegna.it/scaricocartografiaETL/limitiAmministrativi/limiteAmministrRegionale/limiteAmministrReg_CTR.zip), so the file is not byte-identical (about 75 km2 of mostly coastal sea cells differ) |
+| Rebuild | `tools_extra/build_dem.py TILES_DIR OUT.tif --mask region limiteAmministrRegionale_CTR.shp`: the run's recipe (mosaic, reprojection to EPSG:25832 at 30 m, bilinear, sea masked outside the land polygons buffered by 300 m, the run's 4808 x 9080 grid). The run masked with the regional river catchments as held in a project database (not distributed); the public mask is the RAS regional boundary (https://webgis.regione.sardegna.it/scaricocartografiaETL/limitiAmministrativi/limiteAmministrRegionale/limiteAmministrReg_CTR.zip), so the file is not byte-identical (about 75 km2 of mostly coastal sea cells differ) |
 
 ## 5. Soils (land capability)
 
@@ -120,7 +120,7 @@ and `.cpg` identical, coordinates within 5 mm, rows in another order; so `.shp/.
 | Credit | Regione Autonoma della Sardegna |
 | Licence | see provider |
 | Link | Sardegna Geoportale, catalogue record "PPR06 - Fiumi torrenti e altri corsi d'acqua (Elementi lineari)" (R_SARDEG:PKLBJ, https://webgis2.regione.sardegna.it/geonetwork/srv/ita/catalog.search); direct download (zip, 10 MB): https://webgis.regione.sardegna.it/scaricocartografiaETL/ppr/fiumiTorrenti_ARC.zip |
-| Rebuild | `tools_extra/build_rivers.py ZIP OUT.shp` (EPSG:3003 -> EPSG:25832, `ID` = `idFeature`, `LEN_M`). Compared with the run's copy (exported on 14 Oct 2026 from the same layer as held in a project database): same 41,877 segments, IDs and vertices, `.prj` and `.cpg` identical, coordinates within 5 mm, rows in another order; so `.shp/.shx/.dbf` are not byte-identical |
+| Rebuild | `tools_extra/build_rivers.py ZIP OUT.shp` (EPSG:3003 -> EPSG:25832, `ID` = `idFeature`, `LEN_M`). Compared with the run's copy (exported from the same layer as held in a project database): same 41,877 segments, IDs and vertices, `.prj` and `.cpg` identical, coordinates within 5 mm, rows in another order; so `.shp/.shx/.dbf` are not byte-identical |
 
 ## 7. Derived inputs
 
@@ -129,5 +129,5 @@ code in this repository: see `derived/README.md`.
 
 ## URL check
 
-Every link above was checked on 2 November 2026 with `curl -sIL` (HTTP 200 after redirects); every download of
-`notebooks/fetch_data.py` was tested the same day (the soils, rivers, lithology and the 8 DEM tiles in full).
+Every link above was checked with `curl -sIL` (HTTP 200 after redirects); every download of
+`notebooks/fetch_data.py` was tested (the soils, rivers, lithology and the 8 DEM tiles in full).

@@ -4,11 +4,11 @@ Everything here is computed from the raw inputs (`data/README.md`) by code in th
 committed. Two ways to get it:
 
 1. **Download** the cached derived inputs of the full audited run from the results package
-   ("data file/nuraghe-build-abm-full-audited", Nurnet cloud; DOI pending) and put them in
+   ("data file/nuraghe-build-abm-full-audited", Nurnet cloud; not included in this repository) and put them in
    `data/derived/cache/` (notebooks) or in `<run folder>/outputs/caches/config_full_audited/` (the queue, see the
    top-level README, "Run the queue").
-   When the pack is public: `python notebooks/fetch_data.py --derived-url URL` (or `DERIVED_URL` in
-   `notebooks/02_inputs.ipynb`, section 0b) downloads and unpacks it (placeholder until then).
+   `python notebooks/fetch_data.py --derived-url URL` (or `DERIVED_URL` in `notebooks/02_inputs.ipynb`, section 0b)
+   downloads and unpacks it from a URL you give.
 2. **Rebuild** them with the commands below; `python notebooks/fetch_data.py --rebuild-derived [--stone-rule
    hybrid|stones7]` (or 02, section 0b: automatic when any derived input is missing and no pack is available; `REBUILD_DERIVED = True` forces it) runs them all in this order into `data/derived/cache/`.
 
@@ -24,9 +24,9 @@ In every command `CFG` is a configuration file whose `data_dir` points at the ra
 the cache being built (`config/config_full_audited.yaml`: `outputs/cache` relative to the config folder). Run from
 `code/`. All rasters are on the 30 m DEM grid in EPSG:25832.
 
-**Provenance note.** In the project's runs, the base cache was not rebuilt in one go: its entries were reused
-(linked) from earlier runs of the same project (haul tables, outcrop raster and per-friction tables of 29 Oct 2026;
-k-best routes of 2 Nov 2026; food catchments of 1 Nov 2026; cost rasters per friction), the base haul tables were
+**Provenance note.** In the project's runs, the base cache was not rebuilt in one go: its entries were built in
+several steps of the project and linked (haul tables, outcrop raster and per-friction tables; k-best routes; food
+catchments; cost rasters per friction), the base haul tables were
 rebuilt with the on-outcrop test of `code/preprocess.py`, and the sea tables were rebuilt per configuration. The
 commands below are those the project used. A complete rebuild with `code/` has not been compared byte for byte with
 the reused files

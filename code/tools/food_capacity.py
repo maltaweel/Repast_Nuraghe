@@ -1,4 +1,4 @@
-"""S12 (1 Nov 2026) input: land of each nuraghe's catchment by land-capability class.
+"""S12 input: land of each nuraghe's catchment by land-capability class.
 
   python tools/food_capacity.py config.yaml --soils soils250k.geojson --radius 2000 --out CACHE/food/site_food.csv
 

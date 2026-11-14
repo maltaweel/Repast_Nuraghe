@@ -60,15 +60,15 @@ def load_haul(base_haul, cfg, kn):
     return h
 
 
-# v16 (addendum 4 L4, flag add4.sea_priced_as_charged): every sea route the table builder found (not only the rows
-# whose route beat the land route in the builder's own per-crew currency), written by v16 tools/sea_routes.py as r_*
+# Addendum 4 L4 (flag add4.sea_priced_as_charged): every sea route the table builder found (not only the rows
+# whose route beat the land route in the builder's own per-crew currency), written by tools/sea_routes.py as r_*
 # columns. The model decides sea vs land on the cost it charges (alliance.Static._l4_sea_faces).
 ROUTE_COLS = ["r_found", "r_hf1", "r_hm1", "r_hf2", "r_hm2", "r_sea_km", "r_hoist_m", "r_quarry_x", "r_quarry_y",
               "r_quarry_region", "r_quarry_stone"]
 
 
 def load_routes(base_haul, cfg, kn):
-    """The r_* route columns of the sea table for the sites of base_haul (same order). Needs a v16-built table."""
+    """The r_* route columns of the sea table for the sites of base_haul (same order). Needs a table built by tools/sea_routes.py."""
     t = pd.read_csv(haul_csv(cfg, kn)).set_index("UID")
     miss = [c for c in ROUTE_COLS if c not in t.columns]
     assert not miss, f"add4.sea_priced_as_charged needs sea tables rebuilt with v16 tools/sea_routes.py (missing {miss})"

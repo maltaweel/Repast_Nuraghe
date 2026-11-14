@@ -1,4 +1,4 @@
-"""Relationship census (a Nurnet collaborator's definitions), recomputed from the v4 pair files with ask/refusal counters.
+"""Relationship census (a Nurnet collaborator's definitions), recomputed from the pair files with ask/refusal counters.
 
   python tools/census.py config.yaml [--seeds 1-100]
 

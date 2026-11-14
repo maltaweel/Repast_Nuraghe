@@ -451,8 +451,8 @@ def main(cfg_path, speeds):
         h["quarry_region"] = -1
         h.loc[use, "quarry_region"] = lab_flat[qf[use]]
         h["trip_h"] = np.where(use, st, land_h)
-        # v16 (addendum 4 L4): every found route (la != lb), whatever the mode, in r_* columns, so the model can
-        # choose sea vs land on the cost it charges (flag add4.sea_priced_as_charged). The columns above are unchanged.
+        # Addendum 4 L4: every found route (la != lb), whatever the mode, in r_* columns, so the model can
+        # choose sea vs land on the cost it charges (flag add4.sea_priced_as_charged). The columns above are kept as they are.
         rf = found & (la != lb)
         qa = np.where(rf, rr["q_flat"], -1).astype(np.int64)
         h["r_found"] = rf

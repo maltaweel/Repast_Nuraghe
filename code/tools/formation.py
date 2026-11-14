@@ -1,4 +1,4 @@
-"""How the cooperation networks form over time (a Nurnet collaborator's help_log / allied_season bookkeeping, folded into v4).
+"""How the cooperation networks form over time (a Nurnet collaborator's help_log / allied_season bookkeeping).
 
   python tools/formation.py config.yaml
 

@@ -1,6 +1,6 @@
 """Tests of the switch alliance.help_only_if_started (robustness check: in the reference engine a community
-whose nuraghe has not started yet could help others). Default false = the published behaviour (every candidate in
-range, started or not); true = communities not yet started (help_ok False: start not reached / cohort not yet fired)
+whose nuraghe has not started could help others). Default false = the published behaviour (every candidate in
+range, started or not); true = communities that have not started (help_ok False: start not reached / cohort not fired)
 are never help candidates (radius requests, tie requests, relays, lintel helpers) nor levy helpers. A season's whole
 start batch is marked before its start_tower calls, so batch members can help one another's first towers. Fake models (no kbest / raster loading); the signature test reads
 the configuration (NURAGHE_TEST_CONFIG, as the other tests).

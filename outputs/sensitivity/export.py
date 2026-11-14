@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export the sensitivity results of the final model (code v17) into outputs/sensitivity/.
+"""Export the sensitivity results of the model (code/) into outputs/sensitivity/.
 
 Reads the run folders of the project (read-only; nothing is written there) and writes small, island-level tables:
 designs, one row per evaluation / run, and Sobol / Morris indices with 95% confidence intervals. Raw per-site outputs
@@ -111,8 +111,8 @@ class Exporter:
         if partial and not self.dry:
             raise SystemExit(f"export: refusing to export PARTIAL {rel} (only with --dry-run)")
         self.manifest.append({"file": rel, "bytes": len(data), "rows": rows if rows is not None else "",
-                              "sha256": hashlib.sha256(data).hexdigest(), "source": source,
-                              "exported": self.today})
+                              "sha256": hashlib.sha256(data).hexdigest(),
+                              "source": source})
         tag = "PARTIAL " if partial else ""
         print(f"  {'(dry) ' if self.dry and not self.scratch else ''}{tag}{rel}: {len(data):,} B"
               + (f", {rows:,} rows" if rows is not None else ""))
@@ -158,7 +158,7 @@ class Exporter:
     # ---- helpers ----------------------------------------------------------------------------------------------------
     @staticmethod
     def no_times(data):
-        """drop times of day after dates in free text ('10 Nov 13:47' -> '10 Nov'), as the repository's other texts."""
+        """drop times of day that follow a day and month in free text (the time is removed, the rest is kept)."""
         return TIME_OF_DAY.sub(r"\1", data.decode("utf-8")).encode("utf-8")
 
     @staticmethod
@@ -233,7 +233,7 @@ class Exporter:
         ok = self.src(A5_LOGS + "/q_A5_SENSITIVITY_27cells.ok")
         cells = sorted(os.path.basename(d) for d in glob.glob(self.src(A5_ROOT + "/sensitivity/SENS_*")))
         if not os.path.exists(ok) or len(cells) != 27:
-            self.status["a5"] = f"pending ({len(cells)} cells, ok marker {os.path.exists(ok)})"
+            self.status["a5"] = f"incomplete ({len(cells)} cells, ok marker {os.path.exists(ok)})"
             print("  " + self.status["a5"])
             return
         names = ["A0_alone"] + cells
@@ -284,7 +284,7 @@ class Exporter:
 
     # ================================================================================================================
     def sobol2(self, coop_prefix=None):
-        print("[sobol2] Sobol run 2 on the v17 headline (26 factors, N = 512)")
+        print("[sobol2] Sobol analysis of the headline (26 factors, N = 512)")
         R0 = SOBOL2
         if not os.path.exists(self.src(R0 + "/problem.json")):
             self.status["sobol2"] = "run folder missing"
@@ -294,8 +294,8 @@ class Exporter:
         self.put_file("sobol2/design.csv.gz", R0 + "/design.csv", gz=True)
         self.put_file("sobol2/factors.csv", R0 + "/factors.csv", transform=self.no_times)
         self.put_file("sobol2/problem.json", R0 + "/problem.json", transform=lambda d: self.problem_public(
-            d, "code/ (CODE_VERSION 2026-11-09-v17) + the config flag sobol.lift_learning (code variant code_v17s; "
-               "flag off = code v17 exactly)", "config/v16_final/config_full_audited.yaml"))
+            d, "code/ + the config flag sobol.lift_learning (sensitivity/sobol2/code_variant.patch; "
+               "flag off = code/ exactly)", "config/scenarios/config_full_audited.yaml"))
         D = pd.read_csv(self.src(R0 + "/design.csv"), usecols=["eval_id", "base_row", "block"])
         R = self.read_csvs(self.src(R0 + "/evals/*/eval_*.csv"))
         R = R[[c for c in R.columns if c not in DROP_COLS]]
@@ -307,7 +307,7 @@ class Exporter:
         complete = not missing
         partial = not complete
         if partial and not self.dry:
-            self.status["sobol2"] = f"inputs exported; results pending ({len(have):,}/{len(D):,} evaluations)"
+            self.status["sobol2"] = f"inputs exported; results incomplete ({len(have):,}/{len(D):,} evaluations)"
             return
         st = R.groupby("eval_id").status.agg(lambda s: "ok" if (s == "ok").all() else
                                              ("error" if (s == "error").any() else "unfinished"))
@@ -350,7 +350,7 @@ class Exporter:
         self.put_file("coop_sobol/design.csv.gz", R0 + "/design.csv", gz=True)
         self.put_file("coop_sobol/factors.csv", R0 + "/factors.csv", transform=self.no_times)
         self.put_file("coop_sobol/problem.json", R0 + "/problem.json", transform=lambda d: self.problem_public(
-            d, "code/ (CODE_VERSION 2026-11-09-v17)", "config/v16_final/config_full_audited.yaml"))
+            d, "code/", "config/scenarios/config_full_audited.yaml"))
         D = pd.read_csv(self.src(R0 + "/design.csv"), usecols=["eval_id", "base_row", "block", "seed"])
         assert (D.base_row == D.eval_id // (k + 2)).all()
         loaded, notes = {}, {}
@@ -373,7 +373,7 @@ class Exporter:
         else:
             mode, n_use = "partial", None
         if mode == "partial" and not self.dry:
-            self.status["coop_sobol"] = ("inputs exported; results pending (" + ", ".join(
+            self.status["coop_sobol"] = ("inputs exported; results incomplete (" + ", ".join(
                 f"{s} {n:,}/{len(D):,}" for s, n in notes.items()) + ")")
             print("  " + self.status["coop_sobol"])
             return
@@ -423,7 +423,7 @@ class Exporter:
 
     # ================================================================================================================
     def morris(self):
-        print("[morris] 32-factor Morris screen (morris32) and physical Morris (morris_phys) on v17")
+        print("[morris] 32-factor Morris screen (morris32) and physical Morris (morris_phys) on code/")
         done_any = False
         m32 = MORRIS32
         if os.path.exists(self.src(m32 + "/MORRIS_RESULTS.md")) and os.path.exists(self.src(m32 + "/morris_indices.csv")):
@@ -431,13 +431,13 @@ class Exporter:
             n_ev = pd.read_csv(self.src(m32 + "/design.csv"), usecols=["eval_id"]).eval_id.nunique()
             okn = R[R.status.eq("ok")].groupby("eval_id").seed.nunique()
             if int((okn == 3).sum()) < n_ev and not self.dry:
-                print(f"  morris32: {int((okn == 3).sum())}/{n_ev} evaluations complete: pending")
+                print(f"  morris32: {int((okn == 3).sum())}/{n_ev} evaluations complete: incomplete")
             else:
                 self.put_file("morris/morris32_design.csv", m32 + "/design.csv")
                 self.put_file("morris/morris32_factors.csv", m32 + "/factors.csv", transform=self.no_times)
                 self.put_file("morris/morris32_problem.json", m32 + "/problem.json", transform=lambda d:
-                              self.problem_public(d, "code/ (CODE_VERSION 2026-11-09-v17)",
-                                                  "config/v16_final/config_full_audited.yaml"))
+                              self.problem_public(d, "code/",
+                                                  "config/scenarios/config_full_audited.yaml"))
                 self.put_df("morris/morris32_runs.csv", R[[c for c in R.columns if c not in DROP_COLS]],
                             m32 + "/results_per_seed.csv")
                 self.put_file("morris/morris32_ee.csv", m32 + "/morris_ee.csv")
@@ -474,14 +474,14 @@ class Exporter:
             done_any = True
         else:
             print("  morris_phys: no results yet")
-        self.status["morris"] = "exported" if done_any else "pending (no Morris run on v17 has finished)"
+        self.status["morris"] = "exported" if done_any else "incomplete (no Morris run has finished)"
 
     # ================================================================================================================
     def feasibility(self):
-        print("[feasibility] feasibility grid on the sourced range (v17)")
+        print("[feasibility] feasibility grid on the sourced range")
         f = FEAS
         if not os.path.exists(self.src(f + "/grid.ok")):
-            self.status["feasibility"] = "pending (grid not finished)"
+            self.status["feasibility"] = "incomplete (grid not finished)"
             print("  " + self.status["feasibility"])
             return
         for n in ("grid", "boundary_seeds"):

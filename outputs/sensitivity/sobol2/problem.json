@@ -148,8 +148,8 @@
   3
  ],
  "scenario": "MOST_REALISTIC_AUDITED_LIT_P10",
- "code": "code/ (CODE_VERSION 2026-11-09-v17) + the config flag sobol.lift_learning (code variant code_v17s; flag off = code v17 exactly)",
- "config": "config/v16_final/config_full_audited.yaml",
+ "code": "code/ + the config flag sobol.lift_learning (code variant: sensitivity/sobol2/code_variant.patch; flag off = code/ exactly)",
+ "config": "config/scenarios/config_full_audited.yaml",
  "code_version": "2026-11-09-v17",
  "fixed_at_headline": [
   "relay_fractions",

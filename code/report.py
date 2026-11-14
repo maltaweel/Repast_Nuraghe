@@ -119,7 +119,7 @@ SC_ABBR = {"none": "NONE", "low": "LOW", "mixed": "MIX", "mostly": "MOST", "full
 
 
 def _sc_abbr(names):
-    """K1 (30 Oct b): unique <= 6-character abbreviations for the MH_/DAY_ shapefile fields. SC_ABBR names keep
+    """K1: unique <= 6-character abbreviations for the MH_/DAY_ shapefile fields. SC_ABBR names keep
     theirs (unchanged). Other names use their first 6 characters, upper case; when several names share that prefix
     (all four S9_sea_*kn gave S9_SEA) each of them uses the LAST 6 alphanumeric characters instead (SEA4KN, SEA2KN, ...),
     and a 2-digit suffix if that still collides. Same purpose as report_alliance._fields (B21)."""

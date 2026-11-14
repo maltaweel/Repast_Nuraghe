@@ -1,19 +1,18 @@
-# sobol2: Sobol run 2 on the headline
+# sobol2: Sobol analysis of the headline
 
-**Status: the inputs are here; the results land with the final pass** (the run was 6,343 of 14,336 evaluations
-on 11 Nov 2026). Until then this folder holds only the design.
+The design (inputs) and the results of the complete run (14,336 evaluations).
 
-## Design (inputs, here now)
+## Design (inputs)
 
 - Headline cell `MOST_REALISTIC_AUDITED_LIT_P10`, configuration `config/scenarios/config_full_audited.yaml`
   (read-only; each factor is applied to an in-memory copy).
 - Code: `code/` with one added config flag, `sobol.lift_learning` (factor 26).
-  Flag off = `code/` exactly (checked per site, bit for bit, on seeds 1-2); flag on = an earlier lift rule
+  Flag off = `code/` exactly (checked per site, bit for bit, on seeds 1-2); flag on = the alternative lift rule
   (lift discounted by learning and skill). The code variant (a patch on `code/`) and the run harness are in
   `sensitivity/sobol2/`.
 - Saltelli design: SALib 1.6.0 `sobol.sample(N=512, calc_second_order=False, scramble=True, seed=20261110)`,
   k = 26, so N (k + 2) = **14,336 evaluations**. One evaluation = one design row x seeds 1, 2, 3 (common random
-  numbers); its value is the 3-seed mean. 43,008 model runs. Started 10 Nov 2026.
+  numbers); its value is the 3-seed mean. 43,008 model runs.
 - Outputs: island years = (max finish day + 1) / season days; island man-hours = sum of `mh_total`; transport share
   = sum `mh_transport` / sum `mh_total`.
 - Level mapping of the uniform sample u: `unif` lo + u (hi - lo); `int` lo + floor(u (hi - lo + 1)) (equal-probability
@@ -58,9 +57,9 @@ Config keys, sources and the reason for each range: `factors.csv`.
 | `factors.csv` | the 26 factors: config key, kind, range or levels, headline value, source and reason |
 | `problem.json` | the SALib problem, N, sampler, seeds, scenario, code, configuration, level mapping |
 
-## Results (with the final pass)
+## Results
 
-Exported by `../export.py` once all 14,336 evaluations have a result:
+Exported by `../export.py` (all 14,336 evaluations have a result):
 
 | file | content |
 |---|---|

@@ -247,8 +247,8 @@ class Site(core.Agent):
             if oxen is not None:
                 pull = 1e12                                        # human crew = drover + helper, never split
         # heavy blocks: split at the quarry into the fewest equal pieces whose crew fits the largest crew.
-        # N1 (30 Oct b): the largest crew is the cooperator pool OR the largest non-cooperating household,
-        # whichever is bigger (before: the pool alone whenever n_coop > 0, so a bigger household was ignored)
+        # N1: the largest crew is the cooperator pool OR the largest non-cooperating household,
+        # whichever is bigger (a household larger than the pool is not ignored)
         maxcrew = max(self.n_coop, int(self.hh_n.max()) if self.hh_n.size else 0)
         crew0 = np.ceil(mass / pull)
         self.n_splits = 0
@@ -294,7 +294,7 @@ class Site(core.Agent):
         H = float(P["hours_per_day"])
         st = np.zeros(NSTATE)
         if litp is None:
-            if (P.get("v11") or {}).get("webster_day_fix"):      # v11: Webster's man-days at their source day length
+            if (P.get("v11") or {}).get("webster_day_fix"):      # Webster's man-days at their source day length
                 md = P["lit_scenarios"]["webster_md_per_tower"]
                 parts = {k: md[k] for k in ("quarry", "dress", "build")}     # 500 + 1300 + 700 = other_mandays (2500)
                 rest = P["other_mandays_per_tower"] - sum(parts.values())    # 0 with Webster's Table 1
@@ -303,7 +303,7 @@ class Site(core.Agent):
                 st[S_POOLT] = P["other_mandays_per_tower"] * H * tw
             self.stages = None
         else:                                                      # stage-explicit pool
-            # NEW-1 (30 Oct): lever/stair lift is charged per lifted PIECE (blocks after crew/payload splitting);
+            # NEW-1: lever/stair lift is charged per lifted PIECE (blocks after crew/payload splitting);
             # k (drawn blocks) only fixes the mass; n_splits/split_cost_mh stay separate (below)
             self.stages = lit.stage_hours(P, litp, tw, rec["quarry_stone"], int(self.mass.size))
             st[S_POOLT] = self.stages["quarry"] + self.stages["dress"] + self.stages["build"] + self.stages["lift"]
@@ -468,9 +468,9 @@ RES_COLS = ["elapsed_h", "days", "mh_total", "mh_transport", "mh_other", "mh_idl
             "stone_kg", "n_coop", "n_splits", "mh_help", "n_helpers",
             "mh_quarry", "mh_dress", "mh_build", "mh_lift", "ox_h"]
 INT_COLS = ["seed", "gid", "days", "builders", "n_blocks", "n_coop", "n_splits", "n_helpers"]
-# N1 (30 Oct b): the heavy-block split now uses max(cooperator pool, largest household). Hashed into run_signature
-# ONLY for mixed cooperation (0 < p_coop < 1, not patchwork), the only runs whose results change; every other
-# signature (and its cached parts) is unchanged.
+# N1: the heavy-block split uses max(cooperator pool, largest household). Hashed into run_signature
+# ONLY for mixed cooperation (0 < p_coop < 1, not patchwork), the only runs whose results it affects; every other
+# signature (and its cached parts) does not include it.
 SPLIT_VERSION = "2026-10-30b-maxcrew"
 
 
@@ -533,7 +533,7 @@ def load_haul(cfg, a, path):
 
 
 def stale_parts(run_dir, seeds):
-    """N4 (30 Oct b): part files on disk that lack a result column (written by older code under an unchanged
+    """N4: part files on disk that lack a result column (written by a code without that column under the same
     signature). Returns a message naming the first stale file, or None. Counts are never invented."""
     for seed in seeds:
         mk = os.path.join(run_dir, f"seed_{seed:04d}.done")
@@ -563,16 +563,16 @@ def run_signature(cfg, haul, sc):
         import sea as seamod
         h.update(haul[seamod.SEA_COLS].to_csv(index=False).encode())
         h.update(json.dumps(cfg["sea"], sort_keys=True).encode())
-    if (cfg.get("v11") or {}).get("webster_day_fix"):   # v11 (2 Nov 2026): Webster's man-days at source day lengths
+    if (cfg.get("v11") or {}).get("webster_day_fix"):   # Webster's man-days at source day lengths
         h.update(json.dumps(cfg["v11"], sort_keys=True).encode())
     if "lit" in sc:            # literature runs also depend on the lit_scenarios parameters and the quarry stone (S6)
         h.update(json.dumps({k: v for k, v in cfg["lit_scenarios"].items() if k != "list"}, sort_keys=True).encode())
         h.update(haul["quarry_stone"].to_csv(index=False).encode())
         if sc["lit"].get("mixed"):     # per-site rule inputs of a mixed scenario
             h.update(haul[["on_outcrop", "lit_haul_rule", "lit_type"]].to_csv(index=False).encode())
-    # code_v16_final: the code version and the effective add4 settings (L2 acts in lit.resolve_site, season engine only
-    # since the fix of 9 Nov 2026) are always hashed,
-    # so part files written by older code (or under other add4 settings) are never reused
+    # the code version and the effective add4 settings (L2 acts in lit.resolve_site, season engine only)
+    # are always hashed,
+    # so part files written by another code version (or under other add4 settings) are never reused
     h.update(json.dumps(lit.add4(cfg), sort_keys=True).encode())
     h.update(lit.CODE_VERSION.encode())
     return h.hexdigest()[:12]

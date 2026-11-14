@@ -10,7 +10,7 @@ TILES_DIR holds the 8 GLO-30 tiles that cover Sardinia (1 x 1 degree, EPSG:4326,
     Copernicus_DSM_COG_10_N{38,39,40,41}_00_E{008,009}_00_DEM.tif
     https://copernicus-dem-30m.s3.amazonaws.com/<name>/<name>.tif   (notebooks/fetch_data.py downloads and checks them)
 
-Recipe (the steps that produced the run's copy on 14 Oct 2026, unchanged):
+Recipe (the steps that produced the run's copy):
   1. rasterio.merge.merge of the tiles in sorted file-name order; written as an intermediate GeoTIFF with the
      profile of the first tile;
   2. reprojection to EPSG:25832 at 30 m: grid from rasterio.warp.calculate_default_transform(..., resolution=30) on

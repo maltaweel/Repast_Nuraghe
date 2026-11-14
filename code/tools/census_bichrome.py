@@ -1,4 +1,4 @@
-"""v12 S23_bichrome input: straight-line distance (m) from every site to the nearest outcrop cell of basalt (code 3) and
+"""S23_bichrome input: straight-line distance (m) from every site to the nearest outcrop cell of basalt (code 3) and
 of limestone/marble (code 6) on the hybrid outcrop raster (cache/outcrop_code.tif, 30 m), by Euclidean distance
 transform. Writes cache/census/bichrome_dist.csv (UID, dist_basalt_m, dist_limestone_m).
   python tools/census_bichrome.py CACHE_DIR"""
